@@ -82,7 +82,7 @@ struct StatemachineFixture
         fsm_.Init(this, "Fsm");
     }
 
-protected:
+private:
     friend class Fsm; // provide access to private functions of this class
     Fsm fsm_;
 
@@ -94,7 +94,7 @@ protected:
     bool yellow_red_transition2_called_ = false;
     bool on_unhandled_event_called_ = false;
 
-    void CheckAllFalse()
+    void CheckAllFalse() const
     {
         assert(off_entry_called_ == false);
         assert(off_exit_called_ == false);
@@ -105,7 +105,6 @@ protected:
         assert(on_unhandled_event_called_ == false);
     }
 
-private:
     void FsmOffEntry(Fsm::StatePtr /*state*/)
     {
         off_entry_called_ = true;

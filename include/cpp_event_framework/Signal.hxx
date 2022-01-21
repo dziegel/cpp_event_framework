@@ -51,7 +51,7 @@ public:
     /**
      * @brief Get event id
      */
-    IdType Id() const
+    [[nodiscard]] IdType Id() const
     {
         return id_;
     }
@@ -59,7 +59,7 @@ public:
     /**
      * @brief Get event name
      */
-    virtual const char* Name() const = 0;
+    [[nodiscard]] virtual const char* Name() const = 0;
 
     /**
      * @brief Convert an event from shared pointer to void*
@@ -218,7 +218,7 @@ public:
     /**
      * @brief Get event name
      */
-    const char* Name() const override
+    [[nodiscard]] const char* Name() const override
     {
         return typeid(T).name();
         // return abi::__cxa_demangle(typeid(T).name(), nullptr, nullptr, nullptr);

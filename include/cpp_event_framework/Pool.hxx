@@ -49,11 +49,8 @@ public:
      * @param name Pool name (logging)
      */
     Pool(size_t element_size, size_t count, std::string name)
+        : size_(count), element_size_(((element_size + kAlignment) / kAlignment) * kAlignment), name_(std::move(name))
     {
-        name_ = std::move(name);
-        element_size_ = ((element_size + kAlignment) / kAlignment) * kAlignment;
-        size_ = count;
-
         pool_mem_.resize(element_size_ * size_);
         for (size_t i = 0; i < count; i++)
         {
@@ -108,7 +105,7 @@ public:
      *
      * @return size_t
      */
-    size_t Size() const
+    [[nodiscard]] size_t Size() const
     {
         return size_;
     }
@@ -118,7 +115,7 @@ public:
      *
      * @return size_t
      */
-    size_t ElementSize() const
+    [[nodiscard]] size_t ElementSize() const
     {
         return element_size_;
     }
@@ -128,7 +125,7 @@ public:
      *
      * @return const std::string&
      */
-    const std::string& Name() const
+    [[nodiscard]] const std::string& Name() const
     {
         return name_;
     }

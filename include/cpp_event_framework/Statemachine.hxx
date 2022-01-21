@@ -417,7 +417,7 @@ public:
      *
      * @return const std::string&
      */
-    const std::string& Name() const
+    [[nodiscard]] const std::string& Name() const
     {
         return name_;
     }
