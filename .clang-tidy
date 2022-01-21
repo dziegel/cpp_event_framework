@@ -51,7 +51,7 @@ CheckOptions:
     value:           lower_case
   - key:             readability-identifier-naming.IgnoreMainLikeFunctions
     value:           1
-# Added by P+F
+# Added by DZ
   - key:             readability-identifier-naming.ScopedEnumConstantCase
     value:           CamelCase
   - key:             readability-identifier-naming.ScopedEnumConstantPrefix

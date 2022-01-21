@@ -1,5 +1,5 @@
 # Core guidelines formatting style
-# stolen from https://github.com/Microsoft/GSL/blob/master/.clang-format
+# based on https://github.com/Microsoft/GSL/blob/master/.clang-format
 
 # Eclipse specifies different base style on command-line -> fix it
 BasedOnStyle: LLVM
