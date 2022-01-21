@@ -16,11 +16,16 @@
 #include <string>
 #include <vector>
 
-namespace cpp_event_framework {
+namespace cpp_event_framework
+{
 /**
  * @brief State properties flags
  */
-enum class EStateFlags { kNone = 0, kHistory = 1 };
+enum class EStateFlags
+{
+    kNone = 0,
+    kHistory = 1
+};
 /**
  * @brief |= operator for state flags
  *
@@ -28,9 +33,10 @@ enum class EStateFlags { kNone = 0, kHistory = 1 };
  * @param rhs
  * @return EStateFlags&
  */
-inline EStateFlags operator|(EStateFlags lhs, EStateFlags rhs) {
-  using T = std::underlying_type_t<EStateFlags>;
-  return static_cast<EStateFlags>(static_cast<T>(lhs) | static_cast<T>(rhs));
+inline EStateFlags operator|(EStateFlags lhs, EStateFlags rhs)
+{
+    using T = std::underlying_type_t<EStateFlags>;
+    return static_cast<EStateFlags>(static_cast<T>(lhs) | static_cast<T>(rhs));
 }
 /**
  * @brief |= operator for state flags
@@ -39,9 +45,10 @@ inline EStateFlags operator|(EStateFlags lhs, EStateFlags rhs) {
  * @param rhs
  * @return EStateFlags&
  */
-inline EStateFlags &operator|=(EStateFlags &lhs, EStateFlags rhs) {
-  lhs = lhs | rhs;
-  return lhs;
+inline EStateFlags& operator|=(EStateFlags& lhs, EStateFlags rhs)
+{
+    lhs = lhs | rhs;
+    return lhs;
 }
 /**
  * @brief & operator for state flags
@@ -50,9 +57,10 @@ inline EStateFlags &operator|=(EStateFlags &lhs, EStateFlags rhs) {
  * @param rhs
  * @return EStateFlags&
  */
-inline EStateFlags operator&(EStateFlags lhs, EStateFlags rhs) {
-  using T = std::underlying_type_t<EStateFlags>;
-  return static_cast<EStateFlags>(static_cast<T>(lhs) & static_cast<T>(rhs));
+inline EStateFlags operator&(EStateFlags lhs, EStateFlags rhs)
+{
+    using T = std::underlying_type_t<EStateFlags>;
+    return static_cast<EStateFlags>(static_cast<T>(lhs) & static_cast<T>(rhs));
 }
 /**
  * @brief &= operator for state flags
@@ -61,514 +69,577 @@ inline EStateFlags operator&(EStateFlags lhs, EStateFlags rhs) {
  * @param rhs
  * @return EStateFlags&
  */
-inline EStateFlags &operator&=(EStateFlags &lhs, EStateFlags rhs) {
-  lhs = lhs & rhs;
-  return lhs;
+inline EStateFlags& operator&=(EStateFlags& lhs, EStateFlags rhs)
+{
+    lhs = lhs & rhs;
+    return lhs;
 }
 
 /**
  * @brief Statemachine implementation
  *
  */
-template <typename OwnerType, typename EventType> class Statemachine {
+template <typename OwnerType, typename EventType>
+class Statemachine
+{
 public:
-  class State;
+    class State;
 
-  /**
-   * @brief Shared pointer alias
-   *
-   */
-  using SPtr = std::shared_ptr<Statemachine>;
-
-  /**
-   * @brief Statemachine owner type
-   *
-   */
-  using Owner = OwnerType;
-  /**
-   * @brief Statemachine event type
-   *
-   */
-  using Event = EventType;
-  /**
-   * @brief State property flags
-   *
-   */
-  using EFlags = EStateFlags;
-  /**
-   * @brief State pointer (used in many function signatures)
-   *
-   */
-  using StatePtr = const State *;
-
-  /**
-   * @brief State machine transition class, used internally
-   */
-  class Transition {
-  public:
     /**
-     * @brief Type of action handler
+     * @brief Shared pointer alias
      *
      */
-    using ActionType = std::function<void(Owner *, Event)>;
+    using SPtr = std::shared_ptr<Statemachine>;
 
     /**
-     * @brief Transition target
+     * @brief Statemachine owner type
      *
      */
-    StatePtr target_ = nullptr;
+    using Owner = OwnerType;
     /**
-     * @brief Optional transition action
+     * @brief Statemachine event type
      *
      */
-    std::vector<ActionType> actions_;
-
+    using Event = EventType;
     /**
-     * @brief Construct a new Statemachine Transition object
+     * @brief State property flags
      *
      */
-    Transition() = default;
+    using EFlags = EStateFlags;
     /**
-     * @brief Construct a new Statemachine Transition object
-     * Use Statemachine::TransitionTo() instead
-     *
-     * @param target Target state
-     */
-    constexpr Transition(const State &target) : target_(&target) {}
-    /**
-     * @brief Construct a new Statemachine Transition object
-     * Use Statemachine::TransitionTo() instead
-     *
-     * @param target Target state
-     * @param action Transition action
-     */
-    constexpr Transition(const State &target, ActionType &&action)
-        : target_(&target), actions_({std::move(action)}) {}
-    /**
-     * @brief Construct a new Statemachine Transition object
-     * Use Statemachine::TransitionTo() instead
-     *
-     * @param target Target state
-     * @param actions Transition actions
-     */
-    constexpr Transition(const State &target, std::vector<ActionType> &&actions)
-        : target_(&target), actions_(std::move(actions)) {}
-  };
-
-  /**
-   * @brief Statemachine state
-   *
-   */
-  class State {
-  public:
-    /**
-     * @brief Type of on_entry / on_exit handler
+     * @brief State pointer (used in many function signatures)
      *
      */
-    using EntryExitType = std::function<void(Owner *, StatePtr)>;
+    using StatePtr = const State*;
+
     /**
-     * @brief Type of event handler
+     * @brief State machine transition class, used internally
+     */
+    class Transition
+    {
+    public:
+        /**
+         * @brief Type of action handler
+         *
+         */
+        using ActionType = std::function<void(Owner*, Event)>;
+
+        /**
+         * @brief Transition target
+         *
+         */
+        StatePtr target_ = nullptr;
+        /**
+         * @brief Optional transition action
+         *
+         */
+        std::vector<ActionType> actions_;
+
+        /**
+         * @brief Construct a new Statemachine Transition object
+         *
+         */
+        Transition() = default;
+        /**
+         * @brief Construct a new Statemachine Transition object
+         * Use Statemachine::TransitionTo() instead
+         *
+         * @param target Target state
+         */
+        constexpr Transition(const State& target) : target_(&target)
+        {
+        }
+        /**
+         * @brief Construct a new Statemachine Transition object
+         * Use Statemachine::TransitionTo() instead
+         *
+         * @param target Target state
+         * @param action Transition action
+         */
+        constexpr Transition(const State& target, ActionType&& action) : target_(&target), actions_({std::move(action)})
+        {
+        }
+        /**
+         * @brief Construct a new Statemachine Transition object
+         * Use Statemachine::TransitionTo() instead
+         *
+         * @param target Target state
+         * @param actions Transition actions
+         */
+        constexpr Transition(const State& target, std::vector<ActionType>&& actions)
+            : target_(&target), actions_(std::move(actions))
+        {
+        }
+    };
+
+    /**
+     * @brief Statemachine state
      *
      */
-    using HandlerType = std::function<Transition(Owner *, StatePtr, Event)>;
+    class State
+    {
+    public:
+        /**
+         * @brief Type of on_entry / on_exit handler
+         *
+         */
+        using EntryExitType = std::function<void(Owner*, StatePtr)>;
+        /**
+         * @brief Type of event handler
+         *
+         */
+        using HandlerType = std::function<Transition(Owner*, StatePtr, Event)>;
+
+        /**
+         * @brief Flags indicating state properties
+         *
+         */
+        const EFlags flags_ = EFlags::kNone;
+        /**
+         * @brief Optional parent state
+         *
+         */
+        StatePtr parent_ = nullptr;
+        /**
+         * @brief Optional initial substate
+         *
+         */
+        StatePtr initial_ = nullptr;
+        /**
+         * @brief Statename, optional, useful for logging
+         *
+         */
+        const char* name_ = "Unnamed";
+
+        /**
+         * @brief Optional entry action
+         *
+         */
+        EntryExitType on_entry_;
+        /**
+         * @brief Optional exit action
+         *
+         */
+        EntryExitType on_exit_;
+        /**
+         * @brief Statemachine handler, must be assigned
+         */
+        HandlerType handler_ = {};
+
+        /**
+         * @brief Construct a new Statemachine State object
+         *
+         */
+        constexpr State(const char* name, HandlerType handler, StatePtr parent = nullptr, StatePtr initial = nullptr,
+                        EntryExitType on_entry = nullptr, EntryExitType on_exit = nullptr,
+                        EFlags flags = EFlags::kNone) noexcept
+            : flags_(flags)
+            , parent_(parent)
+            , initial_(initial)
+            , name_(name)
+            , on_entry_(std::move(on_entry))
+            , on_exit_(std::move(on_exit))
+            , handler_(std::move(handler))
+        {
+        }
+    };
 
     /**
-     * @brief Flags indicating state properties
+     * @brief State is entered (useful for logging)
      *
      */
-    const EFlags flags_ = EFlags::kNone;
+    std::function<void(StatePtr)> on_state_entry_;
     /**
-     * @brief Optional parent state
+     * @brief State is left (useful for logging)
      *
      */
-    StatePtr parent_ = nullptr;
+    std::function<void(StatePtr)> on_state_exit_;
     /**
-     * @brief Optional initial substate
+     * @brief Event is passed to a state (useful for logging)
      *
      */
-    StatePtr initial_ = nullptr;
+    std::function<void(StatePtr, Event)> on_handle_event_;
     /**
-     * @brief Statename, optional, useful for logging
+     * @brief Unhandled event callback, fired when top-level state does not handle
+     * event
      *
      */
-    const char *name_ = "Unnamed";
-
+    std::function<void(Event)> on_unhandled_event_;
     /**
-     * @brief Optional entry action
+     * @brief Deferred event callback, fired event deferral is requestd
      *
      */
-    EntryExitType on_entry_;
+    std::function<void(StatePtr, Event)> on_defer_event_;
+
     /**
-     * @brief Optional exit action
+     * @brief Construct a new Statemachine object
      *
      */
-    EntryExitType on_exit_;
+    Statemachine() = default;
     /**
-     * @brief Statemachine handler, must be assigned
+     * @brief Copy constructor
+     *
+     * @param rhs
      */
-    HandlerType handler_ = {};
+    Statemachine(const Statemachine& rhs) = default;
+    /**
+     * @brief Move constructor
+     *
+     * @param rhs
+     */
+    Statemachine(Statemachine&& rhs) noexcept = default;
 
     /**
-     * @brief Construct a new Statemachine State object
+     * @brief Destroy the Statemachine object
      *
      */
-    constexpr State(const char *name, HandlerType handler,
-                    StatePtr parent = nullptr, StatePtr initial = nullptr,
-                    EntryExitType on_entry = nullptr,
-                    EntryExitType on_exit = nullptr,
-                    EFlags flags = EFlags::kNone) noexcept
-        : flags_(flags), parent_(parent), initial_(initial), name_(name),
-          on_entry_(std::move(on_entry)), on_exit_(std::move(on_exit)),
-          handler_(std::move(handler)) {}
-  };
+    ~Statemachine() = default;
 
-  /**
-   * @brief State is entered (useful for logging)
-   *
-   */
-  std::function<void(StatePtr)> on_state_entry_;
-  /**
-   * @brief State is left (useful for logging)
-   *
-   */
-  std::function<void(StatePtr)> on_state_exit_;
-  /**
-   * @brief Event is passed to a state (useful for logging)
-   *
-   */
-  std::function<void(StatePtr, Event)> on_handle_event_;
-  /**
-   * @brief Unhandled event callback, fired when top-level state does not handle
-   * event
-   *
-   */
-  std::function<void(Event)> on_unhandled_event_;
-  /**
-   * @brief Deferred event callback, fired event deferral is requestd
-   *
-   */
-  std::function<void(StatePtr, Event)> on_defer_event_;
+    /**
+     * @brief Copy operator
+     *
+     * @param rhs
+     * @return Statemachine&
+     */
+    Statemachine& operator=(const Statemachine& rhs) = default;
+    /**
+     * @brief Move operator
+     *
+     * @param rhs
+     * @return Statemachine&
+     */
+    Statemachine& operator=(Statemachine&& rhs) noexcept = default;
 
-  /**
-   * @brief Construct a new Statemachine object
-   *
-   */
-  Statemachine() = default;
-  /**
-   * @brief Copy constructor
-   *
-   * @param rhs
-   */
-  Statemachine(const Statemachine &rhs) = default;
-  /**
-   * @brief Move constructor
-   *
-   * @param rhs
-   */
-  Statemachine(Statemachine &&rhs) noexcept = default;
-
-  /**
-   * @brief Destroy the Statemachine object
-   *
-   */
-  ~Statemachine() = default;
-
-  /**
-   * @brief Copy operator
-   *
-   * @param rhs
-   * @return Statemachine&
-   */
-  Statemachine &operator=(const Statemachine &rhs) = default;
-  /**
-   * @brief Move operator
-   *
-   * @param rhs
-   * @return Statemachine&
-   */
-  Statemachine &operator=(Statemachine &&rhs) noexcept = default;
-
-  /**
-   * @brief Initialize statemachine with owner and name.
-   *
-   * @param owner Statemachine owner
-   * @param name Statemachine name, useful for logging
-   */
-  void Init(Owner *owner, std::string name) {
-    name_ = std::move(name);
-    owner_ = owner;
-  }
-  /**
-   * @brief Start statemachine, enter initial state
-   *
-   */
-  void Start() {
-    current_state_ = &kInTransition;
-    EnterStatesFromDownTo(nullptr, kInitialState);
-  }
-
-  /**
-   * @brief Synchronously react to an event
-   *
-   * @param event Event
-   */
-  void React(Event event) {
-    assert(current_state_ != nullptr);
-    assert(!working_);
-    working_ = true;
-
-    Transition transition;
-    const auto *s = current_state_;
-
-    do {
-      if (on_handle_event_) {
-        on_handle_event_(s, event);
-      }
-      transition = s->handler_(owner_, s, event);
-
-      if (transition.target_ == &kDeferEvent) {
-        assert(on_defer_event_ != nullptr);
-        on_defer_event_(s, event);
-        working_ = false;
-        return;
-      }
-
-      s = s->parent_;
-    } while ((transition.target_ == &kUnhandled) && (s != nullptr));
-
-    if ((transition.target_ != &kUnhandled)) {
-      if (transition.target_ != &kNone) {
-        const auto *common_parent =
-            FindCommonParent(current_state_, transition.target_);
-
-        const auto *old_state = current_state_;
+    /**
+     * @brief Initialize statemachine with owner and name.
+     *
+     * @param owner Statemachine owner
+     * @param name Statemachine name, useful for logging
+     */
+    void Init(Owner* owner, std::string name)
+    {
+        name_ = std::move(name);
+        owner_ = owner;
+    }
+    /**
+     * @brief Start statemachine, enter initial state
+     *
+     */
+    void Start()
+    {
         current_state_ = &kInTransition;
-
-        ExitStatesFromUpTo(old_state, common_parent);
-
-        for (auto &action : transition.actions_) {
-          action(owner_, event);
-        }
-
-        EnterStatesFromDownTo(common_parent, transition.target_);
-      } else {
-        // No transition
-        for (auto &action : transition.actions_) {
-          action(owner_, event);
-        }
-      }
-    } else {
-      if (on_unhandled_event_) {
-        on_unhandled_event_(event);
-      }
+        EnterStatesFromDownTo(nullptr, kInitialState);
     }
 
-    working_ = false;
-  }
+    /**
+     * @brief Synchronously react to an event
+     *
+     * @param event Event
+     */
+    void React(Event event)
+    {
+        assert(current_state_ != nullptr);
+        assert(!working_);
+        working_ = true;
 
-  /**
-   * @brief Returns current state
-   *
-   * @return const StatemachineState*
-   */
-  StatePtr CurrentState() const { return current_state_; }
+        Transition transition;
+        const auto* s = current_state_;
 
-  /**
-   * @brief Returns name
-   *
-   * @return const std::string&
-   */
-  const std::string &Name() const { return name_; }
+        do
+        {
+            if (on_handle_event_)
+            {
+                on_handle_event_(s, event);
+            }
+            transition = s->handler_(owner_, s, event);
 
-  /**
-   * @brief Event was not handled in this state, shall be passed to parent state
-   *
-   * @return Transition
-   */
-  static Transition UnhandledEvent() { return TransitionTo(kUnhandled); }
-  /**
-   * @brief Defer event until state is exited
-   *
-   * @return Transition
-   */
-  static Transition DeferEvent() { return TransitionTo(kDeferEvent); }
-  /**
-   * @brief Event was handled, but no transition shall be executed, with
-   * optional action
-   *
-   * @param action Action to execute
-   * @return Transition
-   */
-  static Transition
-  NoTransition(typename Transition::ActionType &&action = nullptr) {
-    return TransitionTo(kNone, std::move(action));
-  }
-  /**
-   * @brief Event was handled, but no transition shall be executed, with
-   * optional actions
-   *
-   * @param actions Actions to execute
-   * @return Transition
-   */
-  static Transition
-  NoTransition(std::vector<typename Transition::ActionType> &&actions) {
-    return TransitionTo(kNone, std::move(actions));
-  }
-  /**
-   * @brief Create transition to target state, with optional action
-   *
-   * @param target Target state
-   * @param action Action to execute on transition
-   * @return Transition
-   */
-  static Transition
-  TransitionTo(const State &target,
-               typename Transition::ActionType &&action = nullptr) {
-    if (action == nullptr) {
-      return Transition(target);
+            if (transition.target_ == &kDeferEvent)
+            {
+                assert(on_defer_event_ != nullptr);
+                on_defer_event_(s, event);
+                working_ = false;
+                return;
+            }
+
+            s = s->parent_;
+        } while ((transition.target_ == &kUnhandled) && (s != nullptr));
+
+        if ((transition.target_ != &kUnhandled))
+        {
+            if (transition.target_ != &kNone)
+            {
+                const auto* common_parent = FindCommonParent(current_state_, transition.target_);
+
+                const auto* old_state = current_state_;
+                current_state_ = &kInTransition;
+
+                ExitStatesFromUpTo(old_state, common_parent);
+
+                for (auto& action : transition.actions_)
+                {
+                    action(owner_, event);
+                }
+
+                EnterStatesFromDownTo(common_parent, transition.target_);
+            }
+            else
+            {
+                // No transition
+                for (auto& action : transition.actions_)
+                {
+                    action(owner_, event);
+                }
+            }
+        }
+        else
+        {
+            if (on_unhandled_event_)
+            {
+                on_unhandled_event_(event);
+            }
+        }
+
+        working_ = false;
     }
-    return Transition(target, std::move(action));
-  }
-  /**
-   * @brief Create transition to target state, with optional actions
-   *
-   * @param target Target state
-   * @param actions Actions to execute on transition
-   * @return Transition
-   */
-  static Transition
-  TransitionTo(const State &target,
-               std::vector<typename Transition::ActionType> &&actions) {
-    return Transition(target, std::move(actions));
-  }
+
+    /**
+     * @brief Returns current state
+     *
+     * @return const StatemachineState*
+     */
+    StatePtr CurrentState() const
+    {
+        return current_state_;
+    }
+
+    /**
+     * @brief Returns name
+     *
+     * @return const std::string&
+     */
+    const std::string& Name() const
+    {
+        return name_;
+    }
+
+    /**
+     * @brief Event was not handled in this state, shall be passed to parent state
+     *
+     * @return Transition
+     */
+    static Transition UnhandledEvent()
+    {
+        return TransitionTo(kUnhandled);
+    }
+    /**
+     * @brief Defer event until state is exited
+     *
+     * @return Transition
+     */
+    static Transition DeferEvent()
+    {
+        return TransitionTo(kDeferEvent);
+    }
+    /**
+     * @brief Event was handled, but no transition shall be executed, with
+     * optional action
+     *
+     * @param action Action to execute
+     * @return Transition
+     */
+    static Transition NoTransition(typename Transition::ActionType&& action = nullptr)
+    {
+        return TransitionTo(kNone, std::move(action));
+    }
+    /**
+     * @brief Event was handled, but no transition shall be executed, with
+     * optional actions
+     *
+     * @param actions Actions to execute
+     * @return Transition
+     */
+    static Transition NoTransition(std::vector<typename Transition::ActionType>&& actions)
+    {
+        return TransitionTo(kNone, std::move(actions));
+    }
+    /**
+     * @brief Create transition to target state, with optional action
+     *
+     * @param target Target state
+     * @param action Action to execute on transition
+     * @return Transition
+     */
+    static Transition TransitionTo(const State& target, typename Transition::ActionType&& action = nullptr)
+    {
+        if (action == nullptr)
+        {
+            return Transition(target);
+        }
+        return Transition(target, std::move(action));
+    }
+    /**
+     * @brief Create transition to target state, with optional actions
+     *
+     * @param target Target state
+     * @param actions Actions to execute on transition
+     * @return Transition
+     */
+    static Transition TransitionTo(const State& target, std::vector<typename Transition::ActionType>&& actions)
+    {
+        return Transition(target, std::move(actions));
+    }
 
 private:
-  StatePtr current_state_ = nullptr;
-  bool working_ = false;
-  Owner *owner_ = nullptr;
-  std::string name_;
-  std::map<StatePtr, StatePtr> initial_;
+    StatePtr current_state_ = nullptr;
+    bool working_ = false;
+    Owner* owner_ = nullptr;
+    std::string name_;
+    std::map<StatePtr, StatePtr> initial_;
 
-  static const State kNone;
-  static const State kUnhandled;
-  static const State kInTransition;
-  static const State kDeferEvent;
-  static StatePtr const kInitialState;
+    static const State kNone;
+    static const State kUnhandled;
+    static const State kInTransition;
+    static const State kDeferEvent;
+    static StatePtr const kInitialState;
 
-  void SetInitialState(StatePtr owner, StatePtr initial) {
-    if ((owner->flags_ & EFlags::kHistory) != EFlags::kNone) {
-      initial_[owner] = initial;
-    } else {
-      // ignore
-    }
-  }
-
-  StatePtr GetInitialState(StatePtr owner) const {
-    if ((owner->flags_ & EFlags::kHistory) != EFlags::kNone) {
-      auto search = initial_.find(owner);
-      if (search != initial_.end()) {
-        return search->second;
-      }
-    }
-
-    return owner->initial_;
-  }
-
-  void ExitStatesFromUpTo(StatePtr from, StatePtr top) {
-    const auto *s = from;
-
-    while (s != top) {
-      // Save history state
-      if (s->parent_ != nullptr) {
-        if ((s->parent_->flags_ & EFlags::kHistory) != EFlags::kNone) {
-          SetInitialState(s->parent_, s);
+    void SetInitialState(StatePtr owner, StatePtr initial)
+    {
+        if ((owner->flags_ & EFlags::kHistory) != EFlags::kNone)
+        {
+            initial_[owner] = initial;
         }
-      }
-
-      if (on_state_exit_) {
-        on_state_exit_(s);
-      }
-
-      if (s->on_exit_) {
-        s->on_exit_(owner_, s);
-      }
-
-      s = s->parent_;
-    };
-  }
-
-  void EnterState(StatePtr s) const {
-    if (on_state_entry_) {
-      on_state_entry_(s);
+        else
+        {
+            // ignore
+        }
     }
 
-    if (s->on_entry_) {
-      s->on_entry_(owner_, s);
-    }
-  }
-
-  void EnterStatesFromDownToRecursive(StatePtr top, StatePtr target) {
-    if (top != target) {
-      if (target->parent_ != nullptr) {
-        EnterStatesFromDownTo(top, target->parent_);
-      }
-      EnterState(target);
-    }
-  }
-  void EnterStatesFromDownTo(StatePtr top, StatePtr target) {
-    EnterStatesFromDownToRecursive(top, target->parent_);
-
-    if (GetInitialState(target) != nullptr) {
-      EnterState(target);
-
-      const auto *s = GetInitialState(target);
-      const auto *t = s;
-      while (s != nullptr) {
-        t = s;
-        EnterState(s);
-        s = GetInitialState(s);
-      }
-      current_state_ = t;
-    } else {
-      EnterState(target);
-      current_state_ = target;
-    }
-  }
-  static StatePtr FindCommonParent(StatePtr s1, StatePtr s2) {
-    auto *s = s1->parent_;
-
-    while (s != nullptr) {
-      auto *o = s2->parent_;
-
-      while (o != nullptr) {
-        if (o == s) {
-          return o;
+    StatePtr GetInitialState(StatePtr owner) const
+    {
+        if ((owner->flags_ & EFlags::kHistory) != EFlags::kNone)
+        {
+            auto search = initial_.find(owner);
+            if (search != initial_.end())
+            {
+                return search->second;
+            }
         }
 
-        o = o->parent_;
-      }
-
-      s = s->parent_;
+        return owner->initial_;
     }
 
-    return nullptr;
-  }
+    void ExitStatesFromUpTo(StatePtr from, StatePtr top)
+    {
+        const auto* s = from;
+
+        while (s != top)
+        {
+            // Save history state
+            if (s->parent_ != nullptr)
+            {
+                if ((s->parent_->flags_ & EFlags::kHistory) != EFlags::kNone)
+                {
+                    SetInitialState(s->parent_, s);
+                }
+            }
+
+            if (on_state_exit_)
+            {
+                on_state_exit_(s);
+            }
+
+            if (s->on_exit_)
+            {
+                s->on_exit_(owner_, s);
+            }
+
+            s = s->parent_;
+        };
+    }
+
+    void EnterState(StatePtr s) const
+    {
+        if (on_state_entry_)
+        {
+            on_state_entry_(s);
+        }
+
+        if (s->on_entry_)
+        {
+            s->on_entry_(owner_, s);
+        }
+    }
+
+    void EnterStatesFromDownToRecursive(StatePtr top, StatePtr target)
+    {
+        if (top != target)
+        {
+            if (target->parent_ != nullptr)
+            {
+                EnterStatesFromDownTo(top, target->parent_);
+            }
+            EnterState(target);
+        }
+    }
+    void EnterStatesFromDownTo(StatePtr top, StatePtr target)
+    {
+        EnterStatesFromDownToRecursive(top, target->parent_);
+
+        if (GetInitialState(target) != nullptr)
+        {
+            EnterState(target);
+
+            const auto* s = GetInitialState(target);
+            const auto* t = s;
+            while (s != nullptr)
+            {
+                t = s;
+                EnterState(s);
+                s = GetInitialState(s);
+            }
+            current_state_ = t;
+        }
+        else
+        {
+            EnterState(target);
+            current_state_ = target;
+        }
+    }
+    static StatePtr FindCommonParent(StatePtr s1, StatePtr s2)
+    {
+        auto* s = s1->parent_;
+
+        while (s != nullptr)
+        {
+            auto* o = s2->parent_;
+
+            while (o != nullptr)
+            {
+                if (o == s)
+                {
+                    return o;
+                }
+
+                o = o->parent_;
+            }
+
+            s = s->parent_;
+        }
+
+        return nullptr;
+    }
 };
 
 template <typename Owner, typename Event>
 const typename Statemachine<Owner, Event>::State
-    Statemachine<Owner, Event>::kNone =
-        typename Statemachine<Owner, Event>::State("None", nullptr);
+    Statemachine<Owner, Event>::kNone = typename Statemachine<Owner, Event>::State("None", nullptr);
 template <typename Owner, typename Event>
 const typename Statemachine<Owner, Event>::State
-    Statemachine<Owner, Event>::kUnhandled =
-        typename Statemachine<Owner, Event>::State("Unhandled", nullptr);
+    Statemachine<Owner, Event>::kUnhandled = typename Statemachine<Owner, Event>::State("Unhandled", nullptr);
 template <typename Owner, typename Event>
 const typename Statemachine<Owner, Event>::State
-    Statemachine<Owner, Event>::kInTransition =
-        typename Statemachine<Owner, Event>::State("InTransition", nullptr);
+    Statemachine<Owner, Event>::kInTransition = typename Statemachine<Owner, Event>::State("InTransition", nullptr);
 template <typename Owner, typename Event>
 const typename Statemachine<Owner, Event>::State
-    Statemachine<Owner, Event>::kDeferEvent =
-        typename Statemachine<Owner, Event>::State("Defer", nullptr);
+    Statemachine<Owner, Event>::kDeferEvent = typename Statemachine<Owner, Event>::State("Defer", nullptr);
 } // namespace cpp_event_framework
