@@ -1,0 +1,27 @@
+# Core guidelines formatting style
+# stolen from https://github.com/Microsoft/GSL/blob/master/.clang-format
+
+# Eclipse specifies different base style on command-line -> fix it
+BasedOnStyle: LLVM
+
+ColumnLimit: 120
+
+UseTab: Never
+IndentWidth: 4
+AccessModifierOffset: -4
+NamespaceIndentation: Inner
+
+BreakBeforeBraces: Allman
+AlwaysBreakTemplateDeclarations: true
+BreakConstructorInitializersBeforeComma: true
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+AllowShortBlocksOnASingleLine: false
+AllowShortFunctionsOnASingleLine: None
+AllowShortIfStatementsOnASingleLine: false
+AllowShortLoopsOnASingleLine: false
+
+PointerAlignment: Left
+AlignConsecutiveAssignments: false
+AlignTrailingComments: true
+
+SpaceAfterCStyleCast: true
