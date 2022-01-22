@@ -24,6 +24,7 @@ public:
     ClassContainingAStatemachine()
     {
         fsm_.Init(this, "Fsm");
+        fsm_.Start();
     }
 
 private:

@@ -27,8 +27,18 @@ class EvtTurnOff : public cpp_event_framework::NextSignal<EvtTurnOff, EvtTurnOn>
 
 struct StatemachineFixture;
 using FsmBase = cpp_event_framework::Statemachine<StatemachineFixture, const cpp_event_framework::Signal::SPtr&>;
+class Fsm : public FsmBase
+{
+public:
+    static const Fsm::State kOff;
+    static const Fsm::State kOn;
+    static const Fsm::State kGreen;
+    static const Fsm::State kYellow;
+    static const Fsm::State kRed;
+    static const Fsm::State kRedYellow;
 
-#include "FsmDeclaration.hxx"
+    static const Fsm::Transition kYellowRedTransition;
+};
 
 struct StatemachineFixture
 {
@@ -264,7 +274,20 @@ public:
     }
 };
 
-#include "FsmInstance.hxx"
+const Fsm::State Fsm::kOff("Off", std::mem_fn(&Fsm::Owner::FsmOffHandler), nullptr, nullptr,
+                           std::mem_fn(&Fsm::Owner::FsmOffEntry), std::mem_fn(&Fsm::Owner::FsmOffExit));
+const Fsm::State Fsm::kOn("On", std::mem_fn(&Fsm::Owner::FsmOnHandler), nullptr, &Fsm::kGreen,
+                          std::mem_fn(&Fsm::Owner::FsmOnEntry), std::mem_fn(&Fsm::Owner::FsmOnExit),
+                          Fsm::EFlags::kHistory);
+const Fsm::State Fsm::kGreen("Green", std::mem_fn(&Fsm::Owner::FsmGreenHandler), &Fsm::kOn);
+const Fsm::State Fsm::kYellow("Yellow", std::mem_fn(&Fsm::Owner::FsmYellowHandler), &Fsm::kOn);
+const Fsm::State Fsm::kRed("Red", std::mem_fn(&Fsm::Owner::FsmRedHandler), &Fsm::kOn);
+const Fsm::State Fsm::kRedYellow("RedYellow", std::mem_fn(&Fsm::Owner::FsmRedYellowHandler), &Fsm::kOn);
+
+const Fsm::Transition Fsm::kYellowRedTransition(kRed, {std::mem_fn(&Fsm::Owner::FsmYellowRedTransitionAction1),
+                                                       std::mem_fn(&Fsm::Owner::FsmYellowRedTransitionAction2)});
+
+Fsm::StatePtr const Fsm::kInitialState = &Fsm::kOff;
 
 void StatemachineFixtureMain()
 {

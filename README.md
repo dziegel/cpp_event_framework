@@ -237,7 +237,7 @@ The actual pool fill level can be checked like this:
         template <>
         typename Fsm::StatePtr const FsmBase::kInitialState = &Fsm::kState1;
 
-8) Initialize statemachine
+8) Initialize and start statemachine
 
         class ClassContainingAStatemachine
         {
@@ -245,6 +245,7 @@ The actual pool fill level can be checked like this:
             ClassContainingAStatemachine()
             {
                 fsm_.Init(this, "Fsm");
+                fsm_.Start();
             }
         
         [...]
