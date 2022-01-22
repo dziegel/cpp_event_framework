@@ -1,33 +1,11 @@
-#include <chrono>
 #include <iostream>
 #include <ostream>
-#include <thread>
 
 #include <cpp_event_framework/Pool.hxx>
 #include <cpp_event_framework/Signal.hxx>
 #include <cpp_event_framework/Statemachine.hxx>
 
-using namespace std::chrono_literals;
-
-class EventPoolAllocator : public cpp_event_framework::PoolAllocator<>
-{
-};
-
-class Test : public cpp_event_framework::Signal
-{
-public:
-    using SPtr = std::shared_ptr<Test>;
-
-    const int val_ = 0;
-
-protected:
-    Test(uint32_t id, int val) : Signal(id), val_(val)
-    {
-    }
-};
-
-class EvtGoYellow
-    : public cpp_event_framework::SignalBase<EvtGoYellow, 0, cpp_event_framework::Signal, EventPoolAllocator>
+class EvtGoYellow : public cpp_event_framework::SignalBase<EvtGoYellow, 0>
 {
 };
 
@@ -47,17 +25,6 @@ class EvtTurnOff : public cpp_event_framework::NextSignal<EvtTurnOff, EvtTurnOn>
 {
 };
 
-class TestSig : public cpp_event_framework::NextSignal<TestSig, EvtTurnOff, Test>
-{
-public:
-    TestSig(int val) : Base(val)
-    {
-    }
-};
-
-using PoolSizeCalculator = cpp_event_framework::SignalPoolElementSizeCalculator<EvtGoYellow, EvtGoRed, EvtGoGreen,
-                                                                                EvtTurnOn, EvtTurnOff, TestSig>;
-
 struct StatemachineFixture;
 using FsmBase = cpp_event_framework::Statemachine<StatemachineFixture, const cpp_event_framework::Signal::SPtr&>;
 
@@ -69,10 +36,13 @@ struct StatemachineFixture
     {
         fsm_.on_state_entry_ = [this](Fsm::StatePtr state)
         { std::cout << fsm_.Name() << " enter state " << state->name_ << std::endl; };
+
         fsm_.on_state_exit_ = [this](Fsm::StatePtr state)
         { std::cout << fsm_.Name() << " exit state " << state->name_ << std::endl; };
+
         fsm_.on_handle_event_ = [this](Fsm::StatePtr state, Fsm::Event event)
         { std::cout << fsm_.Name() << " state " << state->name_ << " handle event " << event->Name() << std::endl; };
+
         fsm_.on_unhandled_event_ = [this](Fsm::Event event)
         {
             on_unhandled_event_called_ = true;
@@ -292,27 +262,17 @@ public:
         fsm_.React(EvtTurnOn::MakeShared());
         assert(fsm_.CurrentState() == &Fsm::kYellow);
     }
-
-    void SignalBaseClass()
-    {
-        auto e = TestSig::MakeShared(4);
-        assert(e->val_ == 4);
-    }
 };
 
 #include "FsmInstance.hxx"
 
-int main()
+void StatemachineFixtureMain()
 {
-    auto pool = cpp_event_framework::Pool<>::MakeShared(PoolSizeCalculator::kSptrSize, 10, "MyPool");
-    EventPoolAllocator::SetPool(pool);
-
     StatemachineFixture f;
+
     f.SetUp();
     f.Main();
+
     f.SetUp();
     f.History();
-    f.SetUp();
-    f.SignalBaseClass();
-    return 0;
 }

@@ -2,6 +2,8 @@ project(cpp_event_framework)
 
 add_executable(cpp_event_framework
     test/Statemachine_unittest.cxx
+    test/Events_unittest.cxx
+    test/main.cxx
 )
 
 target_include_directories(cpp_event_framework
