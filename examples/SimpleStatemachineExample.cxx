@@ -27,6 +27,12 @@ public:
         fsm_.Start();
     }
 
+    void Run()
+    {
+        fsm_.React(EEvent::kGo2);
+        fsm_.React(EEvent::kGo1);
+    }
+
 private:
     friend class Fsm;
     Fsm fsm_;

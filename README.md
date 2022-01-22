@@ -191,7 +191,7 @@ The actual pool fill level can be checked like this:
 
 ## Introduction to statemachine framework
 
-### Simple statemachine example
+### Step-by-step walkthrough of a simple statemachine
 
 1) Declare events:
 
@@ -273,6 +273,14 @@ The actual pool fill level can be checked like this:
                 }
             }
         };
+
+8) Send events to statemachine
+
+        void Run()
+        {
+            fsm_.React(EEvent::kGo2);
+            fsm_.React(EEvent::kGo1);
+        }
 
 ### Possible state handler return values
 
