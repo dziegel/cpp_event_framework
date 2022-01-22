@@ -7,14 +7,13 @@
 #include <cpp_event_framework/Pool.hxx>
 #include <cpp_event_framework/Signal.hxx>
 #include <cpp_event_framework/Statemachine.hxx>
+#include <vector>
 
 using namespace std::chrono_literals;
 
 class EventTestBaseClass : public cpp_event_framework::Signal
 {
 public:
-    using SPtr = std::shared_ptr<EventTestBaseClass>;
-
     const int val_ = 0;
 
 protected:
@@ -31,8 +30,18 @@ class SimpleTestEvent2 : public cpp_event_framework::NextSignal<SimpleTestEvent2
 {
 };
 
+class PayloadTestEvent : public cpp_event_framework::NextSignal<PayloadTestEvent, SimpleTestEvent2>
+{
+public:
+    const std::vector<uint8_t> payload_;
+
+    PayloadTestEvent(std::vector<uint8_t> payload) : payload_(std::move(payload))
+    {
+    }
+};
+
 class TestEventWithBaseClass
-    : public cpp_event_framework::NextSignal<TestEventWithBaseClass, SimpleTestEvent2, EventTestBaseClass>
+    : public cpp_event_framework::NextSignal<TestEventWithBaseClass, PayloadTestEvent, EventTestBaseClass>
 {
 public:
     TestEventWithBaseClass(int val) : Base(val)
@@ -72,7 +81,7 @@ public:
     static void SignalBaseClass()
     {
         auto e = TestEventWithBaseClass::MakeShared(4);
-        assert(e->Id() == 2);
+        assert(e->Id() == 3);
         assert(e->val_ == 4);
     }
 
@@ -102,6 +111,33 @@ public:
         PooledSignalsTestHelper(pool);
         assert(pool->FillLevel() == 10);
     }
+
+    static void DispatchEvent(const cpp_event_framework::Signal::SPtr& event)
+    {
+        std::cout << "Dispatching " << event->Name() << std::endl;
+        switch (event->Id())
+        {
+        case SimpleTestEvent::kId:
+            std::cout << "SimpleTestEvent" << std::endl;
+            break;
+        case SimpleTestEvent2::kId:
+            std::cout << "SimpleTestEvent2" << std::endl;
+            break;
+        case PayloadTestEvent::kId:
+        {
+            auto te3 = PayloadTestEvent::FromSignal(event);
+            assert(te3->payload_.at(1) == 2);
+            break;
+        }
+        };
+    }
+
+    static void UsageInSwitchCase()
+    {
+        DispatchEvent(SimpleTestEvent::MakeShared());
+        DispatchEvent(SimpleTestEvent2::MakeShared());
+        DispatchEvent(PayloadTestEvent::MakeShared(std::vector<uint8_t>({1, 2, 3})));
+    }
 };
 
 void EventsFixtureMain()
@@ -109,4 +145,5 @@ void EventsFixtureMain()
     EventsFixture::BasicTest();
     EventsFixture::SignalBaseClass();
     EventsFixture::PooledSignals();
+    EventsFixture::UsageInSwitchCase();
 }
