@@ -304,6 +304,17 @@ The actual pool fill level can be checked like this:
 
         return Fsm::UnhandledEvent();
 
+### Predefining transitions (like states)
+
+    class Fsm : public FsmBase
+    {
+    public:
+        [...]
+        static const Fsm::Transition Fsm::kState2ToState1;
+    };
+
+    const Fsm::Transition Fsm::kState2ToState1(kState1, std::mem_fn(&Fsm::Owner::FsmState2ToState1Action));
+
 ### Hierarchical states
 
 To create a hierarchical statemachine, states may have parent states:
@@ -312,7 +323,7 @@ To create a hierarchical statemachine, states may have parent states:
 
 Parent states may have initial states:
 
-    const Fsm::State Fsm::kParentState("ParentState", std::mem_fn(&Fsm::Owner::ParentHandler), nullptr /* no parent */, &Fsn::ChildState);
+    const Fsm::State Fsm::kParentState("ParentState", std::mem_fn(&Fsm::Owner::ParentHandler), nullptr /* no parent */, &Fsm::ChildState);
 
 ### State entry/exit
 
