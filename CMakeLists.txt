@@ -1,6 +1,8 @@
 project(cpp_event_framework)
 
 add_executable(cpp_event_framework
+    examples/SimpleStatemachineExample.cxx
+
     test/Statemachine_unittest.cxx
     test/Events_unittest.cxx
     test/main.cxx

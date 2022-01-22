@@ -189,7 +189,150 @@ The actual pool fill level can be checked like this:
     auto event2 = PooledSimpleTestEvent2::MakeShared();
     assert(pool->FillLevel() == 8);
 
-## Introduction to Statemachine
+## Introduction to statemachine framework
+
+### Simple statemachine example
+
+1) Declare events
+
+    enum class EEvent : uint32_t
+    {
+        kGo1,
+        kGo2
+    };
+
+2) Forward declare the class that will contain the statemachine
+
+        class ClassContainingAStatemachine;
+
+3) Declare statemachine base class
+
+        using FsmBase = cpp_event_framework::Statemachine<ClassContainingAStatemachine, EEvent>;
+
+4) Declare statemachine class and its states
+
+        class Fsm : public FsmBase
+        {
+        public:
+            static const Fsm::State kState1;
+            static const Fsm::State kState2;
+        };
+
+5) Declare class that contains the statemachine
+
+        class ClassContainingAStatemachine
+        {
+        private:
+            friend class Fsm;
+            Fsm fsm_;
+        };
+
+6) Declare statemachine states
+
+        const Fsm::State Fsm::kState1("State1", std::mem_fn(&Fsm::Owner::State1Handler));
+        const Fsm::State Fsm::kState2("State2", std::mem_fn(&Fsm::Owner::State2Handler));
+
+7) Declare initial state
+
+        template <>
+        typename Fsm::StatePtr const FsmBase::kInitialState = &Fsm::kState1;
+
+8) Initialize statemachine
+
+        class ClassContainingAStatemachine
+        {
+        public:
+            ClassContainingAStatemachine()
+            {
+                fsm_.Init(this, "Fsm");
+            }
+        
+        [...]
+        };
+
+8) Implement statemachine handlers in class that contains the statemachine
+
+        class ClassContainingAStatemachine
+        {
+        [...]
+        private:
+        [...]
+            Fsm::Transition State1Handler(Fsm::StatePtr /* state */, Fsm::Event event)
+            {
+                switch (event)
+                {
+                case EEvent::kGo2:
+                    return Fsm::TransitionTo(Fsm::kState2);
+                default:
+                    return Fsm::NoTransition();
+                }
+            }
+        
+            Fsm::Transition State2Handler(Fsm::StatePtr /* state */, Fsm::Event event)
+            {
+                switch (event)
+                {
+                case EEvent::kGo1:
+                    return Fsm::TransitionTo(Fsm::kState1);
+                default:
+                    return Fsm::UnhandledEvent();
+                }
+            }
+        };
+
+### Possible state handler return values
+
+1) Transition to another state: 
+
+        return Fsm::TransitionTo(Fsm::kState1);
+
+2) Transition to another state with transition action: 
+
+        return Fsm::TransitionTo(Fsm::kState1,
+            [](Fsm::Owner*, Fsm::Event) { std::cout << "Transition action" << std::endl; });
+
+3) No transition - event is handled, but no state transition occurs:
+
+        return Fsm::NoTransition();
+
+4) No state transition, but an action is executed:
+
+        return Fsm::NoTransition([](Fsm::Owner*, Fsm::Event) { std::cout << "Transition action" << std::endl; });
+
+5) Event is not handled in this state. In hierarchical statemachines, the event will be passed to parent state handler.
+   When topmost state does not handle the event, fsm_.on_unhandled_event_ is called.
+
+        return Fsm::UnhandledEvent();
+
+### Hierarchical states
+
+To create a hierarchical statemachine, states may have parent states:
+
+    const Fsm::State Fsm::kChildState("ChildState", std::mem_fn(&Fsm::Owner::ChildHandler), &Fsm::SomeParent);
+
+Parent states may have initial states:
+
+    const Fsm::State Fsm::kParentState("ParentState", std::mem_fn(&Fsm::Owner::ParentHandler), nullptr /* no parent */, &Fsn::ChildState);
+
+### State entry/exit
+
+    const Fsm::State Fsm::kSomeState("SomeState", std::mem_fn(&Fsm::Owner::SomeStateHandler), nullptr, nullptr,
+        std::mem_fn(&Fsm::Owner::FsmSomeStateEntry), std::mem_fn(&Fsm::Owner::FsmSomeStateExit));
+
+### History state
+
+A parent state may be a history state
+
+    const Fsm::State Fsm::kSomeState("SomeState", std::mem_fn(&Fsm::Owner::SomeStateHandler), nullptr, nullptr,
+        nullptr, nullptr, Fsm::EFlags::kHistory);
+
+### Simple example statemachine
+
+https://github.com/dziegel/cpp_event_framework/blob/main/example/SimpleStatemachineExample.cxx
+
+### Complex example
+
+https://github.com/dziegel/cpp_event_framework/blob/main/test/Statemachine_unittest.cxx
 
 ## Future ideas
 
