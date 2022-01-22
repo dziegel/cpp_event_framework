@@ -331,11 +331,11 @@ A parent state may be a history state
     const Fsm::State Fsm::kSomeState("SomeState", std::mem_fn(&Fsm::Owner::SomeStateHandler), nullptr, nullptr,
         nullptr, nullptr, Fsm::EFlags::kHistory);
 
-### Simple example statemachine
+### Simple statemachine example
 
 https://github.com/dziegel/cpp_event_framework/blob/main/examples/SimpleStatemachineExample.cxx
 
-### Complex example
+### Complex statemachine example
 
 https://github.com/dziegel/cpp_event_framework/blob/main/test/Statemachine_unittest.cxx
 
