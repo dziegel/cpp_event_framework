@@ -109,6 +109,36 @@ Example of event usage in a switch/case statement (e.g. for use in statemachines
         };
     }
 
+    static void UsageInSwitchCase()
+    {
+        DispatchEvent(SimpleTestEvent::MakeShared());
+        DispatchEvent(SimpleTestEvent2::MakeShared());
+        DispatchEvent(PayloadTestEvent::MakeShared(std::vector<uint8_t>({1, 2, 3})));
+    }
+
+Events can be passed to C code as void pointer - but be aware this breaks shared_ptr refcounting!
+After converting an event to void* it MUST be converted back ONCE from void* to event!
+
+    static void VoidPointer()
+    {
+        auto event = SimpleTestEvent::MakeShared();
+
+        void* vp = SimpleTestEvent::ToVoidPointer(event);
+
+        // pass vp to C-function
+
+        ...
+
+        // get vp back in some callback function
+
+        auto anonymous = cpp_event_framework::Signal::FromVoidPointer(vp);
+        if (anonymous->Id() == SimpleTestEvent::kId)
+        {
+            auto event2 = SimpleTestEvent::FromSignal(anonymous);
+            // use event2...
+        }
+    }
+
 ## Introduction to Statemachine
 
 ## Future ideas

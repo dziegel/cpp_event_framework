@@ -138,6 +138,30 @@ public:
         DispatchEvent(SimpleTestEvent2::MakeShared());
         DispatchEvent(PayloadTestEvent::MakeShared(std::vector<uint8_t>({1, 2, 3})));
     }
+
+    static void VoidPointer1()
+    {
+        auto event = SimpleTestEvent::MakeShared();
+
+        void* vp = SimpleTestEvent::ToVoidPointer(event);
+
+        auto resurrected = SimpleTestEvent::FromVoidPointer(vp);
+        assert(resurrected->Id() == SimpleTestEvent::kId);
+    }
+
+    static void VoidPointer2()
+    {
+        auto event = SimpleTestEvent::MakeShared();
+
+        void* vp = SimpleTestEvent::ToVoidPointer(event);
+
+        auto anonymous = cpp_event_framework::Signal::FromVoidPointer(vp);
+        if (anonymous->Id() == SimpleTestEvent::kId)
+        {
+            auto event2 = SimpleTestEvent::FromSignal(anonymous);
+            assert(event2->Id() == SimpleTestEvent::kId);
+        }
+    }
 };
 
 void EventsFixtureMain()
@@ -146,4 +170,6 @@ void EventsFixtureMain()
     EventsFixture::SignalBaseClass();
     EventsFixture::PooledSignals();
     EventsFixture::UsageInSwitchCase();
+    EventsFixture::VoidPointer1();
+    EventsFixture::VoidPointer2();
 }
