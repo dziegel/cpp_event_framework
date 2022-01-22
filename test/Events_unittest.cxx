@@ -59,7 +59,7 @@ using PoolSizeCalculator =
 struct EventsFixture
 {
 public:
-    void Main()
+    static void BasicTest()
     {
         auto event = SimpleTestEvent::MakeShared();
         assert(event->Id() == 0);
@@ -69,20 +69,15 @@ public:
         assert(event2->Id() == SimpleTestEvent2::kId);
     }
 
-    void SignalBaseClass()
+    static void SignalBaseClass()
     {
         auto e = TestEventWithBaseClass::MakeShared(4);
         assert(e->Id() == 2);
         assert(e->val_ == 4);
     }
 
-    void PooledSignals()
+    static void PooledSignalsTestHelper(const cpp_event_framework::Pool<>::SPtr& pool)
     {
-        auto pool = cpp_event_framework::Pool<>::MakeShared(PoolSizeCalculator::kSptrSize, 10, "MyPool");
-        EventPoolAllocator::SetPool(pool);
-
-        assert(pool->FillLevel() == 10);
-
         auto event = PooledSimpleTestEvent::MakeShared();
         assert(event->Id() == 3);
         assert(event->Id() == PooledSimpleTestEvent::kId);
@@ -97,12 +92,21 @@ public:
         assert(event.use_count() == 1);
         assert(event2.use_count() == 1);
     }
+
+    static void PooledSignals()
+    {
+        auto pool = cpp_event_framework::Pool<>::MakeShared(PoolSizeCalculator::kSptrSize, 10, "MyPool");
+        EventPoolAllocator::SetPool(pool);
+
+        assert(pool->FillLevel() == 10);
+        PooledSignalsTestHelper(pool);
+        assert(pool->FillLevel() == 10);
+    }
 };
 
 void EventsFixtureMain()
 {
-    EventsFixture f;
-    f.Main();
-    f.SignalBaseClass();
-    f.PooledSignals();
+    EventsFixture::BasicTest();
+    EventsFixture::SignalBaseClass();
+    EventsFixture::PooledSignals();
 }
