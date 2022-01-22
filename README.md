@@ -26,6 +26,8 @@ Header-only C++ event and statemachine framework
 - States have names for logging
 
 ## Introduction to events
+
+### Basic usage
 A simple event class which is allocated from heap is declared via a class that inherits from cpp_event_framework::SignalBase template:
 
     class SimpleTestEvent : public cpp_event_framework::SignalBase<SimpleTestEvent, 0>
@@ -49,6 +51,7 @@ To simplify creation of following events, a NextSignal template is available:
 
 Using this template, events can be "chained" - now SimpleTestEvent2 automatically gets ID 1.
 
+### Event attributes
 Events may have attributes, too:
 
     class PayloadTestEvent : public cpp_event_framework::NextSignal<PayloadTestEvent, SimpleTestEvent2>
@@ -83,10 +86,17 @@ Events may inherit from base classes to simplify creation of similar events:
         }
     };
 
-To convert an event back from Signal base class to its actual type use the following function:
+### Casting events
+To convert an event back from Signal base class to its actual type use the FromSignal class function. Note
+there is an assertion in there that checks that the event ID matches the event class!
 
-    auto te3 = SimpleTestEvent3::FromSignal(event);
+    cpp_event_framework::Signal::SPtr event = SimpleTestEvent2::MakeShared();
+    assert(event->Id() == SimpleTestEvent2::kId);
 
+    auto te_ok  = SimpleTestEvent2::FromSignal(event); // ok
+    auto te_bad = SimpleTestEvent::FromSignal(event);  // exception thrown
+
+### Usage in statemachines example
 Example of event usage in a switch/case statement (e.g. for use in statemachines):
 
     static void DispatchEvent(const cpp_event_framework::Signal::SPtr& event)
@@ -116,6 +126,7 @@ Example of event usage in a switch/case statement (e.g. for use in statemachines
         DispatchEvent(PayloadTestEvent::MakeShared(std::vector<uint8_t>({1, 2, 3})));
     }
 
+### Usage with legacy C code
 Events can be passed to C code as void pointer - but be aware this breaks shared_ptr refcounting!
 After converting an event to void* it MUST be converted back ONCE from void* to event!
 
@@ -138,6 +149,45 @@ After converting an event to void* it MUST be converted back ONCE from void* to 
             // use event2...
         }
     }
+
+### Event pools
+It is also possible to use event pools. The first step is to declare a pool allocator:
+
+    class EventPoolAllocator : public cpp_event_framework::PoolAllocator<>
+    {
+    };
+
+Allocators need to be assigned to a pool:
+
+    auto pool = cpp_event_framework::Pool<>::MakeShared(PoolSizeCalculator::kSptrSize, 10, "MyPool");
+    EventPoolAllocator::SetPool(pool);
+
+To create a pool, a pool must know the maximum event size of all events that will be created from it.
+A helper template is available for this, its argument list must contain ALL signals:
+
+    using PoolSizeCalculator =
+        cpp_event_framework::SignalPoolElementSizeCalculator<PooledSimpleTestEvent, PooledSimpleTestEvent2>;
+
+Using a pool allocator, events can be now declared that are allocated via pools. Note the NextSignal template
+manages the event ID AND inherits the allocator from the previous signal! 
+In the following example, PooledSimpleTestEvent and PooledSimpleTestEvent2 are allocated via EventPoolAllocator.
+
+    class PooledSimpleTestEvent
+        : public cpp_event_framework::SignalBase<PooledSimpleTestEvent, 3, cpp_event_framework::Signal, EventPoolAllocator>
+    {
+    };
+    
+    class PooledSimpleTestEvent2 : public cpp_event_framework::NextSignal<PooledSimpleTestEvent2, PooledSimpleTestEvent>
+    {
+    };
+
+The actual pool fill level can be checked like this:
+
+    auto event = PooledSimpleTestEvent::MakeShared();
+    assert(pool->FillLevel() == 9);
+
+    auto event2 = PooledSimpleTestEvent2::MakeShared();
+    assert(pool->FillLevel() == 8);
 
 ## Introduction to Statemachine
 

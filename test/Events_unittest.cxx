@@ -114,7 +114,8 @@ public:
 
     static void DispatchEvent(const cpp_event_framework::Signal::SPtr& event)
     {
-        std::cout << "Dispatching " << event->Name() << std::endl;
+        std::cout << "Dispatching " << event->Name() << " with id " << event->Id() << std::endl;
+
         switch (event->Id())
         {
         case SimpleTestEvent::kId:
