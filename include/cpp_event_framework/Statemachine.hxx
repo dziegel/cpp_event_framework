@@ -330,6 +330,16 @@ public:
         current_state_ = &kInTransition;
         EnterStatesFromDownTo(nullptr, kInitialState);
     }
+    /**
+     * @brief Start statemachine, enter initial state passed as parameter
+     *
+     * @param initial Initial state
+     */
+    void StartWithInitialState(const State& initial)
+    {
+        current_state_ = &kInTransition;
+        EnterStatesFromDownTo(nullptr, &initial);
+    }
 
     /**
      * @brief Synchronously react to an event

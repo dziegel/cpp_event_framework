@@ -207,7 +207,7 @@ public:
     void Main()
     {
         CheckAllFalse();
-        fsm_.Start();
+        fsm_.StartWithInitialState(Fsm::kOff);
         assert(fsm_.CurrentState() == &Fsm::kOff);
         assert(off_entry_called_ == true);
         off_entry_called_ = false;
@@ -257,7 +257,7 @@ public:
 
     void History()
     {
-        fsm_.Start();
+        fsm_.StartWithInitialState(Fsm::kOff);
         assert(fsm_.CurrentState() == &Fsm::kOff);
 
         fsm_.React(EvtTurnOn::MakeShared());
@@ -286,9 +286,6 @@ const Fsm::State Fsm::kRedYellow("RedYellow", std::mem_fn(&Fsm::Owner::FsmRedYel
 
 const Fsm::Transition Fsm::kYellowRedTransition(kRed, {std::mem_fn(&Fsm::Owner::FsmYellowRedTransitionAction1),
                                                        std::mem_fn(&Fsm::Owner::FsmYellowRedTransitionAction2)});
-
-template <>
-typename Fsm::StatePtr const FsmBase::kInitialState = &Fsm::kOff;
 
 void StatemachineFixtureMain()
 {
