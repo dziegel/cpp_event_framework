@@ -287,7 +287,8 @@ const Fsm::State Fsm::kRedYellow("RedYellow", std::mem_fn(&Fsm::Owner::FsmRedYel
 const Fsm::Transition Fsm::kYellowRedTransition(kRed, {std::mem_fn(&Fsm::Owner::FsmYellowRedTransitionAction1),
                                                        std::mem_fn(&Fsm::Owner::FsmYellowRedTransitionAction2)});
 
-Fsm::StatePtr const Fsm::kInitialState = &Fsm::kOff;
+template <>
+typename Fsm::StatePtr const FsmBase::kInitialState = &Fsm::kOff;
 
 void StatemachineFixtureMain()
 {
