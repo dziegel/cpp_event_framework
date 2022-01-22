@@ -315,11 +315,13 @@ public:
      *
      * @param owner Statemachine owner
      * @param name Statemachine name, useful for logging
+     * @param initial Initial state
      */
-    void Init(Owner* owner, std::string name)
+    void Init(Owner* owner, std::string name, const StatePtr initial)
     {
         name_ = std::move(name);
         owner_ = owner;
+        initial_[nullptr] = initial;
     }
     /**
      * @brief Start statemachine, enter initial state
@@ -328,17 +330,7 @@ public:
     void Start()
     {
         current_state_ = &kInTransition;
-        EnterStatesFromDownTo(nullptr, kInitialState);
-    }
-    /**
-     * @brief Start statemachine, enter initial state passed as parameter
-     *
-     * @param initial Initial state
-     */
-    void StartWithInitialState(const State& initial)
-    {
-        current_state_ = &kInTransition;
-        EnterStatesFromDownTo(nullptr, &initial);
+        EnterStatesFromDownTo(nullptr, initial_[nullptr]);
     }
 
     /**
@@ -510,7 +502,6 @@ private:
     static const State kUnhandled;
     static const State kInTransition;
     static const State kDeferEvent;
-    static StatePtr const kInitialState;
 
     void SetInitialState(StatePtr owner, StatePtr initial)
     {

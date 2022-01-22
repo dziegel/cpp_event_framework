@@ -30,14 +30,16 @@ using FsmBase = cpp_event_framework::Statemachine<StatemachineFixture, const cpp
 class Fsm : public FsmBase
 {
 public:
-    static const Fsm::State kOff;
-    static const Fsm::State kOn;
-    static const Fsm::State kGreen;
-    static const Fsm::State kYellow;
-    static const Fsm::State kRed;
-    static const Fsm::State kRedYellow;
+    static const State kOff;
+    static const State kOn;
+    static const State kGreen;
+    static const State kYellow;
+    static const State kRed;
+    static const State kRedYellow;
 
-    static const Fsm::Transition kYellowRedTransition;
+    static const StatePtr kInitial;
+
+    static const Transition kYellowRedTransition;
 };
 
 struct StatemachineFixture
@@ -59,7 +61,7 @@ struct StatemachineFixture
             std::cout << fsm_.Name() << " unhandled event " << event->Name() << std::endl;
         };
 
-        fsm_.Init(this, "Fsm");
+        fsm_.Init(this, "Fsm", Fsm::kInitial);
     }
 
 private:
@@ -207,7 +209,7 @@ public:
     void Main()
     {
         CheckAllFalse();
-        fsm_.StartWithInitialState(Fsm::kOff);
+        fsm_.Start();
         assert(fsm_.CurrentState() == &Fsm::kOff);
         assert(off_entry_called_ == true);
         off_entry_called_ = false;
@@ -257,7 +259,7 @@ public:
 
     void History()
     {
-        fsm_.StartWithInitialState(Fsm::kOff);
+        fsm_.Start();
         assert(fsm_.CurrentState() == &Fsm::kOff);
 
         fsm_.React(EvtTurnOn::MakeShared());
@@ -283,6 +285,8 @@ const Fsm::State Fsm::kGreen("Green", std::mem_fn(&Fsm::Owner::FsmGreenHandler),
 const Fsm::State Fsm::kYellow("Yellow", std::mem_fn(&Fsm::Owner::FsmYellowHandler), &Fsm::kOn);
 const Fsm::State Fsm::kRed("Red", std::mem_fn(&Fsm::Owner::FsmRedHandler), &Fsm::kOn);
 const Fsm::State Fsm::kRedYellow("RedYellow", std::mem_fn(&Fsm::Owner::FsmRedYellowHandler), &Fsm::kOn);
+
+const Fsm::StatePtr Fsm::kInitial = &Fsm::kOff;
 
 const Fsm::Transition Fsm::kYellowRedTransition(kRed, {std::mem_fn(&Fsm::Owner::FsmYellowRedTransitionAction1),
                                                        std::mem_fn(&Fsm::Owner::FsmYellowRedTransitionAction2)});

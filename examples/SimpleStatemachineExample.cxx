@@ -23,7 +23,7 @@ class ClassContainingAStatemachine
 public:
     ClassContainingAStatemachine()
     {
-        fsm_.Init(this, "Fsm");
+        fsm_.Init(this, "Fsm", &Fsm::kState1);
         fsm_.Start();
     }
 
@@ -57,6 +57,3 @@ private:
 
 const Fsm::State Fsm::kState1("State1", std::mem_fn(&Fsm::Owner::State1Handler));
 const Fsm::State Fsm::kState2("State2", std::mem_fn(&Fsm::Owner::State2Handler));
-
-template <>
-typename Fsm::StatePtr const FsmBase::kInitialState = &Fsm::kState1;

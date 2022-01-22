@@ -232,19 +232,14 @@ The actual pool fill level can be checked like this:
         const Fsm::State Fsm::kState1("State1", std::mem_fn(&Fsm::Owner::State1Handler));
         const Fsm::State Fsm::kState2("State2", std::mem_fn(&Fsm::Owner::State2Handler));
 
-7) Declare initial state
-
-        template <>
-        typename Fsm::StatePtr const FsmBase::kInitialState = &Fsm::kState1;
-
-8) Initialize and start statemachine
+7) Initialize with owner, name and initial state, then and start statemachine
 
         class ClassContainingAStatemachine
         {
         public:
             ClassContainingAStatemachine()
             {
-                fsm_.Init(this, "Fsm");
+                fsm_.Init(this, "Fsm", Fsm::kState1);
                 fsm_.Start();
             }
         
