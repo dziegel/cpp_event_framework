@@ -328,7 +328,7 @@ A parent state may be a history state
 
 ### Simple example statemachine
 
-https://github.com/dziegel/cpp_event_framework/blob/main/example/SimpleStatemachineExample.cxx
+https://github.com/dziegel/cpp_event_framework/blob/main/examples/SimpleStatemachineExample.cxx
 
 ### Complex example
 
