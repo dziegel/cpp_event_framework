@@ -26,8 +26,7 @@ class EvtTurnOff : public cpp_event_framework::NextSignal<EvtTurnOff, EvtTurnOn>
 };
 
 struct StatemachineFixture;
-using FsmBase = cpp_event_framework::Statemachine<StatemachineFixture, const cpp_event_framework::Signal::SPtr&>;
-class Fsm : public FsmBase
+class Fsm : public cpp_event_framework::Statemachine<StatemachineFixture, const cpp_event_framework::Signal::SPtr&>
 {
 public:
     static const State kOff;

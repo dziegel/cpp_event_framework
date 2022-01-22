@@ -10,12 +10,12 @@ enum class EEvent : uint32_t
 };
 
 class ClassContainingAStatemachine;
-using FsmBase = cpp_event_framework::Statemachine<ClassContainingAStatemachine, EEvent>;
-class Fsm : public FsmBase
+class Fsm : public cpp_event_framework::Statemachine<ClassContainingAStatemachine, EEvent>
 {
 public:
-    static const Fsm::State kState1;
-    static const Fsm::State kState2;
+    static const State kState1;
+    static const State kState2;
+    static const StatePtr kInitialState;
 };
 
 class ClassContainingAStatemachine
@@ -23,7 +23,7 @@ class ClassContainingAStatemachine
 public:
     ClassContainingAStatemachine()
     {
-        fsm_.Init(this, "Fsm", &Fsm::kState1);
+        fsm_.Init(this, "Fsm", Fsm::kInitialState);
         fsm_.Start();
     }
 
@@ -57,3 +57,4 @@ private:
 
 const Fsm::State Fsm::kState1("State1", std::mem_fn(&Fsm::Owner::State1Handler));
 const Fsm::State Fsm::kState2("State2", std::mem_fn(&Fsm::Owner::State2Handler));
+const Fsm::StatePtr Fsm::kInitialState = &Fsm::kState1; // initial state of the statemachine

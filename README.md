@@ -193,32 +193,29 @@ The actual pool fill level can be checked like this:
 
 ### Simple statemachine example
 
-1) Declare events
+1) Declare events:
 
-    enum class EEvent : uint32_t
-    {
-        kGo1,
-        kGo2
-    };
+        enum class EEvent : uint32_t
+        {
+            kGo1,
+            kGo2
+        };
 
-2) Forward declare the class that will contain the statemachine
+2) Forward declare the class that will contain the statemachine:
 
         class ClassContainingAStatemachine;
 
-3) Declare statemachine base class
+3) Declare statemachine class and its states:
 
-        using FsmBase = cpp_event_framework::Statemachine<ClassContainingAStatemachine, EEvent>;
-
-4) Declare statemachine class and its states
-
-        class Fsm : public FsmBase
+        class Fsm : public cpp_event_framework::Statemachine<ClassContainingAStatemachine, EEvent>
         {
         public:
             static const Fsm::State kState1;
             static const Fsm::State kState2;
+            static const StatePtr kInitialState;
         };
 
-5) Declare class that contains the statemachine
+4) Declare class that contains the statemachine:
 
         class ClassContainingAStatemachine
         {
@@ -227,26 +224,27 @@ The actual pool fill level can be checked like this:
             Fsm fsm_;
         };
 
-6) Declare statemachine states
+5) Declare statemachine states:
 
         const Fsm::State Fsm::kState1("State1", std::mem_fn(&Fsm::Owner::State1Handler));
         const Fsm::State Fsm::kState2("State2", std::mem_fn(&Fsm::Owner::State2Handler));
+        const Fsm::StatePtr Fsm::kInitial = &Fsm::kState1; // initial state of the statemachine
 
-7) Initialize with owner, name and initial state, then and start statemachine
+6) Initialize with owner, name and initial state, then and start statemachine:
 
         class ClassContainingAStatemachine
         {
         public:
             ClassContainingAStatemachine()
             {
-                fsm_.Init(this, "Fsm", Fsm::kState1);
+                fsm_.Init(this, "Fsm", Fsm::kInitialState);
                 fsm_.Start();
             }
         
         [...]
         };
 
-8) Implement statemachine handlers in class that contains the statemachine
+7) Implement statemachine handlers in class that contains the statemachine:
 
         class ClassContainingAStatemachine
         {
