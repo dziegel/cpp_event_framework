@@ -97,6 +97,11 @@ public:
      */
     using Owner = OwnerType;
     /**
+     * @brief Statemachine owner pointer type
+     *
+     */
+    using OwnerPtr = OwnerType*;
+    /**
      * @brief Statemachine event type
      *
      */
@@ -122,7 +127,7 @@ public:
          * @brief Type of action handler
          *
          */
-        using ActionType = std::function<void(Owner*, Event)>;
+        using ActionType = std::function<void(OwnerPtr, Event)>;
 
         /**
          * @brief Transition target
@@ -140,7 +145,7 @@ public:
          * @param owner
          * @param event
          */
-        void ExecuteActions(Owner* owner, Event event)
+        void ExecuteActions(OwnerPtr owner, Event event)
         {
             for (const auto& action : actions_)
             {
@@ -350,7 +355,7 @@ public:
      * @param name Statemachine name, useful for logging
      * @param initial Initial state
      */
-    void Init(Owner* owner, std::string name, const StatePtr initial)
+    void Init(OwnerPtr owner, std::string name, const StatePtr initial)
     {
         name_ = std::move(name);
         owner_ = owner;
@@ -519,7 +524,7 @@ public:
 private:
     StatePtr current_state_ = nullptr;
     bool working_ = false;
-    Owner* owner_ = nullptr;
+    OwnerPtr owner_ = nullptr;
     std::string name_;
     std::map<StatePtr, StatePtr> initial_;
 

@@ -68,7 +68,7 @@ private:
         {
         case EEvent::kGo1:
             return Fsm::TransitionTo(Fsm::kState1,
-                                     [](Fsm::Owner*, Fsm::Event) { std::cout << "Transition action" << std::endl; });
+                                     [](Fsm::OwnerPtr, Fsm::Event) { std::cout << "Transition action" << std::endl; });
         default:
             return Fsm::UnhandledEvent();
         }

@@ -195,7 +195,7 @@ private:
         switch (event->Id())
         {
         case EvtGoGreen::kId:
-            return Fsm::TransitionTo(Fsm::kGreen, [](Fsm::Owner* /*owner*/, Fsm::Event /*event*/)
+            return Fsm::TransitionTo(Fsm::kGreen, [](Fsm::OwnerPtr /*owner*/, Fsm::Event /*event*/)
                                      { std::cout << "Walk" << std::endl; });
         case EvtGoYellow::kId:
             return Fsm::NoTransition();

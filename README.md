@@ -294,7 +294,7 @@ The actual pool fill level can be checked like this:
 2) Transition to another state with transition action: 
 
         return Fsm::TransitionTo(Fsm::kState1,
-            [](Fsm::Owner*, Fsm::Event) { std::cout << "Transition action" << std::endl; });
+            [](Fsm::OwnerPtr, Fsm::Event) { std::cout << "Transition action" << std::endl; });
 
 3) No transition - event is handled, but no state transition occurs:
 
@@ -302,7 +302,7 @@ The actual pool fill level can be checked like this:
 
 4) No state transition, but an action is executed:
 
-        return Fsm::NoTransition([](Fsm::Owner*, Fsm::Event) { std::cout << "Transition action" << std::endl; });
+        return Fsm::NoTransition([](Fsm::OwnerPtr, Fsm::Event) { std::cout << "Transition action" << std::endl; });
 
 5) Event is not handled in this state. In hierarchical statemachines, the event will be passed to parent state handler.
    When topmost state does not handle the event, fsm_.on_unhandled_event_ is called.
@@ -357,7 +357,7 @@ A parent state may be a history state:
     The argument "event" may be useful in actions because the action may depend on the event type or attributes
     of the event.
 
-        void TransitionAction(Fsm::Owner* owner, Fsm::Event event)
+        void TransitionAction(Fsm::OwnerPtr owner, Fsm::Event event)
 
 
 ### Simple statemachine example
