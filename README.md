@@ -231,7 +231,9 @@ The actual pool fill level can be checked like this:
         const Fsm::State Fsm::kState2("State2", &Fsm::Owner::State2Handler);
         const Fsm::StatePtr Fsm::kInitialState = &Fsm::kState1; // initial state of the statemachine
 
-6) Initialize with owner, name and initial state, then and start statemachine:
+6) Initialize with owner, name and initial state, then and start statemachine.
+    Starting the statemachine is a separate function since it calls the entry handler of the initial state (if present).
+    This may not be desired when the machine is initialized.
 
         class ClassContainingAStatemachine
         {

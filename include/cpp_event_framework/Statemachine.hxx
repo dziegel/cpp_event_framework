@@ -207,12 +207,12 @@ public:
          * @brief Optional parent state
          *
          */
-        StatePtr parent_ = nullptr;
+        StatePtr const parent_ = nullptr;
         /**
          * @brief Optional initial substate
          *
          */
-        StatePtr initial_ = nullptr;
+        StatePtr const initial_ = nullptr;
         /**
          * @brief Statename, optional, useful for logging
          *
@@ -223,16 +223,16 @@ public:
          * @brief Optional entry action
          *
          */
-        EntryExitType on_entry_ = nullptr;
+        EntryExitType const on_entry_ = nullptr;
         /**
          * @brief Optional exit action
          *
          */
-        EntryExitType on_exit_ = nullptr;
+        EntryExitType const on_exit_ = nullptr;
         /**
          * @brief Statemachine handler, must be assigned
          */
-        HandlerType handler_ = nullptr;
+        HandlerType const handler_ = nullptr;
 
         /**
          * @brief Construct a new Statemachine State object
@@ -240,7 +240,7 @@ public:
          */
         constexpr State(const char* name, HandlerType handler, StatePtr parent = nullptr, StatePtr initial = nullptr,
                         EntryExitType on_entry = nullptr, EntryExitType on_exit = nullptr) noexcept
-            : parent_(parent), initial_(initial), name_(name), on_entry_(on_entry), on_exit_(on_exit), handler_(handler)
+            : State(name, handler, parent, initial, on_entry, on_exit, EFlags::kNone)
         {
         }
 
@@ -329,14 +329,14 @@ public:
     ~Statemachine() = default;
 
     /**
-     * @brief Copy operator
+     * @brief Copy assignment
      *
      * @param rhs
      * @return Statemachine&
      */
     Statemachine& operator=(const Statemachine& rhs) = default;
     /**
-     * @brief Move operator
+     * @brief Move assignment
      *
      * @param rhs
      * @return Statemachine&
@@ -344,7 +344,7 @@ public:
     Statemachine& operator=(Statemachine&& rhs) noexcept = default;
 
     /**
-     * @brief Initialize statemachine with owner and name.
+     * @brief Initialize statemachine with owner, name and initial state.
      *
      * @param owner Statemachine owner
      * @param name Statemachine name, useful for logging
