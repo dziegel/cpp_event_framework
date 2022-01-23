@@ -182,13 +182,17 @@ private:
         }
     }
 
+    void WalkTransitionAction(Fsm::Event /* event */)
+    {
+        std::cout << "Walk" << std::endl;
+    }
+
     Fsm::Transition FsmRedYellowHandler(Fsm::StatePtr /*state*/, Fsm::Event event)
     {
         switch (event->Id())
         {
         case EvtGoGreen::kId:
-            return Fsm::TransitionTo(Fsm::kGreen, [](Fsm::Owner* /*owner*/, Fsm::Event /*event*/)
-                                     { std::cout << "Walk" << std::endl; });
+            return Fsm::TransitionTo(Fsm::kGreen, &StatemachineFixture::WalkTransitionAction);
         case EvtGoYellow::kId:
             return Fsm::NoTransition();
         default:
@@ -265,19 +269,18 @@ public:
     }
 };
 
-const Fsm::State Fsm::kOff("Off", std::mem_fn(&Fsm::Owner::FsmOffHandler), nullptr, nullptr,
-                           std::mem_fn(&Fsm::Owner::FsmOffEntry), std::mem_fn(&Fsm::Owner::FsmOffExit));
-const Fsm::State Fsm::kOn("On", std::mem_fn(&Fsm::Owner::FsmOnHandler), nullptr, &Fsm::kGreen,
-                          std::mem_fn(&Fsm::Owner::FsmOnEntry), std::mem_fn(&Fsm::Owner::FsmOnExit),
-                          Fsm::EFlags::kHistory);
-const Fsm::State Fsm::kGreen("Green", std::mem_fn(&Fsm::Owner::FsmGreenHandler), &Fsm::kOn);
-const Fsm::State Fsm::kYellow("Yellow", std::mem_fn(&Fsm::Owner::FsmYellowHandler), &Fsm::kOn);
-const Fsm::State Fsm::kRed("Red", std::mem_fn(&Fsm::Owner::FsmRedHandler), &Fsm::kOn);
-const Fsm::State Fsm::kRedYellow("RedYellow", std::mem_fn(&Fsm::Owner::FsmRedYellowHandler), &Fsm::kOn);
+const Fsm::State Fsm::kOff("Off", &Fsm::Owner::FsmOffHandler, nullptr, nullptr, &Fsm::Owner::FsmOffEntry,
+                           &Fsm::Owner::FsmOffExit);
+const Fsm::State Fsm::kOn("On", &Fsm::Owner::FsmOnHandler, nullptr, &Fsm::kGreen, &Fsm::Owner::FsmOnEntry,
+                          &Fsm::Owner::FsmOnExit, Fsm::EFlags::kHistory);
+const Fsm::State Fsm::kGreen("Green", &Fsm::Owner::FsmGreenHandler, &Fsm::kOn);
+const Fsm::State Fsm::kYellow("Yellow", &Fsm::Owner::FsmYellowHandler, &Fsm::kOn);
+const Fsm::State Fsm::kRed("Red", &Fsm::Owner::FsmRedHandler, &Fsm::kOn);
+const Fsm::State Fsm::kRedYellow("RedYellow", &Fsm::Owner::FsmRedYellowHandler, &Fsm::kOn);
 
 const Fsm::StatePtr Fsm::kInitial = &Fsm::kOff;
 
-const Fsm::Transition Fsm::kYellowRedTransition(kRed, std::mem_fn(&Fsm::Owner::FsmYellowRedTransitionAction1));
+const Fsm::Transition Fsm::kYellowRedTransition(kRed, &Fsm::Owner::FsmYellowRedTransitionAction1);
 
 void StatemachineFixtureMain()
 {
