@@ -166,7 +166,7 @@ public:
          * @param target Target state
          * @param actions Transition actions
          */
-        constexpr Transition(const State& target, std::vector<ActionType>&& actions)
+        constexpr Transition(const State& target, std::vector<ActionType>&& actions) noexcept
             : target_(&target), actions_(std::move(actions))
         {
         }
@@ -183,12 +183,12 @@ public:
          * @brief Type of on_entry / on_exit handler
          *
          */
-        using EntryExitType = std::function<void(Owner*, StatePtr)>;
+        using EntryExitType = void (Owner::*)(StatePtr);
         /**
          * @brief Type of event handler
          *
          */
-        using HandlerType = std::function<Transition(Owner*, StatePtr, Event)>;
+        using HandlerType = Transition (Owner::*)(StatePtr, Event);
 
         /**
          * @brief Flags indicating state properties
@@ -215,16 +215,16 @@ public:
          * @brief Optional entry action
          *
          */
-        EntryExitType on_entry_;
+        EntryExitType on_entry_ = nullptr;
         /**
          * @brief Optional exit action
          *
          */
-        EntryExitType on_exit_;
+        EntryExitType on_exit_ = nullptr;
         /**
          * @brief Statemachine handler, must be assigned
          */
-        HandlerType handler_ = {};
+        HandlerType handler_ = nullptr;
 
         /**
          * @brief Construct a new Statemachine State object
@@ -237,9 +237,9 @@ public:
             , parent_(parent)
             , initial_(initial)
             , name_(name)
-            , on_entry_(std::move(on_entry))
-            , on_exit_(std::move(on_exit))
-            , handler_(std::move(handler))
+            , on_entry_(on_entry)
+            , on_exit_(on_exit)
+            , handler_(handler)
         {
         }
     };
@@ -353,7 +353,7 @@ public:
             {
                 on_handle_event_(s, event);
             }
-            transition = s->handler_(owner_, s, event);
+            transition = (owner_->*s->handler_)(s, event);
 
             if (transition.target_ == &kDeferEvent)
             {
@@ -549,9 +549,9 @@ private:
                 on_state_exit_(s);
             }
 
-            if (s->on_exit_)
+            if (s->on_exit_ != nullptr)
             {
-                s->on_exit_(owner_, s);
+                (owner_->*s->on_exit_)(s);
             }
 
             s = s->parent_;
@@ -565,9 +565,9 @@ private:
             on_state_entry_(s);
         }
 
-        if (s->on_entry_)
+        if (s->on_entry_ != nullptr)
         {
-            s->on_entry_(owner_, s);
+            (owner_->*s->on_entry_)(s);
         }
     }
 

@@ -21,7 +21,8 @@ Header-only C++ event and statemachine framework
 - Independent of event type (can be int, enum, pointer, shared pointer...)
 - Designed to be aggregated by a class
 - Designed to call member functions of class aggregating statemachine
-- State and transition declaration is read-only (const, but due to std::function/std::vector usage not placed in RO section)
+- State declaration is read-only (const and in RO section)
+- Transition declaration may be read-only (const, but due to std::function/std::vector usage not placed in RO section)
 - Logging support (state entry/exit/handler events)
 - States have names for logging
 
@@ -226,8 +227,8 @@ The actual pool fill level can be checked like this:
 
 5) Declare statemachine states:
 
-        const Fsm::State Fsm::kState1("State1", std::mem_fn(&Fsm::Owner::State1Handler));
-        const Fsm::State Fsm::kState2("State2", std::mem_fn(&Fsm::Owner::State2Handler));
+        const Fsm::State Fsm::kState1("State1", &Fsm::Owner::State1Handler);
+        const Fsm::State Fsm::kState2("State2", &Fsm::Owner::State2Handler);
         const Fsm::StatePtr Fsm::kInitialState = &Fsm::kState1; // initial state of the statemachine
 
 6) Initialize with owner, name and initial state, then and start statemachine:
@@ -321,37 +322,37 @@ The actual pool fill level can be checked like this:
 
 To create a hierarchical statemachine, states may have parent states:
 
-    const Fsm::State Fsm::kChildState("ChildState", std::mem_fn(&Fsm::Owner::ChildHandler), &Fsm::SomeParent);
+    const Fsm::State Fsm::kChildState("ChildState", &Fsm::Owner::ChildHandler, &Fsm::SomeParent);
 
 Parent states may have initial states:
 
-    const Fsm::State Fsm::kParentState("ParentState", std::mem_fn(&Fsm::Owner::ParentHandler), nullptr /* no parent */, &Fsm::ChildState);
+    const Fsm::State Fsm::kParentState("ParentState", &Fsm::Owner::ParentHandler, nullptr /* no parent */, &Fsm::ChildState);
 
 ### State entry/exit actions
 
-    const Fsm::State Fsm::kSomeState("SomeState", std::mem_fn(&Fsm::Owner::SomeStateHandler), nullptr, nullptr,
-        std::mem_fn(&Fsm::Owner::FsmSomeStateEntry), std::mem_fn(&Fsm::Owner::FsmSomeStateExit));
+    const Fsm::State Fsm::kSomeState("SomeState", &Fsm::Owner::SomeStateHandler, nullptr, nullptr,
+        &Fsm::Owner::FsmSomeStateEntry, &Fsm::Owner::FsmSomeStateExit);
 
 ### History state
 
 A parent state may be a history state
 
-    const Fsm::State Fsm::kSomeState("SomeState", std::mem_fn(&Fsm::Owner::SomeStateHandler), nullptr, nullptr,
+    const Fsm::State Fsm::kSomeState("SomeState", &Fsm::Owner::SomeStateHandler, nullptr, nullptr,
         nullptr, nullptr, Fsm::EFlags::kHistory);
 
 ### Function signatures
 
-- State handlers. The signature allows to use class member functions via std::mem_fn() as state handlers.
+- State handlers. The signature allows to use class member functions as state handlers.
     Also, the argument "state" allows to use the same handler function for multiple states.
 
-        Fsm::Transition StateHandler(Fsm::Owner* owner, Fsm::StatePtr state, Fsm::Event event)
+        Fsm::Transition (Fsm::Owner::*)(Fsm::StatePtr state, Fsm::Event event)
 
-- Entry/Exit actions. Same as for handlers - the signature allows to use class member functions via
-    std::mem_fn() as action. Also, the argument "state" allows to use the same action function for multiple states.
+- Entry/Exit actions. Same as for handlers - the signature allows to use class member functions
+    as action. Also, the argument "state" allows to use the same action function for multiple states.
 
-        void EntryAction(Fsm::Owner* owner, Fsm::StatePtr state)
+        void (Fsm::Owner::*)(Fsm::StatePtr state)
 
-- Transition actions. The signature allows to use class member functions via std::mem_fn() as state handlers.
+- Transition actions. The signature allows to use class member functions via std::mem_fn() and delegates as actions.
     The argument "event" may be useful in actions because the action may depend on the event type or attributes
     of the event.
 

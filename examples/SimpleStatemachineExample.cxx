@@ -75,8 +75,8 @@ private:
     }
 };
 
-const Fsm::State Fsm::kState1("State1", std::mem_fn(&Fsm::Owner::State1Handler));
-const Fsm::State Fsm::kState2("State2", std::mem_fn(&Fsm::Owner::State2Handler));
+const Fsm::State Fsm::kState1("State1", &Fsm::Owner::State1Handler);
+const Fsm::State Fsm::kState2("State2", &Fsm::Owner::State2Handler);
 const Fsm::StatePtr Fsm::kInitialState = &Fsm::kState1; // initial state of the statemachine
 
 void SimpleStatemachineExampleMain()
