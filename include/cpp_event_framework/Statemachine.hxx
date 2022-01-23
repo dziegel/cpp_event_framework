@@ -267,6 +267,10 @@ public:
         }
     };
 
+    /**
+     * @brief History statemachine state
+     *
+     */
     class HistoryState : public State
     {
     public:
