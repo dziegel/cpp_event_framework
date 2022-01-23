@@ -130,16 +130,24 @@ public:
          */
         StatePtr target_ = nullptr;
         /**
-         * @brief Optional transition action
+         * @brief Optional transition actions
          *
          */
         std::vector<ActionType> actions_;
-
         /**
-         * @brief Construct a new Statemachine Transition object
+         * @brief Execute transition actions
          *
+         * @param owner
+         * @param event
          */
-        Transition() = default;
+        void ExecuteActions(Owner* owner, Event event)
+        {
+            for (const auto& action : actions_)
+            {
+                action(owner, event);
+            }
+        }
+
         /**
          * @brief Construct a new Statemachine Transition object
          * Use Statemachine::TransitionTo() instead
@@ -231,8 +239,18 @@ public:
          *
          */
         constexpr State(const char* name, HandlerType handler, StatePtr parent = nullptr, StatePtr initial = nullptr,
-                        EntryExitType on_entry = nullptr, EntryExitType on_exit = nullptr,
-                        EFlags flags = EFlags::kNone) noexcept
+                        EntryExitType on_entry = nullptr, EntryExitType on_exit = nullptr) noexcept
+            : parent_(parent), initial_(initial), name_(name), on_entry_(on_entry), on_exit_(on_exit), handler_(handler)
+        {
+        }
+
+    protected:
+        /**
+         * @brief Construct a new Statemachine State object
+         *
+         */
+        constexpr State(const char* name, HandlerType handler, StatePtr parent, StatePtr initial,
+                        EntryExitType on_entry, EntryExitType on_exit, EFlags flags) noexcept
             : flags_(flags)
             , parent_(parent)
             , initial_(initial)
@@ -240,6 +258,21 @@ public:
             , on_entry_(on_entry)
             , on_exit_(on_exit)
             , handler_(handler)
+        {
+        }
+    };
+
+    class HistoryState : public State
+    {
+    public:
+        /**
+         * @brief Construct a new Statemachine State object
+         *
+         */
+        constexpr HistoryState(const char* name, typename State::HandlerType handler, StatePtr parent = nullptr,
+                               StatePtr initial = nullptr, typename State::EntryExitType on_entry = nullptr,
+                               typename State::EntryExitType on_exit = nullptr) noexcept
+            : State(name, handler, parent, initial, on_entry, on_exit, EFlags::kHistory)
         {
         }
     };
@@ -344,7 +377,7 @@ public:
         assert(!working_);
         working_ = true;
 
-        Transition transition;
+        Transition transition(kInTransition);
         const auto* s = current_state_;
 
         do
@@ -376,21 +409,13 @@ public:
                 current_state_ = &kInTransition;
 
                 ExitStatesFromUpTo(old_state, common_parent);
-
-                for (auto& action : transition.actions_)
-                {
-                    action(owner_, event);
-                }
-
+                transition.ExecuteActions(owner_, event);
                 EnterStatesFromDownTo(common_parent, transition.target_);
             }
             else
             {
                 // No transition
-                for (auto& action : transition.actions_)
-                {
-                    action(owner_, event);
-                }
+                transition.ExecuteActions(owner_, event);
             }
         }
         else

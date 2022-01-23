@@ -335,10 +335,9 @@ Parent states may have initial states:
 
 ### History state
 
-A parent state may be a history state
+A parent state may be a history state:
 
-    const Fsm::State Fsm::kSomeState("SomeState", &Fsm::Owner::SomeStateHandler, nullptr, nullptr,
-        nullptr, nullptr, Fsm::EFlags::kHistory);
+    const Fsm::HistoryState Fsm::kSomeState("SomeState", &Fsm::Owner::SomeStateHandler, nullptr, nullptr, nullptr, nullptr);
 
 ### Function signatures
 

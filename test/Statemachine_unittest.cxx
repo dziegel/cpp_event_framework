@@ -30,7 +30,7 @@ class Fsm : public cpp_event_framework::Statemachine<StatemachineFixture, const 
 {
 public:
     static const State kOff;
-    static const State kOn;
+    static const HistoryState kOn;
     static const State kGreen;
     static const State kYellow;
     static const State kRed;
@@ -277,8 +277,8 @@ public:
 
 const Fsm::State Fsm::kOff("Off", &Fsm::Owner::FsmOffHandler, nullptr, nullptr, &Fsm::Owner::FsmOffEntry,
                            &Fsm::Owner::FsmOffExit);
-const Fsm::State Fsm::kOn("On", &Fsm::Owner::FsmOnHandler, nullptr, &Fsm::kGreen, &Fsm::Owner::FsmOnEntry,
-                          &Fsm::Owner::FsmOnExit, Fsm::EFlags::kHistory);
+const Fsm::HistoryState Fsm::kOn("On", &Fsm::Owner::FsmOnHandler, nullptr, &Fsm::kGreen, &Fsm::Owner::FsmOnEntry,
+                                 &Fsm::Owner::FsmOnExit);
 const Fsm::State Fsm::kGreen("Green", &Fsm::Owner::FsmGreenHandler, &Fsm::kOn);
 const Fsm::State Fsm::kYellow("Yellow", &Fsm::Owner::FsmYellowHandler, &Fsm::kOn);
 const Fsm::State Fsm::kRed("Red", &Fsm::Owner::FsmRedHandler, &Fsm::kOn);
