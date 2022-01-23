@@ -133,7 +133,7 @@ public:
          * @brief Optional transition action
          *
          */
-        ActionType action_;
+        std::vector<ActionType> actions_;
 
         /**
          * @brief Construct a new Statemachine Transition object
@@ -156,7 +156,18 @@ public:
          * @param target Target state
          * @param action Transition action
          */
-        constexpr Transition(const State& target, ActionType&& actions) : target_(&target), action_(actions)
+        constexpr Transition(const State& target, ActionType&& action) : target_(&target), actions_({std::move(action)})
+        {
+        }
+        /**
+         * @brief Construct a new Statemachine Transition object
+         * Use Statemachine::TransitionTo() instead
+         *
+         * @param target Target state
+         * @param actions Transition actions
+         */
+        constexpr Transition(const State& target, std::vector<ActionType>&& actions)
+            : target_(&target), actions_(std::move(actions))
         {
         }
     };
@@ -366,9 +377,9 @@ public:
 
                 ExitStatesFromUpTo(old_state, common_parent);
 
-                if (transition.action_)
+                for (auto& action : transition.actions_)
                 {
-                    transition.action_(owner_, event);
+                    action(owner_, event);
                 }
 
                 EnterStatesFromDownTo(common_parent, transition.target_);
@@ -376,9 +387,9 @@ public:
             else
             {
                 // No transition
-                if (transition.action_)
+                for (auto& action : transition.actions_)
                 {
-                    transition.action_(owner_, event);
+                    action(owner_, event);
                 }
             }
         }
@@ -443,6 +454,17 @@ public:
         return TransitionTo(kNone, std::move(action));
     }
     /**
+     * @brief Event was handled, but no transition shall be executed, with
+     * optional actions
+     *
+     * @param actions Actions to execute
+     * @return Transition
+     */
+    static Transition NoTransition(std::vector<typename Transition::ActionType>&& actions)
+    {
+        return TransitionTo(kNone, std::move(actions));
+    }
+    /**
      * @brief Create transition to target state, with optional action
      *
      * @param target Target state
@@ -456,6 +478,17 @@ public:
             return Transition(target);
         }
         return Transition(target, std::move(action));
+    }
+    /**
+     * @brief Create transition to target state, with optional actions
+     *
+     * @param target Target state
+     * @param actions Actions to execute on transition
+     * @return Transition
+     */
+    static Transition TransitionTo(const State& target, std::vector<typename Transition::ActionType>&& actions)
+    {
+        return Transition(target, std::move(actions));
     }
 
 private:

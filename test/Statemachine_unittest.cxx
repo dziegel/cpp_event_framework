@@ -71,7 +71,8 @@ private:
     bool off_exit_called_ = false;
     bool on_entry_called_ = false;
     bool on_exit_called_ = false;
-    bool yellow_red_transition_called_ = false;
+    bool yellow_red_transition1_called_ = false;
+    bool yellow_red_transition2_called_ = false;
     bool on_unhandled_event_called_ = false;
 
     void CheckAllFalse() const
@@ -80,7 +81,8 @@ private:
         assert(off_exit_called_ == false);
         assert(on_entry_called_ == false);
         assert(on_exit_called_ == false);
-        assert(yellow_red_transition_called_ == false);
+        assert(yellow_red_transition1_called_ == false);
+        assert(yellow_red_transition2_called_ == false);
         assert(on_unhandled_event_called_ == false);
     }
 
@@ -165,7 +167,13 @@ private:
 
     void FsmYellowRedTransitionAction1(Fsm::Event /*event*/)
     {
-        yellow_red_transition_called_ = true;
+        yellow_red_transition1_called_ = true;
+        std::cout << "Don't walk" << std::endl;
+    }
+
+    void FsmYellowRedTransitionAction2(Fsm::Event /*event*/)
+    {
+        yellow_red_transition2_called_ = true;
         std::cout << "Don't walk" << std::endl;
     }
 
@@ -219,9 +227,11 @@ public:
         CheckAllFalse();
 
         fsm_.React(EvtGoRed::MakeShared());
-        assert(yellow_red_transition_called_ == true);
+        assert(yellow_red_transition1_called_ == true);
+        assert(yellow_red_transition2_called_ == true);
         assert(fsm_.CurrentState() == &Fsm::kRed);
-        yellow_red_transition_called_ = false;
+        yellow_red_transition1_called_ = false;
+        yellow_red_transition2_called_ = false;
         CheckAllFalse();
 
         fsm_.React(EvtGoYellow::MakeShared());
@@ -277,7 +287,8 @@ const Fsm::State Fsm::kRedYellow("RedYellow", std::mem_fn(&Fsm::Owner::FsmRedYel
 
 const Fsm::StatePtr Fsm::kInitial = &Fsm::kOff;
 
-const Fsm::Transition Fsm::kYellowRedTransition(kRed, std::mem_fn(&Fsm::Owner::FsmYellowRedTransitionAction1));
+const Fsm::Transition Fsm::kYellowRedTransition(kRed, {std::mem_fn(&Fsm::Owner::FsmYellowRedTransitionAction1),
+                                                       std::mem_fn(&Fsm::Owner::FsmYellowRedTransitionAction2)});
 
 void StatemachineFixtureMain()
 {
