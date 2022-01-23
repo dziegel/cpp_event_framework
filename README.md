@@ -21,7 +21,7 @@ Header-only C++ event and statemachine framework
 - Independent of event type (can be int, enum, pointer, shared pointer...)
 - Designed to be aggregated by a class
 - Designed to call member functions of class aggregating statemachine
-- State and transition declaration is read-only (const)
+- State and transition declaration is read-only (const, but due to std::function/std::vector usage not placed in RO section)
 - Logging support (state entry/exit/handler events)
 - States have names for logging
 
