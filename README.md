@@ -21,7 +21,7 @@ Header-only C++ event and statemachine framework
 - Independent of event type (can be int, enum, pointer, shared pointer...)
 - Designed to be aggregated by a class
 - Designed to call member functions of class aggregating statemachine
-- State and transition declaration can be placed in RO section, to avoid corruption
+- State and transition declaration is read-only (const)
 - Logging support (state entry/exit/handler events)
 - States have names for logging
 
@@ -226,8 +226,8 @@ The actual pool fill level can be checked like this:
 
 5) Declare statemachine states:
 
-        const Fsm::State Fsm::kState1("State1", &Fsm::Owner::State1Handler);
-        const Fsm::State Fsm::kState2("State2", &Fsm::Owner::State2Handler);
+        const Fsm::State Fsm::kState1("State1", std::mem_fn(&Fsm::Owner::State1Handler));
+        const Fsm::State Fsm::kState2("State2", std::mem_fn(&Fsm::Owner::State2Handler));
         const Fsm::StatePtr Fsm::kInitialState = &Fsm::kState1; // initial state of the statemachine
 
 6) Initialize with owner, name and initial state, then and start statemachine:
@@ -290,7 +290,8 @@ The actual pool fill level can be checked like this:
 
 2) Transition to another state with transition action: 
 
-        return Fsm::TransitionTo(Fsm::kState1, &ClassContainingAStatemachine::Action);
+        return Fsm::TransitionTo(Fsm::kState1,
+            [](Fsm::Owner*, Fsm::Event) { std::cout << "Transition action" << std::endl; });
 
 3) No transition - event is handled, but no state transition occurs:
 
@@ -298,7 +299,7 @@ The actual pool fill level can be checked like this:
 
 4) No state transition, but an action is executed:
 
-        return Fsm::NoTransition(&ClassContainingAStatemachine::Action);
+        return Fsm::NoTransition([](Fsm::Owner*, Fsm::Event) { std::cout << "Transition action" << std::endl; });
 
 5) Event is not handled in this state. In hierarchical statemachines, the event will be passed to parent state handler.
    When topmost state does not handle the event, fsm_.on_unhandled_event_ is called.
@@ -314,47 +315,47 @@ The actual pool fill level can be checked like this:
         static const Fsm::Transition Fsm::kState2ToState1;
     };
 
-    const Fsm::Transition Fsm::kState2ToState1(kState1, &Fsm::Owner::FsmState2ToState1Action);
+    const Fsm::Transition Fsm::kState2ToState1(kState1, std::mem_fn(&Fsm::Owner::FsmState2ToState1Action));
 
 ### Hierarchical states
 
 To create a hierarchical statemachine, states may have parent states:
 
-    const Fsm::State Fsm::kChildState("ChildState", &Fsm::Owner::ChildHandler, &Fsm::SomeParent);
+    const Fsm::State Fsm::kChildState("ChildState", std::mem_fn(&Fsm::Owner::ChildHandler), &Fsm::SomeParent);
 
 Parent states may have initial states:
 
-    const Fsm::State Fsm::kParentState("ParentState", &Fsm::Owner::ParentHandler, nullptr /* no parent */, &Fsm::ChildState);
+    const Fsm::State Fsm::kParentState("ParentState", std::mem_fn(&Fsm::Owner::ParentHandler), nullptr /* no parent */, &Fsm::ChildState);
 
 ### State entry/exit actions
 
-    const Fsm::State Fsm::kSomeState("SomeState", &Fsm::Owner::SomeStateHandler, nullptr, nullptr,
-        &Fsm::Owner::FsmSomeStateEntry, &Fsm::Owner::FsmSomeStateExit);
+    const Fsm::State Fsm::kSomeState("SomeState", std::mem_fn(&Fsm::Owner::SomeStateHandler), nullptr, nullptr,
+        std::mem_fn(&Fsm::Owner::FsmSomeStateEntry), std::mem_fn(&Fsm::Owner::FsmSomeStateExit));
 
 ### History state
 
 A parent state may be a history state
 
-    const Fsm::State Fsm::kSomeState("SomeState", &Fsm::Owner::SomeStateHandler, nullptr, nullptr,
+    const Fsm::State Fsm::kSomeState("SomeState", std::mem_fn(&Fsm::Owner::SomeStateHandler), nullptr, nullptr,
         nullptr, nullptr, Fsm::EFlags::kHistory);
 
 ### Function signatures
 
-- State handlers. The signature allows to use class member functions as state handlers.
+- State handlers. The signature allows to use class member functions via std::mem_fn() as state handlers.
     Also, the argument "state" allows to use the same handler function for multiple states.
 
-        Fsm::Transition (Fsm::Owner::*)(Fsm::StatePtr state, Fsm::Event event)
+        Fsm::Transition StateHandler(Fsm::Owner* owner, Fsm::StatePtr state, Fsm::Event event)
 
-- Entry/Exit actions. Same as for handlers - the signature allows to use class member functions 
-    as action. Also, the argument "state" allows to use the same action function for multiple states.
+- Entry/Exit actions. Same as for handlers - the signature allows to use class member functions via
+    std::mem_fn() as action. Also, the argument "state" allows to use the same action function for multiple states.
 
-        void (Fsm::Owner::*)(Fsm::StatePtr state)
+        void EntryAction(Fsm::Owner* owner, Fsm::StatePtr state)
 
-- Transition actions. The signature allows to use class member functions as state handlers.
+- Transition actions. The signature allows to use class member functions via std::mem_fn() as state handlers.
     The argument "event" may be useful in actions because the action may depend on the event type or attributes
     of the event.
 
-        void (Fsm::Owner::*)(Fsm::Event event)
+        void TransitionAction(Fsm::Owner* owner, Fsm::Event event)
 
 
 ### Simple statemachine example

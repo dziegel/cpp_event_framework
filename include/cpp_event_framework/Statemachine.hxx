@@ -122,7 +122,7 @@ public:
          * @brief Type of action handler
          *
          */
-        using ActionType = void (Owner::*)(Event);
+        using ActionType = std::function<void(Owner*, Event)>;
 
         /**
          * @brief Transition target
@@ -133,7 +133,7 @@ public:
          * @brief Optional transition action
          *
          */
-        ActionType action_ = nullptr;
+        ActionType action_;
 
         /**
          * @brief Construct a new Statemachine Transition object
@@ -156,7 +156,7 @@ public:
          * @param target Target state
          * @param action Transition action
          */
-        constexpr Transition(const State& target, ActionType action) noexcept : target_(&target), action_(action)
+        constexpr Transition(const State& target, ActionType&& actions) : target_(&target), action_(actions)
         {
         }
     };
@@ -172,12 +172,12 @@ public:
          * @brief Type of on_entry / on_exit handler
          *
          */
-        using EntryExitType = void (Owner::*)(StatePtr);
+        using EntryExitType = std::function<void(Owner*, StatePtr)>;
         /**
          * @brief Type of event handler
          *
          */
-        using HandlerType = Transition (Owner::*)(StatePtr, Event);
+        using HandlerType = std::function<Transition(Owner*, StatePtr, Event)>;
 
         /**
          * @brief Flags indicating state properties
@@ -204,16 +204,16 @@ public:
          * @brief Optional entry action
          *
          */
-        EntryExitType on_entry_ = nullptr;
+        EntryExitType on_entry_;
         /**
          * @brief Optional exit action
          *
          */
-        EntryExitType on_exit_ = nullptr;
+        EntryExitType on_exit_;
         /**
          * @brief Statemachine handler, must be assigned
          */
-        HandlerType handler_ = nullptr;
+        HandlerType handler_ = {};
 
         /**
          * @brief Construct a new Statemachine State object
@@ -342,7 +342,7 @@ public:
             {
                 on_handle_event_(s, event);
             }
-            transition = (owner_->*s->handler_)(s, event);
+            transition = s->handler_(owner_, s, event);
 
             if (transition.target_ == &kDeferEvent)
             {
@@ -366,9 +366,9 @@ public:
 
                 ExitStatesFromUpTo(old_state, common_parent);
 
-                if (transition.action_ != nullptr)
+                if (transition.action_)
                 {
-                    (owner_->*transition.action_)(event);
+                    transition.action_(owner_, event);
                 }
 
                 EnterStatesFromDownTo(common_parent, transition.target_);
@@ -376,9 +376,9 @@ public:
             else
             {
                 // No transition
-                if (transition.action_ != nullptr)
+                if (transition.action_)
                 {
-                    (owner_->*transition.action_)(event);
+                    transition.action_(owner_, event);
                 }
             }
         }
@@ -438,9 +438,9 @@ public:
      * @param action Action to execute
      * @return Transition
      */
-    static Transition NoTransition(typename Transition::ActionType action = nullptr)
+    static Transition NoTransition(typename Transition::ActionType&& action = nullptr)
     {
-        return TransitionTo(kNone, action);
+        return TransitionTo(kNone, std::move(action));
     }
     /**
      * @brief Create transition to target state, with optional action
@@ -449,13 +449,13 @@ public:
      * @param action Action to execute on transition
      * @return Transition
      */
-    static Transition TransitionTo(const State& target, typename Transition::ActionType action = nullptr)
+    static Transition TransitionTo(const State& target, typename Transition::ActionType&& action = nullptr)
     {
         if (action == nullptr)
         {
             return Transition(target);
         }
-        return Transition(target, action);
+        return Transition(target, std::move(action));
     }
 
 private:
@@ -511,14 +511,14 @@ private:
                 }
             }
 
-            if (on_state_exit_ != nullptr)
+            if (on_state_exit_)
             {
                 on_state_exit_(s);
             }
 
-            if (s->on_exit_ != nullptr)
+            if (s->on_exit_)
             {
-                (owner_->*s->on_exit_)(s);
+                s->on_exit_(owner_, s);
             }
 
             s = s->parent_;
@@ -527,14 +527,14 @@ private:
 
     void EnterState(StatePtr s) const
     {
-        if (on_state_entry_ != nullptr)
+        if (on_state_entry_)
         {
             on_state_entry_(s);
         }
 
-        if (s->on_entry_ != nullptr)
+        if (s->on_entry_)
         {
-            (owner_->*s->on_entry_)(s);
+            s->on_entry_(owner_, s);
         }
     }
 

@@ -51,11 +51,6 @@ private:
     friend class Fsm;
     Fsm fsm_;
 
-    void TransitionAction(Fsm::Event event)
-    {
-        std::cout << "Transition action on event " << static_cast<int>(event) << std::endl;
-    }
-
     Fsm::Transition State1Handler(Fsm::StatePtr /* state */, Fsm::Event event)
     {
         switch (event)
@@ -72,15 +67,16 @@ private:
         switch (event)
         {
         case EEvent::kGo1:
-            return Fsm::TransitionTo(Fsm::kState1, &ClassContainingAStatemachine::TransitionAction);
+            return Fsm::TransitionTo(Fsm::kState1,
+                                     [](Fsm::Owner*, Fsm::Event) { std::cout << "Transition action" << std::endl; });
         default:
             return Fsm::UnhandledEvent();
         }
     }
 };
 
-const Fsm::State Fsm::kState1("State1", &Fsm::Owner::State1Handler);
-const Fsm::State Fsm::kState2("State2", &Fsm::Owner::State2Handler);
+const Fsm::State Fsm::kState1("State1", std::mem_fn(&Fsm::Owner::State1Handler));
+const Fsm::State Fsm::kState2("State2", std::mem_fn(&Fsm::Owner::State2Handler));
 const Fsm::StatePtr Fsm::kInitialState = &Fsm::kState1; // initial state of the statemachine
 
 void SimpleStatemachineExampleMain()

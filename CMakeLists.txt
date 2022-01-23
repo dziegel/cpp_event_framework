@@ -8,11 +8,6 @@ add_executable(cpp_event_framework
     test/main.cxx
 )
 
-target_link_options(cpp_event_framework
-    PRIVATE
-    -Xlinker -Map=map.txt
-)
-
 target_include_directories(cpp_event_framework
     PUBLIC
     include
