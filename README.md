@@ -228,7 +228,7 @@ The actual pool fill level can be checked like this:
 
         const Fsm::State Fsm::kState1("State1", std::mem_fn(&Fsm::Owner::State1Handler));
         const Fsm::State Fsm::kState2("State2", std::mem_fn(&Fsm::Owner::State2Handler));
-        const Fsm::StatePtr Fsm::kInitial = &Fsm::kState1; // initial state of the statemachine
+        const Fsm::StatePtr Fsm::kInitialState = &Fsm::kState1; // initial state of the statemachine
 
 6) Initialize with owner, name and initial state, then and start statemachine:
 
@@ -327,7 +327,7 @@ Parent states may have initial states:
 
     const Fsm::State Fsm::kParentState("ParentState", std::mem_fn(&Fsm::Owner::ParentHandler), nullptr /* no parent */, &Fsm::ChildState);
 
-### State entry/exit
+### State entry/exit actions
 
     const Fsm::State Fsm::kSomeState("SomeState", std::mem_fn(&Fsm::Owner::SomeStateHandler), nullptr, nullptr,
         std::mem_fn(&Fsm::Owner::FsmSomeStateEntry), std::mem_fn(&Fsm::Owner::FsmSomeStateExit));
@@ -338,6 +338,25 @@ A parent state may be a history state
 
     const Fsm::State Fsm::kSomeState("SomeState", std::mem_fn(&Fsm::Owner::SomeStateHandler), nullptr, nullptr,
         nullptr, nullptr, Fsm::EFlags::kHistory);
+
+### Function signatures
+
+- State handlers. The signature allows to use class member functions via std::mem_fn() as state handlers.
+    Also, the argument "state" allows to use the same handler function for multiple states.
+
+        Fsm::Transition StateHandler(Fsm::Owner* owner, Fsm::StatePtr state, Fsm::Event event)
+
+- Entry/Exit actions. Same as for handlers - the signature allows to use class member functions via
+    std::mem_fn() as action. Also, the argument "state" allows to use the same action function for multiple states.
+
+        void EntryAction(Fsm::Owner* owner, Fsm::StatePtr state)
+
+- Transition actions. The signature allows to use class member functions via std::mem_fn() as state handlers.
+    The argument "event" may be useful in actions because the action may depend on the event type or attributes
+    of the event.
+
+        void TransitionAction(Fsm::Owner* owner, Fsm::Event event)
+
 
 ### Simple statemachine example
 

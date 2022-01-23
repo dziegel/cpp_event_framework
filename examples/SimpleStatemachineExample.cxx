@@ -24,6 +24,20 @@ public:
     ClassContainingAStatemachine()
     {
         fsm_.Init(this, "Fsm", Fsm::kInitialState);
+        fsm_.on_state_entry_ = [this](Fsm::StatePtr state)
+        { std::cout << fsm_.Name() << " enter state " << state->name_ << std::endl; };
+
+        fsm_.on_state_exit_ = [this](Fsm::StatePtr state)
+        { std::cout << fsm_.Name() << " exit state " << state->name_ << std::endl; };
+
+        fsm_.on_handle_event_ = [this](Fsm::StatePtr state, Fsm::Event event) {
+            std::cout << fsm_.Name() << " state " << state->name_ << " handle event " << static_cast<int>(event)
+                      << std::endl;
+        };
+
+        fsm_.on_unhandled_event_ = [this](Fsm::Event event)
+        { std::cout << fsm_.Name() << " unhandled event " << static_cast<int>(event) << std::endl; };
+
         fsm_.Start();
     }
 
@@ -64,3 +78,9 @@ private:
 const Fsm::State Fsm::kState1("State1", std::mem_fn(&Fsm::Owner::State1Handler));
 const Fsm::State Fsm::kState2("State2", std::mem_fn(&Fsm::Owner::State2Handler));
 const Fsm::StatePtr Fsm::kInitialState = &Fsm::kState1; // initial state of the statemachine
+
+void SimpleStatemachineExampleMain()
+{
+    ClassContainingAStatemachine s;
+    s.Run();
+}
