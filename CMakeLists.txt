@@ -1,3 +1,5 @@
+cmake_minimum_required(VERSION 3.18)
+
 project(cpp_event_framework)
 
 add_executable(cpp_event_framework
@@ -61,3 +63,13 @@ target_compile_options(cpp_event_framework
     $<$<AND:$<COMPILE_LANG_AND_ID:CXX,GNU>,$<VERSION_GREATER_EQUAL:$<CXX_COMPILER_VERSION>,10>>:-Wold-style-cast>
     $<$<AND:$<COMPILE_LANG_AND_ID:CXX,GNU>,$<VERSION_GREATER_EQUAL:$<CXX_COMPILER_VERSION>,10>>:-Wmultiple-inheritance>
 )
+
+find_package(Doxygen)
+if (DOXYGEN_FOUND)
+    set(DOXYGEN_GENERATE_HTML YES)
+    set(DOXYGEN_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc)
+    doxygen_add_docs(cpp_event_framework_docs
+        include/cpp_event_framework
+        ALL
+    )
+endif()
