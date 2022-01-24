@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.18)
 
 project(cpp_event_framework)
 
+include(GNUInstallDirs REQUIRED)
+
 add_executable(cpp_event_framework
     examples/SimpleStatemachineExample.cxx
 
@@ -73,3 +75,7 @@ if (DOXYGEN_FOUND)
         ALL
     )
 endif()
+
+install(DIRECTORY include/
+    DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
+)
