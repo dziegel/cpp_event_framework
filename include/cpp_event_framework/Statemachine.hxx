@@ -525,6 +525,19 @@ public:
         return Transition(target, std::move(actions));
     }
 
+    /**
+     * @brief No transition
+     */
+    static const State kNone;
+    /**
+     * @brief Unhandled transition
+     */
+    static const State kUnhandled;
+    /**
+     * @brief Event deferral request
+     */
+    static const State kDeferEvent;
+
 private:
     StatePtr current_state_ = nullptr;
     bool working_ = false;
@@ -532,10 +545,7 @@ private:
     std::string name_;
     std::map<StatePtr, StatePtr> initial_;
 
-    static const State kNone;
-    static const State kUnhandled;
     static const State kInTransition;
-    static const State kDeferEvent;
 
     void SetInitialState(StatePtr owner, StatePtr initial)
     {
