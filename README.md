@@ -368,9 +368,9 @@ https://github.com/dziegel/cpp_event_framework/blob/main/examples/SimpleStatemac
 
 https://github.com/dziegel/cpp_event_framework/blob/main/test/Statemachine_unittest.cxx
 
-## Future ideas
+## Statemachine generation
 
-- Statemachine generator e.g. from scxml or xmi
+https://github.com/dziegel/cpp_statemachine_generator
 
 ## License
 
