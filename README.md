@@ -37,8 +37,8 @@ A simple event class which is allocated from heap is declared via a class that i
 
 The integer "0" is the ID of the event and can be accessed via:
 
-    SimpleTestEvent::kId
-    aSimpleTestEventInstance->Id()
+    SimpleTestEvent::kId           // static context
+    aSimpleTestEventInstance->Id() // instance context
 
 Event instances have names:
 
@@ -168,16 +168,16 @@ It is also possible to use event pools. The first step is to declare a pool allo
     {
     };
 
-Allocators need to be assigned to a pool:
-
-    auto pool = cpp_event_framework::Pool<>::MakeShared(PoolSizeCalculator::kSptrSize, 10, "MyPool");
-    EventPoolAllocator::SetPool(pool);
-
 To create a pool, a pool must know the maximum event size of all events that will be created from it.
 A helper template is available for this, its argument list must contain ALL signals:
 
     using PoolSizeCalculator =
         cpp_event_framework::SignalPoolElementSizeCalculator<PooledSimpleTestEvent, PooledSimpleTestEvent2>;
+
+Using the size calculator, a pool can be instantiated and allocators can be assigned to it:
+
+    auto pool = cpp_event_framework::Pool<>::MakeShared(PoolSizeCalculator::kSptrSize, 10, "MyPool");
+    EventPoolAllocator::SetPool(pool);
 
 Using a pool allocator, events can be now declared that are allocated via pools. Note the NextSignal template
 manages the event ID AND inherits the allocator from the previous signal! 
