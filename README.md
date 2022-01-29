@@ -235,7 +235,7 @@ The actual pool fill level can be checked like this:
             Fsm fsm_;
         };
 
-5) Declare statemachine states:
+5) Declare statemachine states by giving them a name and a pointer to a state handler function:
 
         const Fsm::State Fsm::kState1("State1", &Fsm::Owner::State1Handler);
         const Fsm::State Fsm::kState2("State2", &Fsm::Owner::State2Handler);
