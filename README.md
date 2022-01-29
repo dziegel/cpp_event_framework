@@ -94,6 +94,9 @@ Events are instantiated via static MakeShared() function:
     auto s1 = SimpleTestEvent::MakeShared();
     auto s2 = TestEventWithBaseClass::MakeShared(3);
 
+Instantiating via new() is not possible because operator new has been deleted:
+
+    auto s3 = new SimpleTestEvent(); // compile error
 ### Casting events
 To convert an event back from Signal base class to its actual type use the FromSignal class function. Note
 there is an assertion in there that checks that the event ID matches the event class!
