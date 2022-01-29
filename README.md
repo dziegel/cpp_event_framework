@@ -87,6 +87,13 @@ Events may inherit from base classes to simplify creation of similar events:
         }
     };
 
+### Instantiating events
+
+Events are instantiated via static MakeShared() function:
+
+    auto s1 = SimpleTestEvent::MakeShared();
+    auto s2 = TestEventWithBaseClass::MakeShared(3);
+
 ### Casting events
 To convert an event back from Signal base class to its actual type use the FromSignal class function. Note
 there is an assertion in there that checks that the event ID matches the event class!
