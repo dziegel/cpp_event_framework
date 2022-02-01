@@ -4,7 +4,7 @@ project(cpp_event_framework)
 
 include(GNUInstallDirs REQUIRED)
 
-add_executable(cpp_event_framework
+add_executable(${CMAKE_PROJECT_NAME}
     examples/SimpleStatemachineExample.cxx
 
     test/Statemachine_unittest.cxx
@@ -12,17 +12,17 @@ add_executable(cpp_event_framework
     test/main.cxx
 )
 
-target_link_options(cpp_event_framework
+target_link_options(${CMAKE_PROJECT_NAME}
     PRIVATE
     -Xlinker -Map=map.txt
 )
 
-target_include_directories(cpp_event_framework
+target_include_directories(${CMAKE_PROJECT_NAME}
     PUBLIC
     include
 )
 
-target_compile_options(cpp_event_framework
+target_compile_options(${CMAKE_PROJECT_NAME}
     PRIVATE
     -std=c++17
 
@@ -70,7 +70,7 @@ find_package(Doxygen)
 if (DOXYGEN_FOUND)
     set(DOXYGEN_GENERATE_HTML YES)
     set(DOXYGEN_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc)
-    doxygen_add_docs(cpp_event_framework_docs
+    doxygen_add_docs(${CMAKE_PROJECT_NAME}_docs
         include/cpp_event_framework
         ALL
     )
