@@ -111,8 +111,11 @@ private:
 
 /**
  * @brief Use this allocator to use a Pool as event source
+ *
+ * @tparam T Name of inhering class
+ * @tparam Pool Pool type to use
  */
-template <typename Pool = Pool<>>
+template <typename T, typename Pool = Pool<>>
 struct PoolAllocator
 {
     /**
@@ -141,9 +144,9 @@ struct PoolAllocator
     static typename Pool::SPtr pool;
 };
 
-template <typename Pool>
+template <typename T, typename Pool>
 // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
-typename Pool::SPtr PoolAllocator<Pool>::pool = nullptr;
+typename Pool::SPtr PoolAllocator<T, Pool>::pool = nullptr;
 
 /**
  * @brief Use this allocator to allocate from heap

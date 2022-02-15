@@ -49,7 +49,7 @@ public:
     }
 };
 
-class EventPoolAllocator : public cpp_event_framework::PoolAllocator<>
+class EventPoolAllocator : public cpp_event_framework::PoolAllocator<EventPoolAllocator>
 {
 };
 
