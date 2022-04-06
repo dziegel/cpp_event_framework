@@ -33,7 +33,7 @@ enum class EStateFlags
  * @param rhs
  * @return EStateFlags&
  */
-inline EStateFlags operator|(EStateFlags lhs, EStateFlags rhs)
+inline constexpr EStateFlags operator|(EStateFlags lhs, EStateFlags rhs)
 {
     using T = std::underlying_type_t<EStateFlags>;
     return static_cast<EStateFlags>(static_cast<T>(lhs) | static_cast<T>(rhs));
@@ -45,7 +45,7 @@ inline EStateFlags operator|(EStateFlags lhs, EStateFlags rhs)
  * @param rhs
  * @return EStateFlags&
  */
-inline EStateFlags& operator|=(EStateFlags& lhs, EStateFlags rhs)
+inline constexpr EStateFlags& operator|=(EStateFlags& lhs, EStateFlags rhs)
 {
     lhs = lhs | rhs;
     return lhs;
@@ -57,7 +57,7 @@ inline EStateFlags& operator|=(EStateFlags& lhs, EStateFlags rhs)
  * @param rhs
  * @return EStateFlags&
  */
-inline EStateFlags operator&(EStateFlags lhs, EStateFlags rhs)
+inline constexpr EStateFlags operator&(EStateFlags lhs, EStateFlags rhs)
 {
     using T = std::underlying_type_t<EStateFlags>;
     return static_cast<EStateFlags>(static_cast<T>(lhs) & static_cast<T>(rhs));
@@ -69,7 +69,7 @@ inline EStateFlags operator&(EStateFlags lhs, EStateFlags rhs)
  * @param rhs
  * @return EStateFlags&
  */
-inline EStateFlags& operator&=(EStateFlags& lhs, EStateFlags rhs)
+inline constexpr EStateFlags& operator&=(EStateFlags& lhs, EStateFlags rhs)
 {
     lhs = lhs & rhs;
     return lhs;
