@@ -62,28 +62,6 @@ public:
     [[nodiscard]] virtual const char* Name() const = 0;
 
     /**
-     * @brief Convert an event from shared pointer to void*
-     */
-    static void* ToVoidPointer(SPtr event)
-    {
-        // Store a pointer to self to avoid signal being freed
-        assert(event->self_ == nullptr);
-        auto* ptr = event.get();
-        event->self_ = std::move(event);
-        return ptr;
-    }
-
-    /**
-     * @brief Convert an event from void* to shared pointer
-     */
-    static SPtr FromVoidPointer(void* pointer)
-    {
-        auto* signal = static_cast<Signal*>(pointer);
-        assert(signal->self_ != nullptr);
-        return std::move(signal->self_);
-    }
-
-    /**
      * @brief Cast from generic signal
      */
     static SPtr FromSignal(const SPtr& event)
@@ -104,8 +82,6 @@ protected:
     virtual ~Signal() = default;
 
 private:
-    // Reference to self used by ToVoidPointer / FromVoidPointer
-    Signal::SPtr self_;
     const IdType id_;
 };
 
@@ -208,14 +184,6 @@ public:
     {
         assert(Check(event));
         return std::static_pointer_cast<T>(event);
-    }
-
-    /**
-     * @brief Convert from void* to specific event class
-     */
-    static SPtr FromVoidPointer(void* pointer)
-    {
-        return FromSignal(Signal::FromVoidPointer(pointer));
     }
 
     /**
