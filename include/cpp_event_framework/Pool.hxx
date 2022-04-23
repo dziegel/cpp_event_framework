@@ -22,7 +22,7 @@
 namespace cpp_event_framework
 {
 /**
- * @brief Pool of elements, especially useful for moldau signals
+ * @brief Pool of elements, especially useful for signals
  */
 template <typename MutexType = std::mutex, size_t kAlignment = sizeof(uint64_t)>
 class Pool
@@ -180,7 +180,7 @@ public:
         }
 
         /**
-         * @brief Used Moldau pool
+         * @brief Used pool
          *
          */
         Pool& pool_;
