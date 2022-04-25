@@ -137,30 +137,6 @@ Example of event usage in a switch/case statement (e.g. for use in statemachines
         DispatchEvent(PayloadTestEvent::MakeShared(std::vector<uint8_t>({1, 2, 3})));
     }
 
-### Usage with legacy C code
-Events can be passed to C code as void pointer - but be aware this breaks shared_ptr refcounting!
-After converting an event to void* it MUST be converted back ONCE from void* to event!
-
-    static void VoidPointer()
-    {
-        auto event = SimpleTestEvent::MakeShared();
-
-        void* vp = SimpleTestEvent::ToVoidPointer(event);
-
-        // pass vp to C-function
-
-        ...
-
-        // get vp back in some callback function
-
-        auto anonymous = cpp_event_framework::Signal::FromVoidPointer(vp);
-        if (anonymous->Id() == SimpleTestEvent::kId)
-        {
-            auto event2 = SimpleTestEvent::FromSignal(anonymous);
-            // use event2...
-        }
-    }
-
 ### Event pools
 It is also possible to use event pools. The first step is to declare a pool allocator:
 
