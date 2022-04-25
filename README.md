@@ -304,7 +304,7 @@ The actual pool fill level can be checked like this:
         static const Fsm::Transition Fsm::kState2ToState1;
     };
 
-    const Fsm::Transition Fsm::kState2ToState1(kState1, std::mem_fn(&Fsm::Owner::FsmState2ToState1Action));
+    const Fsm::Transition Fsm::kState2ToState1(kState1, &Fsm::Owner::FsmState2ToState1Action);
 
 ### Hierarchical states
 
@@ -339,7 +339,7 @@ A parent state may be a history state:
 
         void (Fsm::Owner::*)(Fsm::StatePtr state)
 
-- Transition actions. The signature allows to use class member functions via std::mem_fn() and delegates as actions.
+- Transition actions. The signature allows to use class member functions and delegates as actions.
     The argument "event" may be useful in actions because the action may depend on the event type or attributes
     of the event.
 

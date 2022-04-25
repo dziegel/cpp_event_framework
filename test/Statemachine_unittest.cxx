@@ -168,13 +168,13 @@ private:
     void FsmYellowRedTransitionAction1(Fsm::Event /*event*/)
     {
         yellow_red_transition1_called_ = true;
-        std::cout << "Don't walk" << std::endl;
+        std::cout << "Don't walk 1" << std::endl;
     }
 
     void FsmYellowRedTransitionAction2(Fsm::Event /*event*/)
     {
         yellow_red_transition2_called_ = true;
-        std::cout << "Don't walk" << std::endl;
+        std::cout << "Don't walk 2" << std::endl;
     }
 
     Fsm::Transition FsmRedHandler(Fsm::StatePtr /*state*/, Fsm::Event event)
@@ -286,8 +286,8 @@ const Fsm::State Fsm::kRedYellow("RedYellow", &Fsm::Owner::FsmRedYellowHandler, 
 
 const Fsm::StatePtr Fsm::kInitial = &Fsm::kOff;
 
-const Fsm::Transition Fsm::kYellowRedTransition(kRed, {std::mem_fn(&Fsm::Owner::FsmYellowRedTransitionAction1),
-                                                       std::mem_fn(&Fsm::Owner::FsmYellowRedTransitionAction2)});
+const Fsm::Transition Fsm::kYellowRedTransition(kRed, {&Fsm::Owner::FsmYellowRedTransitionAction1,
+                                                       &Fsm::Owner::FsmYellowRedTransitionAction2});
 
 void StatemachineFixtureMain()
 {
