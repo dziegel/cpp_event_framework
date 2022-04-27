@@ -37,12 +37,12 @@ A simple event class which is allocated from heap is declared via a class that i
 
 The integer "0" is the ID of the event and can be accessed via:
 
-    SimpleTestEvent::kId           // static context
-    aSimpleTestEventInstance->Id() // instance context
+    SimpleTestEvent::kId                // static context
+    SimpleTestEvent::MakeShared()->Id() // instance context
 
 Event instances have names:
 
-    std::cout << "This is " << anEventInstance->Name() << " with ID " anEventInstance->Id() << std::endl;
+    std::cout << "This is " << anEventInstance->Name() << " with ID " << anEventInstance->Id() << std::endl;
 
 To simplify creation of following events, a NextSignal template is available:
 
