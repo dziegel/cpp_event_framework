@@ -218,11 +218,6 @@ public:
          *
          */
         StatePtr const initial_ = nullptr;
-        /**
-         * @brief Statename, optional, useful for logging
-         *
-         */
-        const char* name_ = "Unnamed";
 
         /**
          * @brief Optional entry action
@@ -249,6 +244,11 @@ public:
         {
         }
 
+        const char* Name() const
+        {
+            return name_;
+        }
+
     protected:
         /**
          * @brief Construct a new Statemachine State object
@@ -259,12 +259,19 @@ public:
             : flags_(flags)
             , parent_(parent)
             , initial_(initial)
-            , name_(name)
             , on_entry_(on_entry)
             , on_exit_(on_exit)
             , handler_(handler)
+            , name_(name)
         {
         }
+
+    private:
+        /**
+         * @brief Statename, optional, useful for logging
+         *
+         */
+        const char* name_ = "Unnamed";
     };
 
     /**
@@ -676,15 +683,15 @@ private:
 };
 
 template <typename Owner, typename Event>
-const typename Statemachine<Owner, Event>::State
-    Statemachine<Owner, Event>::kNone = typename Statemachine<Owner, Event>::State("None", nullptr);
+const typename Statemachine<Owner, Event>::State Statemachine<Owner, Event>::kNone =
+    typename Statemachine<Owner, Event>::State("None", nullptr);
 template <typename Owner, typename Event>
-const typename Statemachine<Owner, Event>::State
-    Statemachine<Owner, Event>::kUnhandled = typename Statemachine<Owner, Event>::State("Unhandled", nullptr);
+const typename Statemachine<Owner, Event>::State Statemachine<Owner, Event>::kUnhandled =
+    typename Statemachine<Owner, Event>::State("Unhandled", nullptr);
 template <typename Owner, typename Event>
-const typename Statemachine<Owner, Event>::State
-    Statemachine<Owner, Event>::kInTransition = typename Statemachine<Owner, Event>::State("InTransition", nullptr);
+const typename Statemachine<Owner, Event>::State Statemachine<Owner, Event>::kInTransition =
+    typename Statemachine<Owner, Event>::State("InTransition", nullptr);
 template <typename Owner, typename Event>
-const typename Statemachine<Owner, Event>::State
-    Statemachine<Owner, Event>::kDeferEvent = typename Statemachine<Owner, Event>::State("Defer", nullptr);
+const typename Statemachine<Owner, Event>::State Statemachine<Owner, Event>::kDeferEvent =
+    typename Statemachine<Owner, Event>::State("Defer", nullptr);
 } // namespace cpp_event_framework
