@@ -332,14 +332,12 @@ A parent state may be a history state:
 - State handlers. The signature allows to use class member functions as state handlers.
     Also, the argument "state" allows to use the same handler function for multiple states.
 
-        Fsm::Transition (*)(Fsm::OwnerPtr owner, Fsm::StatePtr state, Fsm::Event event) // delegate
-        Fsm::Transition (Fsm::OwnerPtr)(Fsm::StatePtr state, Fsm::Event event)          // C++
+        Fsm::Transition (Fsm::OwnerPtr)(Fsm::StatePtr state, Fsm::Event event)
 
 - Entry/Exit actions. Same as for handlers - the signature allows to use class member functions
     as action. Also, the argument "state" allows to use the same action function for multiple states.
 
-        void (*)(Fsm::OwnerPtr owner, Fsm::StatePtr state) // delegate
-        void (Fsm::OwnerPtr)(Fsm::StatePtr state)          // C++
+        void (Fsm::OwnerPtr)(Fsm::StatePtr state)
 
 - Transition actions. The signature allows to use class member functions and delegates as actions.
     The argument "event" may be useful in actions because the action may depend on the event type or attributes
