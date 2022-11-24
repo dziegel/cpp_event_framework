@@ -368,6 +368,8 @@ public:
      */
     void Init(OwnerPtr owner, std::string name, const StatePtr initial)
     {
+        assert(owner != nullptr);
+        assert(initial != nullptr);
         name_ = std::move(name);
         owner_ = owner;
         initial_[nullptr] = initial;
@@ -378,6 +380,8 @@ public:
      */
     void Start()
     {
+        assert(owner_ != nullptr);
+        assert(initial_[nullptr] != nullptr);
         current_state_ = &kInTransition;
         EnterStatesFromDownTo(nullptr, initial_[nullptr]);
     }
