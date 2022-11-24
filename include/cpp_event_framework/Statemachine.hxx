@@ -380,8 +380,8 @@ public:
      */
     void Start()
     {
-        assert(owner_ != nullptr);
-        assert(initial_[nullptr] != nullptr);
+        assert(owner_ != nullptr);            // Most probably you forgot to call Init()
+        assert(initial_[nullptr] != nullptr); // Most probably you forgot to call Init()
         current_state_ = &kInTransition;
         EnterStatesFromDownTo(nullptr, initial_[nullptr]);
     }
@@ -393,8 +393,8 @@ public:
      */
     void React(Event event)
     {
-        assert(current_state_ != nullptr);
-        assert(!working_);
+        assert(current_state_ != nullptr); // Most probably you forgot to call Start()
+        assert(!working_);                 // Most probably you are recursively calling React()
         working_ = true;
 
         Transition transition(kInTransition);
