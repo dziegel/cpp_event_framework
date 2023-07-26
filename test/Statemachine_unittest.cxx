@@ -38,6 +38,7 @@ public:
 
     static const StatePtr kInitial;
 
+    static const Transition::ActionContainer<2> kYellowRedTransitionActions;
     static const Transition kYellowRedTransition;
 };
 
@@ -286,8 +287,9 @@ const Fsm::State Fsm::kRedYellow("RedYellow", &Fsm::Owner::FsmRedYellowHandler, 
 
 const Fsm::StatePtr Fsm::kInitial = &Fsm::kOff;
 
-const Fsm::Transition Fsm::kYellowRedTransition(kRed, {&Fsm::Owner::FsmYellowRedTransitionAction1,
-                                                       &Fsm::Owner::FsmYellowRedTransitionAction2});
+const Fsm::Transition::ActionContainer<2> Fsm::kYellowRedTransitionActions = {
+    &Fsm::Owner::FsmYellowRedTransitionAction1, &Fsm::Owner::FsmYellowRedTransitionAction2};
+const Fsm::Transition Fsm::kYellowRedTransition(kRed, Fsm::kYellowRedTransitionActions);
 
 void StatemachineFixtureMain()
 {

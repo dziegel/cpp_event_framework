@@ -31,6 +31,8 @@ target_compile_options(${CMAKE_PROJECT_NAME}
     -Wall
     -Wextra
 
+    -Wconversion
+    -Wsign-conversion
     -Wcast-qual
     -Wwrite-strings
     -Wtrampolines

@@ -12,19 +12,22 @@ Header-only C++ event and statemachine framework
 - Events have names for logging
 
 ### Statemachine
-- Hierarchical state support (if a state does not handle an event, it is passed to parent state)
+- Hierarchical state support. If a state does not handle an event, it is passed to parent state.
 - Entry/Exit funtions
 - Transition actions
 - History support
 - Unhandled event support
-- Possibility to use same handler/entry/exit function for multiple states (state is passed as argument to functions)
+- Possibility to use same handler/entry/exit function for multiple states because state is passed as argument to functions
 - Independent of event type (can be int, enum, pointer, shared pointer...)
 - Designed to be aggregated by a class
 - Designed to call member functions of class aggregating statemachine
-- State declaration is read-only (const and in RO section)
-- Transition declaration may be read-only (const, but due to std::function/std::vector usage not placed in RO section)
+- Suitable for small systems: state and transition declarations can be const and in RO section
+- Allow non-capturing lambdas as transition action
 - Logging support (state entry/exit/handler events)
 - States have names for logging
+
+### Notes
+- gsl library (gsl::span<>) is needed when compiling with C++ versions older than C++20
 
 ## Introduction to events
 
@@ -277,7 +280,7 @@ The actual pool fill level can be checked like this:
 
         return Fsm::TransitionTo(Fsm::kState1);
 
-2) Transition to another state with transition action: 
+2) Transition to another state with transition action (non-capturing lambda only): 
 
         return Fsm::TransitionTo(Fsm::kState1,
             [](Fsm::OwnerPtr, Fsm::Event) { std::cout << "Transition action" << std::endl; });
@@ -286,7 +289,7 @@ The actual pool fill level can be checked like this:
 
         return Fsm::NoTransition();
 
-4) No state transition, but an action is executed:
+4) No state transition, but an action is executed (non-capturing lambda only):
 
         return Fsm::NoTransition([](Fsm::OwnerPtr, Fsm::Event) { std::cout << "Transition action" << std::endl; });
 
@@ -339,11 +342,11 @@ A parent state may be a history state:
 
         void (Fsm::OwnerPtr)(Fsm::StatePtr state)
 
-- Transition actions. The signature allows to use class member functions and delegates as actions.
+- Transition actions. The signature allows to use class member functions and non-capturing lambdas as actions.
     The argument "event" may be useful in actions because the action may depend on the event type or attributes
     of the event.
 
-        void (*)(Fsm::OwnerPtr owner, Fsm::Event event) // delegate
+        void (*)(Fsm::OwnerPtr owner, Fsm::Event event) // Non-capturing lambda
         void (Fsm::OwnerPtr)(Fsm::Event event)          // C++
 
 

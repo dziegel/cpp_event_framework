@@ -9,12 +9,20 @@
 
 #pragma once
 
+#if __cplusplus >= 202002L
+#include <span>
+#define StatemachineSpan std::span
+#else
+#include <gsl/span>
+#define StatemachineSpan gsl::span
+#endif
+
+#include <array>
 #include <cassert>
 #include <functional>
 #include <map>
 #include <memory>
 #include <string>
-#include <vector>
 
 namespace cpp_event_framework
 {
@@ -127,18 +135,27 @@ public:
          * @brief Type of action handler
          *
          */
-        using ActionType = std::function<void(OwnerPtr, Event)>;
+        using ActionType = void (OwnerType::*)(Event);
+        /**
+         * @brief Type of action handler
+         *
+         */
+        using DelegateActionType = void (*)(OwnerPtr, Event);
+
+        /**
+         * @brief Action container type
+         *
+         */
+        template <size_t num>
+        class ActionContainer : public std::array<const ActionType, num>
+        {
+        };
 
         /**
          * @brief Transition target
          *
          */
         StatePtr target_ = nullptr;
-        /**
-         * @brief Optional transition actions
-         *
-         */
-        std::vector<ActionType> actions_;
         /**
          * @brief Execute transition actions
          *
@@ -147,9 +164,13 @@ public:
          */
         void ExecuteActions(OwnerPtr owner, Event event)
         {
+            if (delegate_action_ != nullptr)
+            {
+                delegate_action_(owner, event);
+            }
             for (const auto& action : actions_)
             {
-                action(owner, event);
+                (owner->*action)(event);
             }
         }
 
@@ -167,9 +188,20 @@ public:
          * Use Statemachine::TransitionTo() instead
          *
          * @param target Target state
+         */
+        constexpr Transition(const State& target, DelegateActionType action)
+            : target_(&target), delegate_action_(action)
+        {
+        }
+        /**
+         * @brief Construct a new Statemachine Transition object
+         * Use Statemachine::TransitionTo() instead
+         *
+         * @param target Target state
          * @param action Transition action
          */
-        constexpr Transition(const State& target, ActionType&& action) : target_(&target), actions_({std::move(action)})
+        constexpr Transition(const State& target, ActionType action)
+            : target_(&target), single_action_(action), actions_(&single_action_, 1)
         {
         }
         /**
@@ -179,10 +211,29 @@ public:
          * @param target Target state
          * @param actions Transition actions
          */
-        constexpr Transition(const State& target, std::vector<ActionType>&& actions) noexcept
-            : target_(&target), actions_(std::move(actions))
+        constexpr Transition(const State& target, StatemachineSpan<const ActionType> actions) noexcept
+            : target_(&target), actions_(actions)
         {
         }
+
+    private:
+        /**
+         * @brief Optional single transition action
+         *
+         * Provides storage for single transition actions
+         */
+        ActionType single_action_ = nullptr;
+        /**
+         * @brief Optional single lambda transition action
+         *
+         * std::function<> cannot be used here - not longer possible to store Transition in RO section!
+         */
+        DelegateActionType delegate_action_ = nullptr;
+        /**
+         * @brief Optional transition actions
+         *
+         */
+        StatemachineSpan<const ActionType> actions_;
     };
 
     /**
@@ -244,7 +295,12 @@ public:
         {
         }
 
-        const char* Name() const
+        /**
+         * @brief Statemachine name
+         *
+         * @return const char*
+         */
+        [[nodiscard]] const char* Name() const
         {
             return name_;
         }
@@ -474,18 +530,28 @@ public:
      *
      * @return Transition
      */
-    static Transition UnhandledEvent()
+    static inline Transition UnhandledEvent()
     {
-        return TransitionTo(kUnhandled);
+        return Transition(kUnhandled);
     }
     /**
      * @brief Defer event until state is exited
      *
      * @return Transition
      */
-    static Transition DeferEvent()
+    static inline Transition DeferEvent()
     {
-        return TransitionTo(kDeferEvent);
+        return Transition(kDeferEvent);
+    }
+    /**
+     * @brief Event was handled, but no transition shall be executed, with
+     * optional action
+     *
+     * @return Transition
+     */
+    static inline Transition NoTransition()
+    {
+        return Transition(kNone);
     }
     /**
      * @brief Event was handled, but no transition shall be executed, with
@@ -494,20 +560,19 @@ public:
      * @param action Action to execute
      * @return Transition
      */
-    static Transition NoTransition(typename Transition::ActionType&& action = nullptr)
+    static inline Transition NoTransition(typename Transition::DelegateActionType action)
     {
-        return TransitionTo(kNone, std::move(action));
+        return Transition(kNone, action);
     }
     /**
-     * @brief Event was handled, but no transition shall be executed, with
-     * optional actions
+     * @brief Create transition to target state, with optional action
      *
-     * @param actions Actions to execute
+     * @param target Target state
      * @return Transition
      */
-    static Transition NoTransition(std::vector<typename Transition::ActionType>&& actions)
+    static inline Transition TransitionTo(const State& target)
     {
-        return TransitionTo(kNone, std::move(actions));
+        return Transition(target);
     }
     /**
      * @brief Create transition to target state, with optional action
@@ -516,24 +581,9 @@ public:
      * @param action Action to execute on transition
      * @return Transition
      */
-    static Transition TransitionTo(const State& target, typename Transition::ActionType&& action = nullptr)
+    static inline Transition TransitionTo(const State& target, typename Transition::DelegateActionType action)
     {
-        if (action == nullptr)
-        {
-            return Transition(target);
-        }
-        return Transition(target, std::move(action));
-    }
-    /**
-     * @brief Create transition to target state, with optional actions
-     *
-     * @param target Target state
-     * @param actions Actions to execute on transition
-     * @return Transition
-     */
-    static Transition TransitionTo(const State& target, std::vector<typename Transition::ActionType>&& actions)
-    {
-        return Transition(target, std::move(actions));
+        return Transition(target, action);
     }
 
     /**
