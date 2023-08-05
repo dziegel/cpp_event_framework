@@ -9,8 +9,8 @@ enum class EEvent : uint32_t
     kGo2
 };
 
-class ClassContainingAStatemachine;
-class Fsm : public cpp_event_framework::Statemachine<ClassContainingAStatemachine, EEvent>
+class StatemachineImplementation;
+class Fsm : public cpp_event_framework::Statemachine<StatemachineImplementation, EEvent>
 {
 public:
     static const State kState1;
@@ -18,10 +18,10 @@ public:
     static const StatePtr kInitialState;
 };
 
-class ClassContainingAStatemachine
+class StatemachineImplementation
 {
 public:
-    ClassContainingAStatemachine()
+    StatemachineImplementation()
     {
         fsm_.Init(this, "Fsm", Fsm::kInitialState);
         fsm_.on_state_entry_ = [this](Fsm::StatePtr state)
@@ -48,7 +48,10 @@ public:
     }
 
 private:
+    // Allow private functions of class StatemachineImplementation to be used by FSM
     friend class Fsm;
+
+    // Implementation can aggregate the statemachine!
     Fsm fsm_;
 
     Fsm::Transition State1Handler(Fsm::StatePtr /* state */, Fsm::Event event)
@@ -81,6 +84,6 @@ const Fsm::StatePtr Fsm::kInitialState = &Fsm::kState1; // initial state of the 
 
 void SimpleStatemachineExampleMain()
 {
-    ClassContainingAStatemachine s;
+    StatemachineImplementation s;
     s.Run();
 }

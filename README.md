@@ -194,11 +194,11 @@ The actual pool fill level can be checked like this:
 
 2) Forward declare the class that will contain the statemachine:
 
-        class ClassContainingAStatemachine;
+        class StatemachineImplementation;
 
 3) Declare statemachine class and its states:
 
-        class Fsm : public cpp_event_framework::Statemachine<ClassContainingAStatemachine, EEvent>
+        class Fsm : public cpp_event_framework::Statemachine<StatemachineImplementation, EEvent>
         {
         public:
             static const Fsm::State kState1;
@@ -208,10 +208,13 @@ The actual pool fill level can be checked like this:
 
 4) Declare class that contains the statemachine:
 
-        class ClassContainingAStatemachine
+        class StatemachineImplementation
         {
         private:
+            // Allow private functions of class StatemachineImplementation to be used by FSM
             friend class Fsm;
+
+            // Implementation can aggregate the statemachine if desired
             Fsm fsm_;
         };
 
@@ -225,10 +228,10 @@ The actual pool fill level can be checked like this:
     Starting the statemachine is a separate function since it calls the entry handler of the initial state (if present).
     This may not be desired when the machine is initialized.
 
-        class ClassContainingAStatemachine
+        class StatemachineImplementation
         {
         public:
-            ClassContainingAStatemachine()
+            StatemachineImplementation()
             {
                 fsm_.Init(this, "Fsm", Fsm::kInitialState);
                 fsm_.Start();
@@ -239,7 +242,7 @@ The actual pool fill level can be checked like this:
 
 7) Implement statemachine handlers in class that contains the statemachine:
 
-        class ClassContainingAStatemachine
+        class StatemachineImplementation
         {
         [...]
         private:
@@ -260,7 +263,7 @@ The actual pool fill level can be checked like this:
                 switch (event)
                 {
                 case EEvent::kGo1:
-                    return Fsm::TransitionTo(Fsm::kState1);
+                    return Fsm::TransitionTo(Fsm::kState1, &StatemachineImplementation::State2ToState1Action);
                 default:
                     return Fsm::UnhandledEvent();
                 }
@@ -281,8 +284,12 @@ The actual pool fill level can be checked like this:
 
         return Fsm::TransitionTo(Fsm::kState1);
 
-2) Transition to another state with transition action (non-capturing lambda only): 
+2) Transition to another state with transition action: 
 
+        // Using class StatemachineImplementation member function
+        return Fsm::TransitionTo(Fsm::kState1, &StatemachineImplementation::SomeAction);
+
+        // using non-capturing lambda
         return Fsm::TransitionTo(Fsm::kState1,
             [](Fsm::ImplPtr, Fsm::Event) { std::cout << "Transition action" << std::endl; });
 
@@ -290,8 +297,12 @@ The actual pool fill level can be checked like this:
 
         return Fsm::NoTransition();
 
-4) No state transition, but an action is executed (non-capturing lambda only):
+4) No state transition, but an action is executed:
 
+        // Using class StatemachineImplementation member function
+        return Fsm::NoTransition(&StatemachineImplementation::SomeAction);
+
+        // using non-capturing lambda
         return Fsm::NoTransition([](Fsm::ImplPtr, Fsm::Event) { std::cout << "Transition action" << std::endl; });
 
 5) Event is not handled in this state. In hierarchical statemachines, the event will be passed to parent state handler.

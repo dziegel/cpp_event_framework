@@ -25,7 +25,7 @@ class EvtTurnOff : public cpp_event_framework::NextSignal<EvtTurnOff, EvtTurnOn>
 {
 };
 
-struct StatemachineFixture;
+class StatemachineFixture;
 class Fsm : public cpp_event_framework::Statemachine<StatemachineFixture, const cpp_event_framework::Signal::SPtr&>
 {
 public:
@@ -42,8 +42,9 @@ public:
     static const Transition kYellowRedTransition;
 };
 
-struct StatemachineFixture
+class StatemachineFixture
 {
+public:
     void SetUp()
     {
         fsm_.on_state_entry_ = [this](Fsm::StatePtr state)
@@ -65,7 +66,10 @@ struct StatemachineFixture
     }
 
 private:
-    friend class Fsm; // provide access to private functions of this class
+    // Allow private functions of class StatemachineFixture to be used by FSM
+    friend class Fsm;
+
+    // Implementation can aggregate the statemachine!
     Fsm fsm_;
 
     bool off_entry_called_ = false;
