@@ -25,8 +25,8 @@ class EvtTurnOff : public cpp_event_framework::NextSignal<EvtTurnOff, EvtTurnOn>
 {
 };
 
-class StatemachineFixture;
-class Fsm : public cpp_event_framework::Statemachine<StatemachineFixture, const cpp_event_framework::Signal::SPtr&>
+class IStatemachine;
+class Fsm : public cpp_event_framework::Statemachine<IStatemachine, const cpp_event_framework::Signal::SPtr&>
 {
 public:
     static const State kOff;
@@ -42,7 +42,52 @@ public:
     static const Transition kYellowRedTransition;
 };
 
-class StatemachineFixture
+class IStatemachine
+{
+public:
+    virtual ~IStatemachine() = default;
+
+    virtual void FsmOffEntry(Fsm::StateRef) = 0;
+
+    virtual void FsmOffExit(Fsm::StateRef) = 0;
+
+    virtual void FsmOnEntry(Fsm::StateRef) = 0;
+
+    virtual void FsmOnExit(Fsm::StateRef) = 0;
+
+    virtual Fsm::Transition FsmOffHandler(Fsm::StateRef, Fsm::Event) = 0;
+
+    virtual Fsm::Transition FsmOnHandler(Fsm::StateRef, Fsm::Event) = 0;
+
+    virtual Fsm::Transition FsmGreenHandler(Fsm::StateRef, Fsm::Event) = 0;
+
+    virtual Fsm::Transition FsmYellowHandler(Fsm::StateRef, Fsm::Event) = 0;
+
+    virtual void FsmYellowRedTransitionAction1(Fsm::Event) = 0;
+
+    virtual void FsmYellowRedTransitionAction2(Fsm::Event) = 0;
+
+    virtual Fsm::Transition FsmRedHandler(Fsm::StateRef, Fsm::Event) = 0;
+
+    virtual Fsm::Transition FsmRedYellowHandler(Fsm::StateRef, Fsm::Event) = 0;
+};
+
+const Fsm::State Fsm::kOff("Off", &Fsm::Impl::FsmOffHandler, nullptr, nullptr, &Fsm::Impl::FsmOffEntry,
+                           &Fsm::Impl::FsmOffExit);
+const Fsm::HistoryState Fsm::kOn("On", &Fsm::Impl::FsmOnHandler, nullptr, &Fsm::kGreen, &Fsm::Impl::FsmOnEntry,
+                                 &Fsm::Impl::FsmOnExit);
+const Fsm::State Fsm::kGreen("Green", &Fsm::Impl::FsmGreenHandler, &Fsm::kOn);
+const Fsm::State Fsm::kYellow("Yellow", &Fsm::Impl::FsmYellowHandler, &Fsm::kOn);
+const Fsm::State Fsm::kRed("Red", &Fsm::Impl::FsmRedHandler, &Fsm::kOn);
+const Fsm::State Fsm::kRedYellow("RedYellow", &Fsm::Impl::FsmRedYellowHandler, &Fsm::kOn);
+
+const Fsm::StatePtr Fsm::kInitial = &Fsm::kOff;
+
+const Fsm::Transition::ActionContainer<2> Fsm::kYellowRedTransitionActions = {
+    &Fsm::Impl::FsmYellowRedTransitionAction1, &Fsm::Impl::FsmYellowRedTransitionAction2};
+const Fsm::Transition Fsm::kYellowRedTransition(kRed, Fsm::kYellowRedTransitionActions);
+
+class StatemachineFixture : private IStatemachine
 {
 public:
     void SetUp()
@@ -67,9 +112,6 @@ public:
     }
 
 private:
-    // Allow private functions of class StatemachineFixture to be used by FSM
-    friend class Fsm;
-
     // Implementation can aggregate the statemachine!
     Fsm fsm_;
 
@@ -92,31 +134,31 @@ private:
         assert(on_unhandled_event_called_ == false);
     }
 
-    void FsmOffEntry(Fsm::StateRef /*state*/)
+    void FsmOffEntry(Fsm::StateRef /*state*/) override
     {
         off_entry_called_ = true;
         std::cout << "Off entry" << std::endl;
     }
 
-    void FsmOffExit(Fsm::StateRef /*state*/)
+    void FsmOffExit(Fsm::StateRef /*state*/) override
     {
         off_exit_called_ = true;
         std::cout << "Off exit" << std::endl;
     }
 
-    void FsmOnEntry(Fsm::StateRef /*state*/)
+    void FsmOnEntry(Fsm::StateRef /*state*/) override
     {
         on_entry_called_ = true;
         std::cout << "On entry" << std::endl;
     }
 
-    void FsmOnExit(Fsm::StateRef /*state*/)
+    void FsmOnExit(Fsm::StateRef /*state*/) override
     {
         on_exit_called_ = true;
         std::cout << "On exit" << std::endl;
     }
 
-    Fsm::Transition FsmOffHandler(Fsm::StateRef /*state*/, Fsm::Event event)
+    Fsm::Transition FsmOffHandler(Fsm::StateRef /*state*/, Fsm::Event event) override
     {
         switch (event->Id())
         {
@@ -132,7 +174,7 @@ private:
         }
     }
 
-    Fsm::Transition FsmOnHandler(Fsm::StateRef /*state*/, Fsm::Event event)
+    Fsm::Transition FsmOnHandler(Fsm::StateRef /*state*/, Fsm::Event event) override
     {
         switch (event->Id())
         {
@@ -145,7 +187,7 @@ private:
         }
     }
 
-    Fsm::Transition FsmGreenHandler(Fsm::StateRef /*state*/, Fsm::Event event)
+    Fsm::Transition FsmGreenHandler(Fsm::StateRef /*state*/, Fsm::Event event) override
     {
         switch (event->Id())
         {
@@ -158,7 +200,7 @@ private:
         }
     }
 
-    Fsm::Transition FsmYellowHandler(Fsm::StateRef /*state*/, Fsm::Event event)
+    Fsm::Transition FsmYellowHandler(Fsm::StateRef /*state*/, Fsm::Event event) override
     {
         switch (event->Id())
         {
@@ -171,19 +213,19 @@ private:
         }
     }
 
-    void FsmYellowRedTransitionAction1(Fsm::Event /*event*/)
+    void FsmYellowRedTransitionAction1(Fsm::Event /*event*/) override
     {
         yellow_red_transition1_called_ = true;
         std::cout << "Don't walk 1" << std::endl;
     }
 
-    void FsmYellowRedTransitionAction2(Fsm::Event /*event*/)
+    void FsmYellowRedTransitionAction2(Fsm::Event /*event*/) override
     {
         yellow_red_transition2_called_ = true;
         std::cout << "Don't walk 2" << std::endl;
     }
 
-    Fsm::Transition FsmRedHandler(Fsm::StateRef /*state*/, Fsm::Event event)
+    Fsm::Transition FsmRedHandler(Fsm::StateRef /*state*/, Fsm::Event event) override
     {
         switch (event->Id())
         {
@@ -196,7 +238,7 @@ private:
         }
     }
 
-    Fsm::Transition FsmRedYellowHandler(Fsm::StateRef /*state*/, Fsm::Event event)
+    Fsm::Transition FsmRedYellowHandler(Fsm::StateRef /*state*/, Fsm::Event event) override
     {
         switch (event->Id())
         {
@@ -280,21 +322,6 @@ public:
         assert(fsm_.CurrentState() == &Fsm::kYellow);
     }
 };
-
-const Fsm::State Fsm::kOff("Off", &Fsm::Impl::FsmOffHandler, nullptr, nullptr, &Fsm::Impl::FsmOffEntry,
-                           &Fsm::Impl::FsmOffExit);
-const Fsm::HistoryState Fsm::kOn("On", &Fsm::Impl::FsmOnHandler, nullptr, &Fsm::kGreen, &Fsm::Impl::FsmOnEntry,
-                                 &Fsm::Impl::FsmOnExit);
-const Fsm::State Fsm::kGreen("Green", &Fsm::Impl::FsmGreenHandler, &Fsm::kOn);
-const Fsm::State Fsm::kYellow("Yellow", &Fsm::Impl::FsmYellowHandler, &Fsm::kOn);
-const Fsm::State Fsm::kRed("Red", &Fsm::Impl::FsmRedHandler, &Fsm::kOn);
-const Fsm::State Fsm::kRedYellow("RedYellow", &Fsm::Impl::FsmRedYellowHandler, &Fsm::kOn);
-
-const Fsm::StatePtr Fsm::kInitial = &Fsm::kOff;
-
-const Fsm::Transition::ActionContainer<2> Fsm::kYellowRedTransitionActions = {
-    &Fsm::Impl::FsmYellowRedTransitionAction1, &Fsm::Impl::FsmYellowRedTransitionAction2};
-const Fsm::Transition Fsm::kYellowRedTransition(kRed, Fsm::kYellowRedTransitionActions);
 
 void StatemachineFixtureMain()
 {
