@@ -174,11 +174,15 @@ In the following example, PooledSimpleTestEvent and PooledSimpleTestEvent2 are a
 
 The actual pool fill level can be checked like this:
 
-    auto event = PooledSimpleTestEvent::MakeShared();
-    assert(pool->FillLevel() == 9);
+    assert(pool->FillLevel() == 10);
+    {
+        auto event = PooledSimpleTestEvent::MakeShared();
+        assert(pool->FillLevel() == 9);
 
-    auto event2 = PooledSimpleTestEvent2::MakeShared();
-    assert(pool->FillLevel() == 8);
+        auto event2 = PooledSimpleTestEvent2::MakeShared();
+        assert(pool->FillLevel() == 8);
+    }
+    assert(pool->FillLevel() == 10);
 
 ## Introduction to statemachine framework
 

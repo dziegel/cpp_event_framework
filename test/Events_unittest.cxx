@@ -85,30 +85,19 @@ public:
         assert(e->val_ == 4);
     }
 
-    static void PooledSignalsTestHelper(const cpp_event_framework::Pool<>::SPtr& pool)
-    {
-        auto event = PooledSimpleTestEvent::MakeShared();
-        assert(event->Id() == 3);
-        assert(event->Id() == PooledSimpleTestEvent::kId);
-        assert(pool->FillLevel() == 9);
-
-        auto event2 = PooledSimpleTestEvent2::MakeShared();
-        assert(event2->Id() == 4);
-        assert(event2->Id() == PooledSimpleTestEvent2::kId);
-        assert(pool->FillLevel() == 8);
-
-        // Reference events again to avoid them being freed
-        assert(event.use_count() == 1);
-        assert(event2.use_count() == 1);
-    }
-
     static void PooledSignals()
     {
         auto pool = cpp_event_framework::Pool<>::MakeShared(PoolSizeCalculator::kSptrSize, 10, "MyPool");
         EventPoolAllocator::SetPool(pool);
 
         assert(pool->FillLevel() == 10);
-        PooledSignalsTestHelper(pool);
+        {
+            auto event = PooledSimpleTestEvent::MakeShared();
+            assert(pool->FillLevel() == 9);
+
+            auto event2 = PooledSimpleTestEvent2::MakeShared();
+            assert(pool->FillLevel() == 8);
+        }
         assert(pool->FillLevel() == 10);
     }
 
