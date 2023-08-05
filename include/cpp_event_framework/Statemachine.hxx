@@ -87,7 +87,7 @@ inline constexpr EStateFlags& operator&=(EStateFlags& lhs, EStateFlags rhs)
  * @brief Statemachine implementation
  *
  */
-template <typename OwnerType, typename EventType>
+template <typename ImplType, typename EventType>
 class Statemachine
 {
 public:
@@ -100,15 +100,15 @@ public:
     using SPtr = std::shared_ptr<Statemachine>;
 
     /**
-     * @brief Statemachine owner type
+     * @brief Statemachine implementation type
      *
      */
-    using Owner = OwnerType;
+    using Impl = ImplType;
     /**
-     * @brief Statemachine owner pointer type
+     * @brief Statemachine implementation pointer type
      *
      */
-    using OwnerPtr = OwnerType*;
+    using ImplPtr = ImplType*;
     /**
      * @brief Statemachine event type
      *
@@ -135,12 +135,12 @@ public:
          * @brief Type of action handler
          *
          */
-        using ActionType = void (OwnerType::*)(Event);
+        using ActionType = void (ImplType::*)(Event);
         /**
          * @brief Type of action handler
          *
          */
-        using DelegateActionType = void (*)(OwnerPtr, Event);
+        using DelegateActionType = void (*)(ImplPtr, Event);
 
         /**
          * @brief Action container type
@@ -159,18 +159,18 @@ public:
         /**
          * @brief Execute transition actions
          *
-         * @param owner
+         * @param impl
          * @param event
          */
-        void ExecuteActions(OwnerPtr owner, Event event)
+        void ExecuteActions(ImplPtr impl, Event event)
         {
             if (delegate_action_ != nullptr)
             {
-                delegate_action_(owner, event);
+                delegate_action_(impl, event);
             }
             for (const auto& action : actions_)
             {
-                (owner->*action)(event);
+                (impl->*action)(event);
             }
         }
 
@@ -247,12 +247,12 @@ public:
          * @brief Type of on_entry / on_exit handler
          *
          */
-        using EntryExitType = void (Owner::*)(StatePtr);
+        using EntryExitType = void (Impl::*)(StatePtr);
         /**
          * @brief Type of event handler
          *
          */
-        using HandlerType = Transition (Owner::*)(StatePtr, Event);
+        using HandlerType = Transition (Impl::*)(StatePtr, Event);
 
         /**
          * @brief Flags indicating state properties
@@ -416,18 +416,18 @@ public:
     Statemachine& operator=(Statemachine&& rhs) noexcept = default;
 
     /**
-     * @brief Initialize statemachine with owner, name and initial state.
+     * @brief Initialize statemachine with impl, name and initial state.
      *
-     * @param owner Statemachine owner
+     * @param impl Statemachine implementation
      * @param name Statemachine name, useful for logging
      * @param initial Initial state
      */
-    void Init(OwnerPtr owner, std::string name, const StatePtr initial)
+    void Init(ImplPtr impl, std::string name, const StatePtr initial)
     {
-        assert(owner != nullptr);
+        assert(impl != nullptr);
         assert(initial != nullptr);
         name_ = std::move(name);
-        owner_ = owner;
+        impl_ = impl;
         initial_[nullptr] = initial;
     }
     /**
@@ -436,7 +436,7 @@ public:
      */
     void Start()
     {
-        assert(owner_ != nullptr);            // Most probably you forgot to call Init()
+        assert(impl_ != nullptr);             // Most probably you forgot to call Init()
         assert(initial_[nullptr] != nullptr); // Most probably you forgot to call Init()
         current_state_ = &kInTransition;
         EnterStatesFromDownTo(nullptr, initial_[nullptr]);
@@ -462,7 +462,7 @@ public:
             {
                 on_handle_event_(s, event);
             }
-            transition = (owner_->*s->handler_)(s, event);
+            transition = (impl_->*s->handler_)(s, event);
 
             if (transition.target_ == &kDeferEvent)
             {
@@ -485,13 +485,13 @@ public:
                 current_state_ = &kInTransition;
 
                 ExitStatesFromUpTo(old_state, common_parent);
-                transition.ExecuteActions(owner_, event);
+                transition.ExecuteActions(impl_, event);
                 EnterStatesFromDownTo(common_parent, transition.target_);
             }
             else
             {
                 // No transition
-                transition.ExecuteActions(owner_, event);
+                transition.ExecuteActions(impl_, event);
             }
         }
         else
@@ -602,17 +602,17 @@ public:
 private:
     StatePtr current_state_ = nullptr;
     bool working_ = false;
-    OwnerPtr owner_ = nullptr;
+    ImplPtr impl_ = nullptr;
     std::string name_;
     std::map<StatePtr, StatePtr> initial_;
 
     static const State kInTransition;
 
-    void SetInitialState(StatePtr owner, StatePtr initial)
+    void SetInitialState(StatePtr impl, StatePtr initial)
     {
-        if ((owner->flags_ & EFlags::kHistory) != EFlags::kNone)
+        if ((impl->flags_ & EFlags::kHistory) != EFlags::kNone)
         {
-            initial_[owner] = initial;
+            initial_[impl] = initial;
         }
         else
         {
@@ -620,18 +620,18 @@ private:
         }
     }
 
-    StatePtr GetInitialState(StatePtr owner) const
+    StatePtr GetInitialState(StatePtr impl) const
     {
-        if ((owner->flags_ & EFlags::kHistory) != EFlags::kNone)
+        if ((impl->flags_ & EFlags::kHistory) != EFlags::kNone)
         {
-            auto search = initial_.find(owner);
+            auto search = initial_.find(impl);
             if (search != initial_.end())
             {
                 return search->second;
             }
         }
 
-        return owner->initial_;
+        return impl->initial_;
     }
 
     void ExitStatesFromUpTo(StatePtr from, StatePtr top)
@@ -656,7 +656,7 @@ private:
 
             if (s->on_exit_ != nullptr)
             {
-                (owner_->*s->on_exit_)(s);
+                (impl_->*s->on_exit_)(s);
             }
 
             s = s->parent_;
@@ -672,7 +672,7 @@ private:
 
         if (s->on_entry_ != nullptr)
         {
-            (owner_->*s->on_entry_)(s);
+            (impl_->*s->on_entry_)(s);
         }
     }
 
@@ -736,16 +736,16 @@ private:
     }
 };
 
-template <typename Owner, typename Event>
-const typename Statemachine<Owner, Event>::State Statemachine<Owner, Event>::kNone =
-    typename Statemachine<Owner, Event>::State("None", nullptr);
-template <typename Owner, typename Event>
-const typename Statemachine<Owner, Event>::State Statemachine<Owner, Event>::kUnhandled =
-    typename Statemachine<Owner, Event>::State("Unhandled", nullptr);
-template <typename Owner, typename Event>
-const typename Statemachine<Owner, Event>::State Statemachine<Owner, Event>::kInTransition =
-    typename Statemachine<Owner, Event>::State("InTransition", nullptr);
-template <typename Owner, typename Event>
-const typename Statemachine<Owner, Event>::State Statemachine<Owner, Event>::kDeferEvent =
-    typename Statemachine<Owner, Event>::State("Defer", nullptr);
+template <typename Impl, typename Event>
+const typename Statemachine<Impl, Event>::State Statemachine<Impl, Event>::kNone =
+    typename Statemachine<Impl, Event>::State("None", nullptr);
+template <typename Impl, typename Event>
+const typename Statemachine<Impl, Event>::State Statemachine<Impl, Event>::kUnhandled =
+    typename Statemachine<Impl, Event>::State("Unhandled", nullptr);
+template <typename Impl, typename Event>
+const typename Statemachine<Impl, Event>::State Statemachine<Impl, Event>::kInTransition =
+    typename Statemachine<Impl, Event>::State("InTransition", nullptr);
+template <typename Impl, typename Event>
+const typename Statemachine<Impl, Event>::State Statemachine<Impl, Event>::kDeferEvent =
+    typename Statemachine<Impl, Event>::State("Defer", nullptr);
 } // namespace cpp_event_framework

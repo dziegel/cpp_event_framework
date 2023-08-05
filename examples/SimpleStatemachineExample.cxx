@@ -68,15 +68,15 @@ private:
         {
         case EEvent::kGo1:
             return Fsm::TransitionTo(Fsm::kState1,
-                                     [](Fsm::OwnerPtr, Fsm::Event) { std::cout << "Transition action" << std::endl; });
+                                     [](Fsm::ImplPtr, Fsm::Event) { std::cout << "Transition action" << std::endl; });
         default:
             return Fsm::UnhandledEvent();
         }
     }
 };
 
-const Fsm::State Fsm::kState1("State1", &Fsm::Owner::State1Handler);
-const Fsm::State Fsm::kState2("State2", &Fsm::Owner::State2Handler);
+const Fsm::State Fsm::kState1("State1", &Fsm::Impl::State1Handler);
+const Fsm::State Fsm::kState2("State2", &Fsm::Impl::State2Handler);
 const Fsm::StatePtr Fsm::kInitialState = &Fsm::kState1; // initial state of the statemachine
 
 void SimpleStatemachineExampleMain()

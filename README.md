@@ -217,11 +217,11 @@ The actual pool fill level can be checked like this:
 
 5) Declare statemachine states by giving them a name and a pointer to a state handler function:
 
-        const Fsm::State Fsm::kState1("State1", &Fsm::Owner::State1Handler);
-        const Fsm::State Fsm::kState2("State2", &Fsm::Owner::State2Handler);
+        const Fsm::State Fsm::kState1("State1", &Fsm::Impl::State1Handler);
+        const Fsm::State Fsm::kState2("State2", &Fsm::Impl::State2Handler);
         const Fsm::StatePtr Fsm::kInitialState = &Fsm::kState1; // initial state of the statemachine
 
-6) Initialize with owner, name and initial state, then and start statemachine.
+6) Initialize with implementation, name and initial state, then and start statemachine.
     Starting the statemachine is a separate function since it calls the entry handler of the initial state (if present).
     This may not be desired when the machine is initialized.
 
@@ -284,7 +284,7 @@ The actual pool fill level can be checked like this:
 2) Transition to another state with transition action (non-capturing lambda only): 
 
         return Fsm::TransitionTo(Fsm::kState1,
-            [](Fsm::OwnerPtr, Fsm::Event) { std::cout << "Transition action" << std::endl; });
+            [](Fsm::ImplPtr, Fsm::Event) { std::cout << "Transition action" << std::endl; });
 
 3) No transition - event is handled, but no state transition occurs:
 
@@ -292,7 +292,7 @@ The actual pool fill level can be checked like this:
 
 4) No state transition, but an action is executed (non-capturing lambda only):
 
-        return Fsm::NoTransition([](Fsm::OwnerPtr, Fsm::Event) { std::cout << "Transition action" << std::endl; });
+        return Fsm::NoTransition([](Fsm::ImplPtr, Fsm::Event) { std::cout << "Transition action" << std::endl; });
 
 5) Event is not handled in this state. In hierarchical statemachines, the event will be passed to parent state handler.
    When topmost state does not handle the event, fsm_.on_unhandled_event_ is called.
@@ -319,36 +319,36 @@ The actual pool fill level can be checked like this:
     };
 
     // Single action
-    const Fsm::Transition Fsm::kState2ToState1(kState1, &Fsm::Owner::FsmState2ToState1Action);
+    const Fsm::Transition Fsm::kState2ToState1(kState1, &Fsm::Impl::FsmState2ToState1Action);
 
     // Multiple actions (clean, std::array<> based)
-    const Fsm::Transition::ActionContainer<2> Fsm::kState2ToState3Actions = {&Fsm::Owner::FsmState2ToState3Action1, &Fsm::Owner::FsmState2ToState3Action2};
+    const Fsm::Transition::ActionContainer<2> Fsm::kState2ToState3Actions = {&Fsm::Impl::FsmState2ToState3Action1, &Fsm::Impl::FsmState2ToState3Action2};
     const Fsm::Transition Fsm::kState2ToState3(kState3, kState2ToState3Actions);
 
     // Multiple actions (unclean, C-style array)
-    const Fsm::Transition::ActionType Fsm::kState2ToState4Actions[] = {&Fsm::Owner::FsmState2ToState4Action1, &Fsm::Owner::FsmState2ToState4Action2};
+    const Fsm::Transition::ActionType Fsm::kState2ToState4Actions[] = {&Fsm::Impl::FsmState2ToState4Action1, &Fsm::Impl::FsmState2ToState4Action2};
     const Fsm::Transition Fsm::kState2ToState4(kState4, kState2ToState4Actions);
 
 ### Hierarchical states
 
 To create a hierarchical statemachine, states may have parent states:
 
-    const Fsm::State Fsm::kChildState("ChildState", &Fsm::Owner::ChildHandler, &Fsm::SomeParent);
+    const Fsm::State Fsm::kChildState("ChildState", &Fsm::Impl::ChildHandler, &Fsm::SomeParent);
 
 Parent states may have initial states:
 
-    const Fsm::State Fsm::kParentState("ParentState", &Fsm::Owner::ParentHandler, nullptr /* no parent */, &Fsm::ChildState);
+    const Fsm::State Fsm::kParentState("ParentState", &Fsm::Impl::ParentHandler, nullptr /* no parent */, &Fsm::ChildState);
 
 ### State entry/exit actions
 
-    const Fsm::State Fsm::kSomeState("SomeState", &Fsm::Owner::SomeStateHandler, nullptr, nullptr,
-        &Fsm::Owner::FsmSomeStateEntry, &Fsm::Owner::FsmSomeStateExit);
+    const Fsm::State Fsm::kSomeState("SomeState", &Fsm::Impl::SomeStateHandler, nullptr, nullptr,
+        &Fsm::Impl::FsmSomeStateEntry, &Fsm::Impl::FsmSomeStateExit);
 
 ### History state
 
 A parent state may be a history state:
 
-    const Fsm::HistoryState Fsm::kSomeState("SomeState", &Fsm::Owner::SomeStateHandler, nullptr, nullptr, nullptr, nullptr);
+    const Fsm::HistoryState Fsm::kSomeState("SomeState", &Fsm::Impl::SomeStateHandler, nullptr, nullptr, nullptr, nullptr);
 
 ### Deferred events
 
@@ -364,19 +364,19 @@ Example:
 - State handlers. The signature allows to use class member functions as state handlers.
     Also, the argument "state" allows to use the same handler function for multiple states.
 
-        Fsm::Transition (Fsm::OwnerPtr)(Fsm::StatePtr state, Fsm::Event event)
+        Fsm::Transition (Fsm::ImplPtr)(Fsm::StatePtr state, Fsm::Event event)
 
 - Entry/Exit actions. Same as for handlers - the signature allows to use class member functions
     as action. Also, the argument "state" allows to use the same action function for multiple states.
 
-        void (Fsm::OwnerPtr)(Fsm::StatePtr state)
+        void (Fsm::ImplPtr)(Fsm::StatePtr state)
 
 - Transition actions. The signature allows to use class member functions and non-capturing lambdas as actions.
     The argument "event" may be useful in actions because the action may depend on the event type or attributes
     of the event.
 
-        void (*)(Fsm::OwnerPtr owner, Fsm::Event event) // Non-capturing lambda
-        void (Fsm::OwnerPtr)(Fsm::Event event)          // C++
+        void (*)(Fsm::ImplPtr impl, Fsm::Event event) // Non-capturing lambda
+        void (Fsm::ImplPtr)(Fsm::Event event)         // C++
 
 
 ### Simple statemachine example
