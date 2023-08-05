@@ -24,19 +24,22 @@ public:
     StatemachineImplementation()
     {
         fsm_.Init(this, "Fsm", Fsm::kInitialState);
-        fsm_.on_state_entry_ = [this](Fsm::StatePtr state)
-        { std::cout << fsm_.Name() << " enter state " << state->Name() << std::endl; };
+        fsm_.on_state_entry_ = [this](Fsm::StateRef state)
+        { std::cout << fsm_.Name() << " enter state " << state.Name() << std::endl; };
 
-        fsm_.on_state_exit_ = [this](Fsm::StatePtr state)
-        { std::cout << fsm_.Name() << " exit state " << state->Name() << std::endl; };
+        fsm_.on_state_exit_ = [this](Fsm::StateRef state)
+        { std::cout << fsm_.Name() << " exit state " << state.Name() << std::endl; };
 
-        fsm_.on_handle_event_ = [this](Fsm::StatePtr state, Fsm::Event event) {
-            std::cout << fsm_.Name() << " state " << state->Name() << " handle event " << static_cast<int>(event)
+        fsm_.on_handle_event_ = [this](Fsm::StateRef state, Fsm::Event event) {
+            std::cout << fsm_.Name() << " state " << state.Name() << " handle event " << static_cast<int>(event)
                       << std::endl;
         };
 
-        fsm_.on_unhandled_event_ = [this](Fsm::Event event)
-        { std::cout << fsm_.Name() << " unhandled event " << static_cast<int>(event) << std::endl; };
+        fsm_.on_unhandled_event_ = [this](Fsm::StateRef state, Fsm::Event event)
+        {
+            std::cout << fsm_.Name() << " unhandled event " << static_cast<int>(event) << " in state " << state.Name()
+                      << std::endl;
+        };
 
         fsm_.Start();
     }
@@ -54,7 +57,7 @@ private:
     // Implementation can aggregate the statemachine!
     Fsm fsm_;
 
-    Fsm::Transition State1Handler(Fsm::StatePtr /* state */, Fsm::Event event)
+    Fsm::Transition State1Handler(Fsm::StateRef /* state */, Fsm::Event event)
     {
         switch (event)
         {
@@ -65,7 +68,7 @@ private:
         }
     }
 
-    Fsm::Transition State2Handler(Fsm::StatePtr /* state */, Fsm::Event event)
+    Fsm::Transition State2Handler(Fsm::StateRef /* state */, Fsm::Event event)
     {
         switch (event)
         {

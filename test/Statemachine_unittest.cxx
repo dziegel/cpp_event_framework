@@ -47,19 +47,20 @@ class StatemachineFixture
 public:
     void SetUp()
     {
-        fsm_.on_state_entry_ = [this](Fsm::StatePtr state)
-        { std::cout << fsm_.Name() << " enter state " << state->Name() << std::endl; };
+        fsm_.on_state_entry_ = [this](Fsm::StateRef state)
+        { std::cout << fsm_.Name() << " enter state " << state.Name() << std::endl; };
 
-        fsm_.on_state_exit_ = [this](Fsm::StatePtr state)
-        { std::cout << fsm_.Name() << " exit state " << state->Name() << std::endl; };
+        fsm_.on_state_exit_ = [this](Fsm::StateRef state)
+        { std::cout << fsm_.Name() << " exit state " << state.Name() << std::endl; };
 
-        fsm_.on_handle_event_ = [this](Fsm::StatePtr state, Fsm::Event event)
-        { std::cout << fsm_.Name() << " state " << state->Name() << " handle event " << event->Name() << std::endl; };
+        fsm_.on_handle_event_ = [this](Fsm::StateRef state, Fsm::Event event)
+        { std::cout << fsm_.Name() << " state " << state.Name() << " handle event " << event->Name() << std::endl; };
 
-        fsm_.on_unhandled_event_ = [this](Fsm::Event event)
+        fsm_.on_unhandled_event_ = [this](Fsm::StateRef state, Fsm::Event event)
         {
             on_unhandled_event_called_ = true;
-            std::cout << fsm_.Name() << " unhandled event " << event->Name() << std::endl;
+            std::cout << fsm_.Name() << " unhandled event " << event->Name() << " in state " << state.Name()
+                      << std::endl;
         };
 
         fsm_.Init(this, "Fsm", Fsm::kInitial);
@@ -91,31 +92,31 @@ private:
         assert(on_unhandled_event_called_ == false);
     }
 
-    void FsmOffEntry(Fsm::StatePtr /*state*/)
+    void FsmOffEntry(Fsm::StateRef /*state*/)
     {
         off_entry_called_ = true;
         std::cout << "Off entry" << std::endl;
     }
 
-    void FsmOffExit(Fsm::StatePtr /*state*/)
+    void FsmOffExit(Fsm::StateRef /*state*/)
     {
         off_exit_called_ = true;
         std::cout << "Off exit" << std::endl;
     }
 
-    void FsmOnEntry(Fsm::StatePtr /*state*/)
+    void FsmOnEntry(Fsm::StateRef /*state*/)
     {
         on_entry_called_ = true;
         std::cout << "On entry" << std::endl;
     }
 
-    void FsmOnExit(Fsm::StatePtr /*state*/)
+    void FsmOnExit(Fsm::StateRef /*state*/)
     {
         on_exit_called_ = true;
         std::cout << "On exit" << std::endl;
     }
 
-    Fsm::Transition FsmOffHandler(Fsm::StatePtr /*state*/, Fsm::Event event)
+    Fsm::Transition FsmOffHandler(Fsm::StateRef /*state*/, Fsm::Event event)
     {
         switch (event->Id())
         {
@@ -131,7 +132,7 @@ private:
         }
     }
 
-    Fsm::Transition FsmOnHandler(Fsm::StatePtr /*state*/, Fsm::Event event)
+    Fsm::Transition FsmOnHandler(Fsm::StateRef /*state*/, Fsm::Event event)
     {
         switch (event->Id())
         {
@@ -144,7 +145,7 @@ private:
         }
     }
 
-    Fsm::Transition FsmGreenHandler(Fsm::StatePtr /*state*/, Fsm::Event event)
+    Fsm::Transition FsmGreenHandler(Fsm::StateRef /*state*/, Fsm::Event event)
     {
         switch (event->Id())
         {
@@ -157,7 +158,7 @@ private:
         }
     }
 
-    Fsm::Transition FsmYellowHandler(Fsm::StatePtr /*state*/, Fsm::Event event)
+    Fsm::Transition FsmYellowHandler(Fsm::StateRef /*state*/, Fsm::Event event)
     {
         switch (event->Id())
         {
@@ -182,7 +183,7 @@ private:
         std::cout << "Don't walk 2" << std::endl;
     }
 
-    Fsm::Transition FsmRedHandler(Fsm::StatePtr /*state*/, Fsm::Event event)
+    Fsm::Transition FsmRedHandler(Fsm::StateRef /*state*/, Fsm::Event event)
     {
         switch (event->Id())
         {
@@ -195,7 +196,7 @@ private:
         }
     }
 
-    Fsm::Transition FsmRedYellowHandler(Fsm::StatePtr /*state*/, Fsm::Event event)
+    Fsm::Transition FsmRedYellowHandler(Fsm::StateRef /*state*/, Fsm::Event event)
     {
         switch (event->Id())
         {

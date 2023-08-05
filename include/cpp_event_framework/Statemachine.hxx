@@ -124,6 +124,11 @@ public:
      *
      */
     using StatePtr = const State*;
+    /**
+     * @brief State reference (used in many function signatures)
+     *
+     */
+    using StateRef = const State&;
 
     /**
      * @brief State machine transition class, used internally
@@ -180,7 +185,7 @@ public:
          *
          * @param target Target state
          */
-        constexpr Transition(const State& target) : target_(&target)
+        constexpr Transition(StateRef target) : target_(&target)
         {
         }
         /**
@@ -189,8 +194,7 @@ public:
          *
          * @param target Target state
          */
-        constexpr Transition(const State& target, DelegateActionType action)
-            : target_(&target), delegate_action_(action)
+        constexpr Transition(StateRef target, DelegateActionType action) : target_(&target), delegate_action_(action)
         {
         }
         /**
@@ -200,7 +204,7 @@ public:
          * @param target Target state
          * @param action Transition action
          */
-        constexpr Transition(const State& target, ActionType action)
+        constexpr Transition(StateRef target, ActionType action)
             : target_(&target), single_action_(action), actions_(&single_action_, 1)
         {
         }
@@ -211,7 +215,7 @@ public:
          * @param target Target state
          * @param actions Transition actions
          */
-        constexpr Transition(const State& target, StatemachineSpan<const ActionType> actions) noexcept
+        constexpr Transition(StateRef target, StatemachineSpan<const ActionType> actions) noexcept
             : target_(&target), actions_(actions)
         {
         }
@@ -247,12 +251,12 @@ public:
          * @brief Type of on_entry / on_exit handler
          *
          */
-        using EntryExitType = void (Impl::*)(StatePtr);
+        using EntryExitType = void (Impl::*)(StateRef);
         /**
          * @brief Type of event handler
          *
          */
-        using HandlerType = Transition (Impl::*)(StatePtr, Event);
+        using HandlerType = Transition (Impl::*)(StateRef, Event);
 
         /**
          * @brief Flags indicating state properties
@@ -353,28 +357,28 @@ public:
      * @brief State is entered (useful for logging)
      *
      */
-    std::function<void(StatePtr)> on_state_entry_;
+    std::function<void(StateRef)> on_state_entry_;
     /**
      * @brief State is left (useful for logging)
      *
      */
-    std::function<void(StatePtr)> on_state_exit_;
+    std::function<void(StateRef)> on_state_exit_;
     /**
      * @brief Event is passed to a state (useful for logging)
      *
      */
-    std::function<void(StatePtr, Event)> on_handle_event_;
+    std::function<void(StateRef, Event)> on_handle_event_;
     /**
      * @brief Unhandled event callback, fired when top-level state does not handle
      * event
      *
      */
-    std::function<void(Event)> on_unhandled_event_;
+    std::function<void(StateRef, Event)> on_unhandled_event_;
     /**
      * @brief Deferred event callback, fired event deferral is requestd
      *
      */
-    std::function<void(StatePtr, Event)> on_defer_event_;
+    std::function<void(StateRef, Event)> on_defer_event_;
 
     /**
      * @brief Construct a new Statemachine object
@@ -422,7 +426,7 @@ public:
      * @param name Statemachine name, useful for logging
      * @param initial Initial state
      */
-    void Init(ImplPtr impl, std::string name, const StatePtr initial)
+    void Init(ImplPtr impl, std::string name, const State* initial)
     {
         assert(impl != nullptr);
         assert(initial != nullptr);
@@ -454,20 +458,21 @@ public:
         working_ = true;
 
         Transition transition(kInTransition);
+        const auto* start = current_state_;
         const auto* s = current_state_;
 
         do
         {
             if (on_handle_event_)
             {
-                on_handle_event_(s, event);
+                on_handle_event_(*s, event);
             }
-            transition = (impl_->*s->handler_)(s, event);
+            transition = (impl_->*s->handler_)(*s, event);
 
             if (transition.target_ == &kDeferEvent)
             {
                 assert(on_defer_event_ != nullptr);
-                on_defer_event_(s, event);
+                on_defer_event_(*s, event);
                 working_ = false;
                 return;
             }
@@ -498,7 +503,7 @@ public:
         {
             if (on_unhandled_event_)
             {
-                on_unhandled_event_(event);
+                on_unhandled_event_(*start, event);
             }
         }
 
@@ -570,7 +575,7 @@ public:
      * @param target Target state
      * @return Transition
      */
-    static inline Transition TransitionTo(const State& target)
+    static inline Transition TransitionTo(StateRef target)
     {
         return Transition(target);
     }
@@ -581,7 +586,7 @@ public:
      * @param action Action to execute on transition
      * @return Transition
      */
-    static inline Transition TransitionTo(const State& target, typename Transition::DelegateActionType action)
+    static inline Transition TransitionTo(StateRef target, typename Transition::DelegateActionType action)
     {
         return Transition(target, action);
     }
@@ -651,28 +656,28 @@ private:
 
             if (on_state_exit_)
             {
-                on_state_exit_(s);
+                on_state_exit_(*s);
             }
 
             if (s->on_exit_ != nullptr)
             {
-                (impl_->*s->on_exit_)(s);
+                (impl_->*s->on_exit_)(*s);
             }
 
             s = s->parent_;
         };
     }
 
-    void EnterState(StatePtr s) const
+    void EnterState(StateRef s) const
     {
         if (on_state_entry_)
         {
             on_state_entry_(s);
         }
 
-        if (s->on_entry_ != nullptr)
+        if (s.on_entry_ != nullptr)
         {
-            (impl_->*s->on_entry_)(s);
+            (impl_->*s.on_entry_)(s);
         }
     }
 
@@ -684,7 +689,7 @@ private:
             {
                 EnterStatesFromDownTo(top, target->parent_);
             }
-            EnterState(target);
+            EnterState(*target);
         }
     }
     void EnterStatesFromDownTo(StatePtr top, StatePtr target)
@@ -693,21 +698,21 @@ private:
 
         if (GetInitialState(target) != nullptr)
         {
-            EnterState(target);
+            EnterState(*target);
 
             const auto* s = GetInitialState(target);
             const auto* t = s;
             while (s != nullptr)
             {
                 t = s;
-                EnterState(s);
+                EnterState(*s);
                 s = GetInitialState(s);
             }
             current_state_ = t;
         }
         else
         {
-            EnterState(target);
+            EnterState(*target);
             current_state_ = target;
         }
     }

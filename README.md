@@ -251,7 +251,7 @@ The actual pool fill level can be checked like this:
         [...]
         private:
         [...]
-            Fsm::Transition State1Handler(Fsm::StatePtr /* state */, Fsm::Event event)
+            Fsm::Transition State1Handler(Fsm::StateRef /* state */, Fsm::Event event)
             {
                 switch (event)
                 {
@@ -262,7 +262,7 @@ The actual pool fill level can be checked like this:
                 }
             }
         
-            Fsm::Transition State2Handler(Fsm::StatePtr /* state */, Fsm::Event event)
+            Fsm::Transition State2Handler(Fsm::StateRef /* state */, Fsm::Event event)
             {
                 switch (event)
                 {
@@ -379,12 +379,12 @@ Example:
 - State handlers. The signature allows to use class member functions as state handlers.
     Also, the argument "state" allows to use the same handler function for multiple states.
 
-        Fsm::Transition (Fsm::ImplPtr)(Fsm::StatePtr state, Fsm::Event event)
+        Fsm::Transition (Fsm::ImplPtr)(Fsm::StateRef state, Fsm::Event event)
 
 - Entry/Exit actions. Same as for handlers - the signature allows to use class member functions
     as action. Also, the argument "state" allows to use the same action function for multiple states.
 
-        void (Fsm::ImplPtr)(Fsm::StatePtr state)
+        void (Fsm::ImplPtr)(Fsm::StateRef state)
 
 - Transition actions. The signature allows to use class member functions and non-capturing lambdas as actions.
     The argument "event" may be useful in actions because the action may depend on the event type or attributes
@@ -392,6 +392,20 @@ Example:
 
         void (*)(Fsm::ImplPtr impl, Fsm::Event event) // Non-capturing lambda
         void (Fsm::ImplPtr)(Fsm::Event event)         // C++
+
+### Logging
+
+        fsm_.on_state_entry_ = [this](Fsm::StateRef state)
+            { std::cout << fsm_.Name() << " enter state " << state.Name() << std::endl; };
+
+        fsm_.on_state_exit_ = [this](Fsm::StateRef state)
+            { std::cout << fsm_.Name() << " exit state " << state.Name() << std::endl; };
+
+        fsm_.on_handle_event_ = [this](Fsm::StateRef state, Fsm::Event event)
+            { std::cout << fsm_.Name() << " state " << state.Name() << " handle event " << event->Name() << std::endl; };
+
+        fsm_.on_unhandled_event_ = [this](Fsm::StateRef state, Fsm::Event event)
+            { std::cout << fsm_.Name() << " unhandled event " << event->Name() << " in state " << state.Name() << std::endl; };
 
 
 ### Simple statemachine example
