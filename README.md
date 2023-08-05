@@ -17,6 +17,7 @@ Header-only C++ event and statemachine framework
 - Transition actions
 - History support
 - Unhandled event support
+- Deferred event support (needs external framework)
 - Possibility to use same handler/entry/exit function for multiple states because state is passed as argument to functions
 - Independent of event type (can be int, enum, pointer, shared pointer...)
 - Designed to be aggregated by a class
@@ -298,6 +299,10 @@ The actual pool fill level can be checked like this:
 
         return Fsm::UnhandledEvent();
 
+6) Defer event (needs external framework support)
+
+        return Fsm::DeferEvent();
+
 ### Predefining transitions (like states)
 
     class Fsm : public FsmBase
@@ -305,9 +310,24 @@ The actual pool fill level can be checked like this:
     public:
         [...]
         static const Fsm::Transition Fsm::kState2ToState1;
+
+        static const Fsm::Transition::ActionContainer<2> kState2ToState3Actions;
+        static const Fsm::Transition Fsm::kState2ToState3;
+
+        static const Fsm::Transition::ActionType kState2ToState4Actions[]; 
+        static const Fsm::Transition Fsm::kState2ToState4;
     };
 
+    // Single action
     const Fsm::Transition Fsm::kState2ToState1(kState1, &Fsm::Owner::FsmState2ToState1Action);
+
+    // Multiple actions (clean, std::array<> based)
+    const Fsm::Transition::ActionContainer<2> Fsm::kState2ToState3Actions = {&Fsm::Owner::FsmState2ToState3Action1, &Fsm::Owner::FsmState2ToState3Action2};
+    const Fsm::Transition Fsm::kState2ToState3(kState3, kState2ToState3Actions);
+
+    // Multiple actions (unclean, C-style array)
+    const Fsm::Transition::ActionType Fsm::kState2ToState4Actions[] = {&Fsm::Owner::FsmState2ToState4Action1, &Fsm::Owner::FsmState2ToState4Action2};
+    const Fsm::Transition Fsm::kState2ToState4(kState4, kState2ToState4Actions);
 
 ### Hierarchical states
 
@@ -329,6 +349,15 @@ Parent states may have initial states:
 A parent state may be a history state:
 
     const Fsm::HistoryState Fsm::kSomeState("SomeState", &Fsm::Owner::SomeStateHandler, nullptr, nullptr, nullptr, nullptr);
+
+### Deferred events
+
+Events can be deferred by using "Fsm::DeferEvent()" transition. The statemachine provides an on_defer_event_ event for this.
+External code is responsible to store events and to provide a possibility to recall deferred events.
+Example:
+
+    // std::vector<Fsm::Event> deferred_events;
+    fsm.on_defer_event_ = [this](Fsm::State /*state*/, Fsm::Event event) { deferred_events.emplace_back(event); };
 
 ### Function signatures
 
