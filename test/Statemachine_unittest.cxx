@@ -55,91 +55,21 @@ public:
 
     virtual void FsmOnExit(Fsm::StateRef) = 0;
 
+    virtual Fsm::Transition FsmOffHandler(Fsm::StateRef, Fsm::Event) = 0;
+
+    virtual Fsm::Transition FsmOnHandler(Fsm::StateRef, Fsm::Event) = 0;
+
+    virtual Fsm::Transition FsmGreenHandler(Fsm::StateRef, Fsm::Event) = 0;
+
+    virtual Fsm::Transition FsmYellowHandler(Fsm::StateRef, Fsm::Event) = 0;
+
     virtual void FsmYellowRedTransitionAction1(Fsm::Event) = 0;
 
     virtual void FsmYellowRedTransitionAction2(Fsm::Event) = 0;
 
-    Fsm::Transition FsmOffHandler(Fsm::StateRef /*state*/, Fsm::Event event)
-    {
-        switch (event->Id())
-        {
-        case EvtTurnOn::kId:
-            return Fsm::TransitionTo(Fsm::kOn);
-        case EvtTurnOff::kId:
-            return Fsm::NoTransition();
-        case EvtGoYellow::kId: // fall through
-        case EvtGoRed::kId:
-            return Fsm::DeferEvent();
-        default:
-            return Fsm::UnhandledEvent();
-        }
-    }
+    virtual Fsm::Transition FsmRedHandler(Fsm::StateRef, Fsm::Event) = 0;
 
-    Fsm::Transition FsmOnHandler(Fsm::StateRef /*state*/, Fsm::Event event)
-    {
-        switch (event->Id())
-        {
-        case EvtTurnOff::kId:
-            return Fsm::TransitionTo(Fsm::kOff);
-        case EvtTurnOn::kId:
-            return Fsm::NoTransition();
-        default:
-            return Fsm::UnhandledEvent();
-        }
-    }
-
-    Fsm::Transition FsmGreenHandler(Fsm::StateRef /*state*/, Fsm::Event event)
-    {
-        switch (event->Id())
-        {
-        case EvtGoYellow::kId:
-            return Fsm::TransitionTo(Fsm::kYellow);
-        case EvtGoGreen::kId:
-            return Fsm::NoTransition();
-        default:
-            return Fsm::UnhandledEvent();
-        }
-    }
-
-    Fsm::Transition FsmYellowHandler(Fsm::StateRef /*state*/, Fsm::Event event)
-    {
-        switch (event->Id())
-        {
-        case EvtGoRed::kId:
-            return Fsm::kYellowRedTransition;
-        case EvtGoYellow::kId:
-            return Fsm::NoTransition();
-        default:
-            return Fsm::UnhandledEvent();
-        }
-    }
-
-    Fsm::Transition FsmRedHandler(Fsm::StateRef /*state*/, Fsm::Event event)
-    {
-        switch (event->Id())
-        {
-        case EvtGoYellow::kId:
-            return Fsm::TransitionTo(Fsm::kRedYellow);
-        case EvtGoRed::kId:
-            return Fsm::NoTransition();
-        default:
-            return Fsm::UnhandledEvent();
-        }
-    }
-
-    Fsm::Transition FsmRedYellowHandler(Fsm::StateRef /*state*/, Fsm::Event event)
-    {
-        switch (event->Id())
-        {
-        case EvtGoGreen::kId:
-            return Fsm::TransitionTo(Fsm::kGreen, [](Fsm::ImplPtr /*impl*/, Fsm::Event /*event*/)
-                                     { std::cout << "Walk" << std::endl; });
-        case EvtGoYellow::kId:
-            return Fsm::NoTransition();
-        default:
-            return Fsm::UnhandledEvent();
-        }
-    }
+    virtual Fsm::Transition FsmRedYellowHandler(Fsm::StateRef, Fsm::Event) = 0;
 };
 
 const Fsm::State Fsm::kOff("Off", &Fsm::Impl::FsmOffHandler, nullptr, nullptr, &Fsm::Impl::FsmOffEntry,
@@ -228,6 +158,61 @@ private:
         std::cout << "On exit" << std::endl;
     }
 
+    Fsm::Transition FsmOffHandler(Fsm::StateRef /*state*/, Fsm::Event event) override
+    {
+        switch (event->Id())
+        {
+        case EvtTurnOn::kId:
+            return Fsm::TransitionTo(Fsm::kOn);
+        case EvtTurnOff::kId:
+            return Fsm::NoTransition();
+        case EvtGoYellow::kId: // fall through
+        case EvtGoRed::kId:
+            return Fsm::DeferEvent();
+        default:
+            return Fsm::UnhandledEvent();
+        }
+    }
+
+    Fsm::Transition FsmOnHandler(Fsm::StateRef /*state*/, Fsm::Event event) override
+    {
+        switch (event->Id())
+        {
+        case EvtTurnOff::kId:
+            return Fsm::TransitionTo(Fsm::kOff);
+        case EvtTurnOn::kId:
+            return Fsm::NoTransition();
+        default:
+            return Fsm::UnhandledEvent();
+        }
+    }
+
+    Fsm::Transition FsmGreenHandler(Fsm::StateRef /*state*/, Fsm::Event event) override
+    {
+        switch (event->Id())
+        {
+        case EvtGoYellow::kId:
+            return Fsm::TransitionTo(Fsm::kYellow);
+        case EvtGoGreen::kId:
+            return Fsm::NoTransition();
+        default:
+            return Fsm::UnhandledEvent();
+        }
+    }
+
+    Fsm::Transition FsmYellowHandler(Fsm::StateRef /*state*/, Fsm::Event event) override
+    {
+        switch (event->Id())
+        {
+        case EvtGoRed::kId:
+            return Fsm::kYellowRedTransition;
+        case EvtGoYellow::kId:
+            return Fsm::NoTransition();
+        default:
+            return Fsm::UnhandledEvent();
+        }
+    }
+
     void FsmYellowRedTransitionAction1(Fsm::Event /*event*/) override
     {
         yellow_red_transition1_called_ = true;
@@ -238,6 +223,33 @@ private:
     {
         yellow_red_transition2_called_ = true;
         std::cout << "Don't walk 2" << std::endl;
+    }
+
+    Fsm::Transition FsmRedHandler(Fsm::StateRef /*state*/, Fsm::Event event) override
+    {
+        switch (event->Id())
+        {
+        case EvtGoYellow::kId:
+            return Fsm::TransitionTo(Fsm::kRedYellow);
+        case EvtGoRed::kId:
+            return Fsm::NoTransition();
+        default:
+            return Fsm::UnhandledEvent();
+        }
+    }
+
+    Fsm::Transition FsmRedYellowHandler(Fsm::StateRef /*state*/, Fsm::Event event) override
+    {
+        switch (event->Id())
+        {
+        case EvtGoGreen::kId:
+            return Fsm::TransitionTo(Fsm::kGreen, [](Fsm::ImplPtr /*impl*/, Fsm::Event /*event*/)
+                                     { std::cout << "Walk" << std::endl; });
+        case EvtGoYellow::kId:
+            return Fsm::NoTransition();
+        default:
+            return Fsm::UnhandledEvent();
+        }
     }
 
 public:
