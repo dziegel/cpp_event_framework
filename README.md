@@ -372,8 +372,23 @@ Events can be deferred by using "Fsm::DeferEvent()" transition. The statemachine
 External code is responsible to store events and to provide a possibility to recall deferred events.
 Example:
 
-    // std::vector<Fsm::Event> deferred_events;
-    fsm.on_defer_event_ = [this](Fsm::State /*state*/, Fsm::Event event) { deferred_events.emplace_back(event); };
+    class Impl
+    {
+        std::vector<Fsm::Event> deferred_events;
+
+        void Init()
+        {
+            fsm_.on_defer_event_ = [this](Fsm::StateRef, Fsm::Event event) { deferred_events.emplace_back(event); };
+        }
+
+        void RecallDeferredEvents()
+        {
+            for (auto& event : deferred_events)
+            {
+                fsm_.React(event);
+            }
+        }
+    };
 
 ### Function signatures
 
