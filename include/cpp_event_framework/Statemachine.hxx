@@ -98,6 +98,16 @@ public:
      *
      */
     using SPtr = std::shared_ptr<Statemachine>;
+    /**
+     * @brief Unique pointer alias
+     *
+     */
+    using UPtr = std::unique_ptr<Statemachine>;
+    /**
+     * @brief Weak pointer alias
+     *
+     */
+    using WPtr = std::weak_ptr<Statemachine>;
 
     /**
      * @brief Statemachine implementation type
@@ -513,7 +523,7 @@ public:
     /**
      * @brief Returns current state
      *
-     * @return const StatemachineState*
+     * @return StatePtr State pointer
      */
     StatePtr CurrentState() const
     {
@@ -521,9 +531,19 @@ public:
     }
 
     /**
+     * @brief Implementation
+     *
+     * @return ImplPtr Implementation pointer
+     */
+    ImplPtr Implementation() const
+    {
+        return impl_;
+    }
+
+    /**
      * @brief Returns name
      *
-     * @return const std::string&
+     * @return const std::string& Statemachine name
      */
     [[nodiscard]] const std::string& Name() const
     {
