@@ -410,15 +410,9 @@ Example:
 
 ### Simple statemachine example
 
-- Uses integers as events
-- Direct interaction between implementation and statemachine 
-
 https://github.com/dziegel/cpp_event_framework/blob/main/examples/SimpleStatemachineExample.cxx
 
 ### Complex statemachine example
-
-- Uses cpp_event_framework::Signal as events
-- Decoupling of statemachine and implementation using an interface 
 
 https://github.com/dziegel/cpp_event_framework/blob/main/test/Statemachine_unittest.cxx
 
