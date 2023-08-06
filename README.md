@@ -19,9 +19,10 @@ Header-only C++ event and statemachine framework
 - Unhandled event support
 - Deferred event support (needs external framework)
 - Possibility to use same handler/entry/exit function for multiple states because state is passed as argument to functions
-- Independent of event type (can be int, enum, pointer, shared pointer...)
-- Designed to be aggregated by a class
-- Designed to call member functions of class aggregating statemachine
+- Independent of event type (can be int, enum, shared pointer...)
+- Can be aggregated by class using the statemachine
+- Designed to call member functions of a C++ class or interface
+- It is fairly simple to write statemachines "by hand" without a code generator
 - Suitable for small systems: state and transition declarations can be const and in RO section
 - Allow non-capturing lambdas as transition action
 - Logging support (state entry/exit/handler events)
