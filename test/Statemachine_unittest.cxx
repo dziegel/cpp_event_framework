@@ -56,6 +56,18 @@ public:
         fsm_.on_handle_event_ = [this](Fsm::StateRef state, Fsm::Event event)
         { std::cout << fsm_.Name() << " state " << state.Name() << " handle event " << event->Name() << std::endl; };
 
+        fsm_.on_defer_event_ = [this](Fsm::StateRef state, Fsm::Event event)
+        {
+            on_defer_event_called_ = true;
+            std::cout << fsm_.Name() << " state " << state.Name() << " defer event " << event->Name() << std::endl;
+        };
+
+        fsm_.on_recall_deferred_events_ = [this](Fsm::StateRef state)
+        {
+            on_recall_event_called_ = true;
+            std::cout << fsm_.Name() << " state " << state.Name() << " recall deferred events" << std::endl;
+        };
+
         fsm_.on_unhandled_event_ = [this](Fsm::StateRef state, Fsm::Event event)
         {
             on_unhandled_event_called_ = true;
@@ -80,6 +92,8 @@ private:
     bool yellow_red_transition1_called_ = false;
     bool yellow_red_transition2_called_ = false;
     bool on_unhandled_event_called_ = false;
+    bool on_defer_event_called_ = false;
+    bool on_recall_event_called_ = false;
 
     void CheckAllFalse() const
     {
@@ -90,6 +104,8 @@ private:
         assert(yellow_red_transition1_called_ == false);
         assert(yellow_red_transition2_called_ == false);
         assert(on_unhandled_event_called_ == false);
+        assert(on_defer_event_called_ == false);
+        assert(on_recall_event_called_ == false);
     }
 
     void FsmOffEntry(Fsm::StateRef /*state*/)
@@ -139,6 +155,7 @@ private:
         case EvtTurnOff::kId:
             return Fsm::TransitionTo(Fsm::kOff);
         case EvtTurnOn::kId:
+            fsm_.RecallEvents();
             return Fsm::NoTransition();
         default:
             return Fsm::UnhandledEvent();
@@ -228,6 +245,12 @@ public:
         on_entry_called_ = false;
         CheckAllFalse();
 
+        fsm_.React(EvtTurnOn::MakeShared());
+        assert(on_recall_event_called_ == true);
+        assert(fsm_.CurrentState() == &Fsm::kGreen);
+        on_recall_event_called_ = false;
+        CheckAllFalse();
+
         fsm_.React(EvtGoYellow::MakeShared());
         assert(fsm_.CurrentState() == &Fsm::kYellow);
         CheckAllFalse();
@@ -259,6 +282,11 @@ public:
         fsm_.React(EvtGoGreen::MakeShared());
         assert(on_unhandled_event_called_ == true);
         on_unhandled_event_called_ = false;
+        CheckAllFalse();
+
+        fsm_.React(EvtGoRed::MakeShared());
+        assert(on_defer_event_called_ == true);
+        on_defer_event_called_ = false;
         CheckAllFalse();
     }
 

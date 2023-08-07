@@ -385,10 +385,15 @@ public:
      */
     std::function<void(StateRef, Event)> on_unhandled_event_;
     /**
-     * @brief Deferred event callback, fired event deferral is requestd
+     * @brief Deferred event callback, fired event deferral is requested
      *
      */
     std::function<void(StateRef, Event)> on_defer_event_;
+    /**
+     * @brief Deferred event callback, fired event recall is requested
+     *
+     */
+    std::function<void(StateRef)> on_recall_deferred_events_;
 
     /**
      * @brief Construct a new Statemachine object
@@ -518,6 +523,16 @@ public:
         }
 
         working_ = false;
+    }
+
+    /**
+     * @brief Recall deferred events
+     *
+     */
+    void RecallEvents()
+    {
+        assert(on_recall_deferred_events_ != nullptr);
+        on_recall_deferred_events_(*current_state_);
     }
 
     /**

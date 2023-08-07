@@ -374,18 +374,38 @@ Example:
 
     class Impl
     {
+        Fsm fsm_;
         std::vector<Fsm::Event> deferred_events;
 
         void Init()
         {
-            fsm_.on_defer_event_ = [this](Fsm::StateRef, Fsm::Event event) { deferred_events.emplace_back(event); };
+            fsm_.on_defer_event_ = [this](Fsm::StateRef, Fsm::Event event)
+            {
+                deferred_events.emplace_back(event);
+            };
+
+            fsm_.on_recall_deferred_events_ = [this](Fsm::StateRef)
+            {
+                for (auto& event : deferred_events)
+                {
+                    fsm_.React(event);
+                }
+            };
         }
 
-        void RecallDeferredEvents()
+        void FsmOnStateIdleEntry(Fsm::StateRef)
+        {   
+            fsm_.RecallEvents();
+        }
+
+        Fsm::Transition FsmStateActiveHandler(Fsm::StateRef, Fsm::Event event)
         {
-            for (auto& event : deferred_events)
+            switch (event->Id())
             {
-                fsm_.React(event);
+            case EvtDoSomething::kId:
+                return Fsm::DeferEvent();
+            default:
+                return Fsm::UnhandledEvent();
             }
         }
     };
