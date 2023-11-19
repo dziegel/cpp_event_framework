@@ -3,7 +3,9 @@
 Header-only C++ event and statemachine framework
 
 ## Overview
+
 ### Events
+
 - Shared pointers for easy handling
 - Allocatable from heap or pools
 - Simple to declare
@@ -12,6 +14,7 @@ Header-only C++ event and statemachine framework
 - Events have names for logging
 
 ### Statemachine
+
 - Hierarchical state support. If a state does not handle an event, it is passed to parent state.
 - Entry/Exit funtions
 - Transition actions
@@ -28,12 +31,10 @@ Header-only C++ event and statemachine framework
 - Logging support (state entry/exit/handler events)
 - States have names for logging
 
-### Notes
-- gsl library (gsl::span<>) is needed when compiling with C++ versions older than C++20
-
 ## Introduction to events
 
 ### Basic usage
+
 A simple event class which is allocated from heap is declared via a class that inherits from cpp_event_framework::SignalBase template:
 
     class SimpleTestEvent : public cpp_event_framework::SignalBase<SimpleTestEvent, 0>
@@ -58,6 +59,7 @@ To simplify creation of following events, a NextSignal template is available:
 Using this template, events can be "chained" - now SimpleTestEvent2 automatically gets ID 1.
 
 ### Event attributes
+
 Events may have attributes, too:
 
     class PayloadTestEvent : public cpp_event_framework::NextSignal<PayloadTestEvent, SimpleTestEvent2>
@@ -102,7 +104,9 @@ Events are instantiated via static MakeShared() function:
 Instantiating via new() is not possible because operator new has been deleted:
 
     auto s3 = new SimpleTestEvent(); // compile error
+
 ### Casting events
+
 To convert an event back from Signal base class to its actual type use the FromSignal class function. Note
 there is an assertion in there that checks that the event ID matches the event class!
 
@@ -113,6 +117,7 @@ there is an assertion in there that checks that the event ID matches the event c
     auto te_bad = SimpleTestEvent::FromSignal(event);  // exception thrown
 
 ### Usage in statemachines example
+
 Example of event usage in a switch/case statement (e.g. for use in statemachines):
 
     static void DispatchEvent(const cpp_event_framework::Signal::SPtr& event)
@@ -143,6 +148,7 @@ Example of event usage in a switch/case statement (e.g. for use in statemachines
     }
 
 ### Event pools
+
 It is also possible to use event pools. The first step is to declare a pool allocator:
 
     class EventPoolAllocator : public cpp_event_framework::PoolAllocator<>
@@ -161,7 +167,7 @@ Using the size calculator, a pool can be instantiated and allocators can be assi
     EventPoolAllocator::SetPool(pool);
 
 Using a pool allocator, events can be now declared that are allocated via pools. Note the NextSignal template
-manages the event ID AND inherits the allocator from the previous signal! 
+manages the event ID AND inherits the allocator from the previous signal!
 In the following example, PooledSimpleTestEvent and PooledSimpleTestEvent2 are allocated via EventPoolAllocator.
 
     class PooledSimpleTestEvent
@@ -285,11 +291,11 @@ The actual pool fill level can be checked like this:
 
 ### Possible state handler return values
 
-1) Transition to another state: 
+1) Transition to another state:
 
         return Fsm::TransitionTo(Fsm::kState1);
 
-2) Transition to another state with transition action: 
+2) Transition to another state with transition action:
 
         // Using class StatemachineImplementation member function
         return Fsm::TransitionTo(Fsm::kState1, &StatemachineImplementation::SomeAction);
@@ -443,22 +449,21 @@ Example:
         fsm_.on_unhandled_event_ = [this](Fsm::StateRef state, Fsm::Event event)
             { std::cout << fsm_.Name() << " unhandled event " << event->Name() << " in state " << state.Name() << std::endl; };
 
-
 ### Simple statemachine example
 
 Uses integers as events.
 
-https://github.com/dziegel/cpp_event_framework/blob/main/examples/SimpleStatemachineExample.cxx
+<https://github.com/dziegel/cpp_event_framework/blob/main/examples/SimpleStatemachineExample.cxx>
 
 ### Complex statemachine example
 
 Uses cpp_event_framework::Signal as events.
 
-https://github.com/dziegel/cpp_event_framework/blob/main/test/Statemachine_unittest.cxx
+<https://github.com/dziegel/cpp_event_framework/blob/main/test/Statemachine_unittest.cxx>
 
 ## Statemachine generation
 
-https://github.com/dziegel/cpp_statemachine_generator
+<https://github.com/dziegel/cpp_statemachine_generator>
 
 ## License
 

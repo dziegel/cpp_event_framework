@@ -148,7 +148,7 @@ public:
          *
          * @param pool Pool to use
          */
-        Allocator(Pool& pool) noexcept : pool_(pool)
+        explicit Allocator(Pool& pool) noexcept : pool_(pool)
         {
         }
 

@@ -73,7 +73,7 @@ protected:
     /**
      * @brief Construct a new Signal object
      */
-    Signal(IdType id) : id_(id)
+    explicit Signal(IdType id) : id_(id)
     {
     }
     /**

@@ -35,7 +35,7 @@ class PayloadTestEvent : public cpp_event_framework::NextSignal<PayloadTestEvent
 public:
     const std::vector<uint8_t> payload_;
 
-    PayloadTestEvent(std::vector<uint8_t> payload) : payload_(std::move(payload))
+    explicit PayloadTestEvent(std::vector<uint8_t> payload) : payload_(std::move(payload))
     {
     }
 };
@@ -44,7 +44,7 @@ class TestEventWithBaseClass
     : public cpp_event_framework::NextSignal<TestEventWithBaseClass, PayloadTestEvent, EventTestBaseClass>
 {
 public:
-    TestEventWithBaseClass(int val) : Base(val)
+    explicit TestEventWithBaseClass(int val) : Base(val)
     {
     }
 };

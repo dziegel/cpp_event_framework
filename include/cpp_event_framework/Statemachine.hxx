@@ -9,19 +9,12 @@
 
 #pragma once
 
-#if __cplusplus >= 202002L
-#include <span>
-#define StatemachineSpan std::span
-#else
-#include <gsl/span>
-#define StatemachineSpan gsl::span
-#endif
-
 #include <array>
 #include <cassert>
 #include <functional>
 #include <map>
 #include <memory>
+#include <span>
 #include <string>
 
 namespace cpp_event_framework
@@ -195,7 +188,7 @@ public:
          *
          * @param target Target state
          */
-        constexpr Transition(StateRef target) : target_(&target)
+        constexpr explicit Transition(StateRef target) : target_(&target)
         {
         }
         /**
@@ -225,7 +218,7 @@ public:
          * @param target Target state
          * @param actions Transition actions
          */
-        constexpr Transition(StateRef target, StatemachineSpan<const ActionType> actions) noexcept
+        constexpr Transition(StateRef target, std::span<const ActionType> actions) noexcept
             : target_(&target), actions_(actions)
         {
         }
@@ -247,7 +240,7 @@ public:
          * @brief Optional transition actions
          *
          */
-        StatemachineSpan<const ActionType> actions_;
+        std::span<const ActionType> actions_;
     };
 
     /**
