@@ -1,5 +1,5 @@
 /**
- * @file ActiveObject.hxx
+ * @file ActiveObjectBase.hxx
  * @author Dirk Ziegelmeier (dirk@ziegelmeier.net)
  * @brief
  * @date 16-08-2023
