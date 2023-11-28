@@ -16,6 +16,29 @@ public:
     static const State kState1;
     static const State kState2;
     static const StatePtr kInitialState;
+
+    static Fsm::Transition State1Handler(Fsm::ImplPtr /* impl */, Fsm::Event event)
+    {
+        switch (event)
+        {
+        case EEvent::kGo2:
+            return Fsm::TransitionTo(Fsm::kState2);
+        default:
+            return Fsm::NoTransition();
+        }
+    }
+
+    static Fsm::Transition State2Handler(Fsm::ImplPtr /* impl */, Fsm::Event event)
+    {
+        switch (event)
+        {
+        case EEvent::kGo1:
+            return Fsm::TransitionTo(Fsm::kState1,
+                                     [](Fsm::ImplPtr, Fsm::Event) { std::cout << "Transition action" << std::endl; });
+        default:
+            return Fsm::UnhandledEvent();
+        }
+    }
 };
 
 class StatemachineImplementation
@@ -56,33 +79,10 @@ private:
 
     // Implementation can aggregate the statemachine!
     Fsm fsm_;
-
-    Fsm::Transition State1Handler(Fsm::StateRef /* state */, Fsm::Event event)
-    {
-        switch (event)
-        {
-        case EEvent::kGo2:
-            return Fsm::TransitionTo(Fsm::kState2);
-        default:
-            return Fsm::NoTransition();
-        }
-    }
-
-    Fsm::Transition State2Handler(Fsm::StateRef /* state */, Fsm::Event event)
-    {
-        switch (event)
-        {
-        case EEvent::kGo1:
-            return Fsm::TransitionTo(Fsm::kState1,
-                                     [](Fsm::ImplPtr, Fsm::Event) { std::cout << "Transition action" << std::endl; });
-        default:
-            return Fsm::UnhandledEvent();
-        }
-    }
 };
 
-const Fsm::State Fsm::kState1("State1", &Fsm::Impl::State1Handler);
-const Fsm::State Fsm::kState2("State2", &Fsm::Impl::State2Handler);
+const Fsm::State Fsm::kState1("State1", &Fsm::State1Handler);
+const Fsm::State Fsm::kState2("State2", &Fsm::State2Handler);
 const Fsm::StatePtr Fsm::kInitialState = &Fsm::kState1; // initial state of the statemachine
 
 void SimpleStatemachineExampleMain()

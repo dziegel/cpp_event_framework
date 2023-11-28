@@ -254,12 +254,12 @@ public:
          * @brief Type of on_entry / on_exit handler
          *
          */
-        using EntryExitType = void (Impl::*)(StateRef);
+        using EntryExitType = void (Impl::*)();
         /**
          * @brief Type of event handler
          *
          */
-        using HandlerType = Transition (Impl::*)(StateRef, Event);
+        using HandlerType = Transition (*)(ImplPtr, Event);
 
         /**
          * @brief Flags indicating state properties
@@ -475,7 +475,7 @@ public:
             {
                 on_handle_event_(*s, event);
             }
-            transition = (impl_->*s->handler_)(*s, event);
+            transition = s->handler_(impl_, event);
 
             if (transition.target_ == &kDeferEvent)
             {
@@ -689,7 +689,7 @@ private:
 
             if (s->on_exit_ != nullptr)
             {
-                (impl_->*s->on_exit_)(*s);
+                (impl_->*s->on_exit_)();
             }
 
             s = s->parent_;
@@ -705,7 +705,7 @@ private:
 
         if (s.on_entry_ != nullptr)
         {
-            (impl_->*s.on_entry_)(s);
+            (impl_->*s.on_entry_)();
         }
     }
 

@@ -21,9 +21,7 @@ Header-only C++ event and statemachine framework
 - History support
 - Unhandled event support
 - Deferred event support (needs external framework)
-- Possibility to use same handler/entry/exit function for multiple states because state is passed as argument to functions
 - Independent of event type (can be int, enum, shared pointer...)
-- Can be aggregated by class using the statemachine
 - Designed to call member functions of a C++ class or interface
 - It is fairly simple to write statemachines "by hand" without a code generator
 - Suitable for small systems: state and transition declarations can be const and in RO section
@@ -207,14 +205,36 @@ The actual pool fill level can be checked like this:
 
         class StatemachineImplementation;
 
-3) Declare statemachine class and its states:
+3) Declare statemachine class and its states and state handlers:
 
         class Fsm : public cpp_event_framework::Statemachine<StatemachineImplementation, EEvent>
         {
         public:
             static const Fsm::State kState1;
             static const Fsm::State kState2;
-            static const StatePtr kInitialState;
+            static const Transition kState2ToState1Transition;
+
+            static Transition State1Handler(ImplPtr /* impl */, Event event)
+            {
+                switch (event)
+                {
+                case EEvent::kGo2:
+                    return TransitionTo(Fsm::kState2);
+                default:
+                    return NoTransition();
+                }
+            }
+        
+            static Transition State2Handler(ImplPtr /* impl */, Event event)
+            {
+                switch (event)
+                {
+                case EEvent::kGo1:
+                    return kState2ToState1Transition;
+                default:
+                    return UnhandledEvent();
+                }
+            }
         };
 
 4) Declare class that contains the statemachine:
@@ -227,13 +247,19 @@ The actual pool fill level can be checked like this:
 
             // Implementation can aggregate the statemachine if desired
             Fsm fsm_;
+
+            void State2ToState1Action(Fsm::Event /*event*/)
+            {
+                [...]
+            }
         };
 
-5) Declare statemachine states by giving them a name and a pointer to a state handler function:
+5) Declare statemachine states by giving them a name and a pointer to a state handler function, declare transitions with actions:
 
-        const Fsm::State Fsm::kState1("State1", &Fsm::Impl::State1Handler);
-        const Fsm::State Fsm::kState2("State2", &Fsm::Impl::State2Handler);
-        const Fsm::StatePtr Fsm::kInitialState = &Fsm::kState1; // initial state of the statemachine
+        const Fsm::State Fsm::kState1("State1", &Fsm::State1Handler);
+        const Fsm::State Fsm::kState2("State2", &Fsm::State2Handler);
+
+        const Fsm::Transition Fsm::kState2ToState1Transition(Fsm::kState1, &Fsm::Impl::State2ToState1Action);
 
 6) Initialize with implementation, name and initial state, then and start statemachine.
     Starting the statemachine is a separate function since it calls the entry handler of the initial state (if present).
@@ -244,44 +270,14 @@ The actual pool fill level can be checked like this:
         public:
             StatemachineImplementation()
             {
-                fsm_.Init(this, "Fsm", Fsm::kInitialState);
+                fsm_.Init(this, "Fsm", &Fsm::kState1);
                 fsm_.Start();
             }
         
         [...]
         };
 
-7) Implement statemachine handlers in class that contains the statemachine:
-
-        class StatemachineImplementation
-        {
-        [...]
-        private:
-        [...]
-            Fsm::Transition State1Handler(Fsm::StateRef /* state */, Fsm::Event event)
-            {
-                switch (event)
-                {
-                case EEvent::kGo2:
-                    return Fsm::TransitionTo(Fsm::kState2);
-                default:
-                    return Fsm::NoTransition();
-                }
-            }
-        
-            Fsm::Transition State2Handler(Fsm::StateRef /* state */, Fsm::Event event)
-            {
-                switch (event)
-                {
-                case EEvent::kGo1:
-                    return Fsm::TransitionTo(Fsm::kState1, &StatemachineImplementation::State2ToState1Action);
-                default:
-                    return Fsm::UnhandledEvent();
-                }
-            }
-        };
-
-8) Send events to statemachine
+7) Send events to statemachine
 
         void Run()
         {
@@ -378,6 +374,22 @@ Events can be deferred by using "Fsm::DeferEvent()" transition. The statemachine
 External code is responsible to store events and to provide a possibility to recall deferred events.
 Example:
 
+    class Impl;
+    class Fsm : public cpp_event_framework::Statemachine<Impl, EEvent>
+    {
+        [...]
+        Fsm::Transition FsmStateActiveHandler(Fsm::StateRef, Fsm::Event event)
+        {
+            switch (event->Id())
+            {
+            case EvtDoSomething::kId:
+                return Fsm::DeferEvent();
+            default:
+                return Fsm::UnhandledEvent();
+            }
+        }
+    };
+
     class Impl
     {
         Fsm fsm_;
@@ -402,17 +414,6 @@ Example:
         void FsmOnStateIdleEntry(Fsm::StateRef)
         {   
             fsm_.RecallEvents();
-        }
-
-        Fsm::Transition FsmStateActiveHandler(Fsm::StateRef, Fsm::Event event)
-        {
-            switch (event->Id())
-            {
-            case EvtDoSomething::kId:
-                return Fsm::DeferEvent();
-            default:
-                return Fsm::UnhandledEvent();
-            }
         }
     };
 
