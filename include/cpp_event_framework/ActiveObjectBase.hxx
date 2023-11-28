@@ -18,7 +18,7 @@
 
 namespace cpp_event_framework
 {
-class ActiveObjectBase : IActiveObject
+class ActiveObjectBase : public IActiveObject
 {
 public:
     void SetQueue(const IEventQueue::SPtr& queue) final
