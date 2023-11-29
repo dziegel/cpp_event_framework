@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <cpp_event_framework/IActiveObject.hxx>
+#include <experimental/IActiveObject.hxx>
 
 namespace cpp_event_framework
 {

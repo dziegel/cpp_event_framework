@@ -13,7 +13,7 @@
 #include <memory>
 #include <vector>
 
-#include <cpp_event_framework/ActiveObjectBase.hxx>
+#include <experimental/ActiveObjectBase.hxx>
 #include <cpp_event_framework/Signal.hxx>
 #include <cpp_event_framework/Statemachine.hxx>
 

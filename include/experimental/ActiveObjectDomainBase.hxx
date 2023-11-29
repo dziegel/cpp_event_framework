@@ -12,8 +12,8 @@
 
 #include <memory>
 
-#include <cpp_event_framework/IActiveObjectDomain.hxx>
-#include <cpp_event_framework/IEventQueue.hxx>
+#include <experimental/IActiveObjectDomain.hxx>
+#include <experimental/IEventQueue.hxx>
 #include <cpp_event_framework/Signal.hxx>
 
 namespace cpp_event_framework
