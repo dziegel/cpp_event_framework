@@ -307,18 +307,18 @@ public:
     }
 };
 
-const Fsm::State Fsm::kOff("Off", &Fsm::FsmOffHandler, nullptr, nullptr, &Fsm::Impl::FsmOffEntry,
+const Fsm::State Fsm::kOff("Off", &FsmOffHandler, nullptr, nullptr, &Fsm::Impl::FsmOffEntry,
                            &Fsm::Impl::FsmOffExit);
-const Fsm::HistoryState Fsm::kOn("On", &Fsm::FsmOnHandler, nullptr, &Fsm::kGreen, &Fsm::Impl::FsmOnEntry,
+const Fsm::HistoryState Fsm::kOn("On", &FsmOnHandler, nullptr, &kGreen, &Fsm::Impl::FsmOnEntry,
                                  &Fsm::Impl::FsmOnExit);
-const Fsm::State Fsm::kGreen("Green", &Fsm::FsmGreenHandler, &Fsm::kOn);
-const Fsm::State Fsm::kYellow("Yellow", &Fsm::FsmYellowHandler, &Fsm::kOn);
-const Fsm::State Fsm::kRed("Red", &Fsm::FsmRedHandler, &Fsm::kOn);
-const Fsm::State Fsm::kRedYellow("RedYellow", &Fsm::FsmRedYellowHandler, &Fsm::kOn);
+const Fsm::State Fsm::kGreen("Green", &FsmGreenHandler, &kOn);
+const Fsm::State Fsm::kYellow("Yellow", &FsmYellowHandler, &kOn);
+const Fsm::State Fsm::kRed("Red", &FsmRedHandler, &kOn);
+const Fsm::State Fsm::kRedYellow("RedYellow", &FsmRedYellowHandler, &kOn);
 
 const Fsm::Transition::ActionContainer<2> Fsm::kYellowRedTransitionActions = {
     &Fsm::Impl::FsmYellowRedTransitionAction1, &Fsm::Impl::FsmYellowRedTransitionAction2};
-const Fsm::Transition Fsm::kYellowRedTransition(kRed, Fsm::kYellowRedTransitionActions);
+const Fsm::Transition Fsm::kYellowRedTransition(kRed, kYellowRedTransitionActions);
 
 void StatemachineFixtureMain()
 {
