@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Statemachine.hxx>
+#include <cpp_event_framework/Statemachine.hxx>
 
 namespace example::interface
 {

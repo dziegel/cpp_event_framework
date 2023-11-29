@@ -2,7 +2,7 @@
 
 #include <memory>
 
-#include <Statemachine.hxx>
+#include <cpp_event_framework/Statemachine.hxx>
 
 namespace example::pimpl
 {
