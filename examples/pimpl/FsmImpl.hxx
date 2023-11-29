@@ -22,6 +22,8 @@ public:
     FsmImpl();
     ~FsmImpl();
 
+    void Run();
+
 private:
     struct Private;
     std::unique_ptr<Private> private_;

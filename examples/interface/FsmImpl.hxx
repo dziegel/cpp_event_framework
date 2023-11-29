@@ -11,6 +11,8 @@ class FsmImpl : public IFsmImpl
 public:
     FsmImpl();
 
+    void Run();
+
     void State1Entry() override;
 
     void State2ToState1TransitionAction(FsmBase::Event) override;
