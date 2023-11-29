@@ -419,19 +419,15 @@ Example:
 
 ### Function signatures
 
-- State handlers. The signature allows to use class member functions as state handlers.
-    Also, the argument "state" allows to use the same handler function for multiple states.
+- State handlers. The ImplPtr allows to call implementation member functions.
 
-        Fsm::Transition (Fsm::ImplPtr)(Fsm::StateRef state, Fsm::Event event)
+        Fsm::Transition (*)(Fsm::ImplPtr impl, Fsm::Event event)
 
-- Entry/Exit actions. Same as for handlers - the signature allows to use class member functions
-    as action. Also, the argument "state" allows to use the same action function for multiple states.
+- Entry/Exit actions. Actions are member functions of a class.
 
-        void (Fsm::ImplPtr)(Fsm::StateRef state)
+        void (Fsm::ImplPtr)()
 
-- Transition actions. The signature allows to use class member functions and non-capturing lambdas as actions.
-    The argument "event" may be useful in actions because the action may depend on the event type or attributes
-    of the event.
+- Transition actions. The signature allows to use class member functions and non-capturing lambdas as actions. The argument "event" may be useful in actions because the action may depend on the event type or attributes of the event.
 
         void (*)(Fsm::ImplPtr impl, Fsm::Event event) // Non-capturing lambda
         void (Fsm::ImplPtr)(Fsm::Event event)         // C++
@@ -450,11 +446,21 @@ Example:
         fsm_.on_unhandled_event_ = [this](Fsm::StateRef state, Fsm::Event event)
             { std::cout << fsm_.Name() << " unhandled event " << event->Name() << " in state " << state.Name() << std::endl; };
 
+### Implementation variants
+
+There are multiple possible implementation variants:
+
+1) Complete separation of statemachine and implementation code using an interface. This is the cleanest solution, it allows unit testing of statemachine code, at the cost of using virtual calls for actions. See <https://github.com/dziegel/cpp_event_framework/tree/main/examples/interface>
+
+2) Statemachine and implementation are tighly coupled, implementation uses PIMPL pattern. Less clean, but does not need virtual calls for actions which might be interesting for embedded systems. See <https://github.com/dziegel/cpp_event_framework/tree/main/examples/pimpl>
+
+3) Statemachine and implementation are even more tighly coupled, implementation and statemachine code intermix. Least cleanest solution, also does not need virtual calls for actions. See <https://github.com/dziegel/cpp_event_framework/tree/main/examples/plain>
+
 ### Simple statemachine example
 
 Uses integers as events.
 
-<https://github.com/dziegel/cpp_event_framework/blob/main/examples/SimpleStatemachineExample.cxx>
+<https://github.com/dziegel/cpp_event_framework/tree/main/examples/interface>
 
 ### Complex statemachine example
 

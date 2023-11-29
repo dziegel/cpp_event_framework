@@ -5,7 +5,13 @@ project(cpp_event_framework)
 include(GNUInstallDirs REQUIRED)
 
 add_executable(${CMAKE_PROJECT_NAME}
-    examples/SimpleStatemachineExample.cxx
+    examples/interface/Fsm.cxx
+    examples/interface/FsmImpl.cxx
+
+    examples/pimpl/Fsm.cxx
+    examples/pimpl/FsmImpl.cxx
+
+    examples/plain/FsmImpl.cxx
 
     test/Statemachine_unittest.cxx
     test/Events_unittest.cxx
