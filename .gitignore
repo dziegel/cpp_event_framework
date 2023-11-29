@@ -40,3 +40,7 @@ build
 
 # documentation
 doc
+
+# VS code
+.vscode
+*.code-workspace

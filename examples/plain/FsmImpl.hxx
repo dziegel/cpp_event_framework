@@ -25,8 +25,8 @@ public:
     static const Transition kState2State1Transition;
 
     // Handlers
-    static Fsm::Transition State1Handler(Fsm::ImplPtr impl, Fsm::Event event);
-    static Fsm::Transition State2Handler(Fsm::ImplPtr impl, Fsm::Event event);
+    static Transition State1Handler(ImplPtr impl, Event event);
+    static Transition State2Handler(ImplPtr impl, Event event);
 };
 
 class FsmImpl
