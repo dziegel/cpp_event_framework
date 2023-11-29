@@ -50,6 +50,5 @@ void FsmImpl::State1Entry()
 void FsmImpl::State2ToState1TransitionAction(FsmBase::Event /*event*/)
 {
     std::cout << "State2ToState1TransitionAction" << std::endl;
-   
 }
 }
