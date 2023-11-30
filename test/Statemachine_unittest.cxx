@@ -127,43 +127,34 @@ class StatemachineImpl
 public:
     void SetUp()
     {
-        fsm_.on_state_entry_ = [this](Fsm::StateRef state)
-        { std::cout << fsm_.Name() << " enter state " << state.Name() << std::endl; };
+        fsm_.on_state_entry_ = [](Fsm::Ref fsm, Fsm::StateRef state)
+        { std::cout << fsm.Name() << " enter state " << state.Name() << std::endl; };
 
-        fsm_.on_state_exit_ = [this](Fsm::StateRef state)
-        { std::cout << fsm_.Name() << " exit state " << state.Name() << std::endl; };
+        fsm_.on_state_exit_ = [](Fsm::Ref fsm, Fsm::StateRef state)
+        { std::cout << fsm.Name() << " exit state " << state.Name() << std::endl; };
 
-        fsm_.on_handle_event_ = [this](Fsm::StateRef state, Fsm::Event event)
-        { std::cout << fsm_.Name() << " state " << state.Name() << " handle event " << event->Name() << std::endl; };
+        fsm_.on_handle_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event)
+        { std::cout << fsm.Name() << " state " << state.Name() << " handle event " << event->Name() << std::endl; };
 
-        fsm_.on_defer_event_ = [this](Fsm::StateRef state, Fsm::Event event)
-        {
-            on_defer_event_called_ = true;
-            std::cout << fsm_.Name() << " state " << state.Name() << " defer event " << event->Name() << std::endl;
-        };
-
-        fsm_.on_recall_deferred_events_ = [this](Fsm::StateRef state)
-        {
-            on_recall_event_called_ = true;
-            std::cout << fsm_.Name() << " state " << state.Name() << " recall deferred events" << std::endl;
-        };
-
-        fsm_.on_unhandled_event_ = [this](Fsm::StateRef state, Fsm::Event event)
-        {
-            on_unhandled_event_called_ = true;
-            std::cout << fsm_.Name() << " unhandled event " << event->Name() << " in state " << state.Name()
+        fsm_.on_unhandled_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event) {
+            std::cout << fsm.Name() << " unhandled event " << event->Name() << " in state " << state.Name()
                       << std::endl;
+        };
+
+        fsm_.on_defer_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event)
+        {
+            fsm.Implementation()->on_defer_event_called_ = true;
+            std::cout << "state " << state.Name() << " defer event " << event->Name() << std::endl;
+        };
+
+        fsm_.on_recall_deferred_events_ = [](Fsm::Ref fsm, Fsm::StateRef state)
+        {
+            fsm.Implementation()->on_recall_event_called_ = true;
+            std::cout << "state " << state.Name() << " recall deferred events" << std::endl;
         };
 
         fsm_.Init(this, "Fsm", &Fsm::kOff);
     }
-
-private:
-    // Allow private functions of class StatemachineFixture to be used by FSM
-    friend class Fsm;
-
-    // Implementation can aggregate the statemachine!
-    Fsm fsm_;
 
     bool off_entry_called_ = false;
     bool off_exit_called_ = false;
@@ -174,6 +165,13 @@ private:
     bool on_unhandled_event_called_ = false;
     bool on_defer_event_called_ = false;
     bool on_recall_event_called_ = false;
+
+private:
+    // Allow private functions of class StatemachineFixture to be used by FSM
+    friend class Fsm;
+
+    // Implementation can aggregate the statemachine!
+    Fsm fsm_;
 
     void CheckAllFalse() const
     {
@@ -307,10 +305,8 @@ public:
     }
 };
 
-const Fsm::State Fsm::kOff("Off", &FsmOffHandler, nullptr, nullptr, &Fsm::Impl::FsmOffEntry,
-                           &Fsm::Impl::FsmOffExit);
-const Fsm::HistoryState Fsm::kOn("On", &FsmOnHandler, nullptr, &kGreen, &Fsm::Impl::FsmOnEntry,
-                                 &Fsm::Impl::FsmOnExit);
+const Fsm::State Fsm::kOff("Off", &FsmOffHandler, nullptr, nullptr, &Fsm::Impl::FsmOffEntry, &Fsm::Impl::FsmOffExit);
+const Fsm::HistoryState Fsm::kOn("On", &FsmOnHandler, nullptr, &kGreen, &Fsm::Impl::FsmOnEntry, &Fsm::Impl::FsmOnExit);
 const Fsm::State Fsm::kGreen("Green", &FsmGreenHandler, &kOn);
 const Fsm::State Fsm::kYellow("Yellow", &FsmYellowHandler, &kOn);
 const Fsm::State Fsm::kRed("Red", &FsmRedHandler, &kOn);

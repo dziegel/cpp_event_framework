@@ -11,7 +11,6 @@
 
 #include <array>
 #include <cassert>
-#include <functional>
 #include <map>
 #include <memory>
 #include <span>
@@ -101,6 +100,11 @@ public:
      *
      */
     using WPtr = std::weak_ptr<Statemachine>;
+    /**
+     * @brief Constant statemachine referenace
+     *
+     */
+    using Ref = const Statemachine&;
 
     /**
      * @brief Statemachine implementation type
@@ -360,33 +364,33 @@ public:
      * @brief State is entered (useful for logging)
      *
      */
-    std::function<void(StateRef)> on_state_entry_;
+    void (*on_state_entry_)(Ref, StateRef) = nullptr;
     /**
      * @brief State is left (useful for logging)
      *
      */
-    std::function<void(StateRef)> on_state_exit_;
+    void (*on_state_exit_)(Ref, StateRef) = nullptr;
     /**
      * @brief Event is passed to a state (useful for logging)
      *
      */
-    std::function<void(StateRef, Event)> on_handle_event_;
+    void (*on_handle_event_)(Ref, StateRef, Event) = nullptr;
     /**
      * @brief Unhandled event callback, fired when top-level state does not handle
      * event
      *
      */
-    std::function<void(StateRef, Event)> on_unhandled_event_;
+    void (*on_unhandled_event_)(Ref, StateRef, Event) = nullptr;
     /**
      * @brief Deferred event callback, fired event deferral is requested
      *
      */
-    std::function<void(StateRef, Event)> on_defer_event_;
+    void (*on_defer_event_)(Ref, StateRef, Event) = nullptr;
     /**
      * @brief Deferred event callback, fired event recall is requested
      *
      */
-    std::function<void(StateRef)> on_recall_deferred_events_;
+    void (*on_recall_deferred_events_)(Ref, StateRef) = nullptr;
 
     /**
      * @brief Construct a new Statemachine object
@@ -471,16 +475,16 @@ public:
 
         do
         {
-            if (on_handle_event_)
+            if (on_handle_event_ != nullptr)
             {
-                on_handle_event_(*s, event);
+                on_handle_event_(*this, *s, event);
             }
             transition = s->handler_(impl_, event);
 
             if (transition.target_ == &kDeferEvent)
             {
                 assert(on_defer_event_ != nullptr);
-                on_defer_event_(*s, event);
+                on_defer_event_(*this, *s, event);
                 working_ = false;
                 return;
             }
@@ -509,9 +513,9 @@ public:
         }
         else
         {
-            if (on_unhandled_event_)
+            if (on_unhandled_event_ != nullptr)
             {
-                on_unhandled_event_(*start, event);
+                on_unhandled_event_(*this, *start, event);
             }
         }
 
@@ -525,7 +529,7 @@ public:
     void RecallEvents()
     {
         assert(on_recall_deferred_events_ != nullptr);
-        on_recall_deferred_events_(*current_state_);
+        on_recall_deferred_events_(*this, *current_state_);
     }
 
     /**
@@ -669,43 +673,43 @@ private:
 
     void ExitStatesFromUpTo(StatePtr from, StatePtr top)
     {
-        const auto* s = from;
+        const auto* state = from;
 
-        while (s != top)
+        while (state != top)
         {
             // Save history state
-            if (s->parent_ != nullptr)
+            if (state->parent_ != nullptr)
             {
-                if ((s->parent_->flags_ & EFlags::kHistory) != EFlags::kNone)
+                if ((state->parent_->flags_ & EFlags::kHistory) != EFlags::kNone)
                 {
-                    SetInitialState(s->parent_, s);
+                    SetInitialState(state->parent_, state);
                 }
             }
 
-            if (on_state_exit_)
+            if (on_state_exit_ != nullptr)
             {
-                on_state_exit_(*s);
+                on_state_exit_(*this, *state);
             }
 
-            if (s->on_exit_ != nullptr)
+            if (state->on_exit_ != nullptr)
             {
-                (impl_->*s->on_exit_)();
+                (impl_->*state->on_exit_)();
             }
 
-            s = s->parent_;
+            state = state->parent_;
         };
     }
 
-    void EnterState(StateRef s) const
+    void EnterState(StateRef state) const
     {
-        if (on_state_entry_)
+        if (on_state_entry_ != nullptr)
         {
-            on_state_entry_(s);
+            on_state_entry_(*this, state);
         }
 
-        if (s.on_entry_ != nullptr)
+        if (state.on_entry_ != nullptr)
         {
-            (impl_->*s.on_entry_)();
+            (impl_->*state.on_entry_)();
         }
     }
 
@@ -728,15 +732,15 @@ private:
         {
             EnterState(*target);
 
-            const auto* s = GetInitialState(target);
-            const auto* t = s;
-            while (s != nullptr)
+            const auto* state = GetInitialState(target);
+            const auto* current_target = state;
+            while (state != nullptr)
             {
-                t = s;
-                EnterState(*s);
-                s = GetInitialState(s);
+                current_target = state;
+                EnterState(*state);
+                state = GetInitialState(state);
             }
-            current_state_ = t;
+            current_state_ = current_target;
         }
         else
         {
@@ -744,25 +748,25 @@ private:
             current_state_ = target;
         }
     }
-    static StatePtr FindCommonParent(StatePtr s1, StatePtr s2)
+    static StatePtr FindCommonParent(StatePtr state1, StatePtr state2)
     {
-        auto* s = s1->parent_;
+        auto* state = state1->parent_;
 
-        while (s != nullptr)
+        while (state != nullptr)
         {
-            auto* o = s2->parent_;
+            auto* parent = state2->parent_;
 
-            while (o != nullptr)
+            while (parent != nullptr)
             {
-                if (o == s)
+                if (parent == state)
                 {
-                    return o;
+                    return parent;
                 }
 
-                o = o->parent_;
+                parent = parent->parent_;
             }
 
-            s = s->parent_;
+            state = state->parent_;
         }
 
         return nullptr;
