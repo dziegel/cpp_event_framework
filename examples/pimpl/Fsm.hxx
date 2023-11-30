@@ -19,4 +19,4 @@ public:
     static Transition State1Handler(ImplPtr impl, Event event);
     static Transition State2Handler(ImplPtr impl, Event event);
 };
-}
+} // namespace example::pimpl

@@ -21,4 +21,4 @@ public:
 
     virtual void State2ToState1TransitionAction(FsmBase::Event) = 0;
 };
-}
+} // namespace example::interface

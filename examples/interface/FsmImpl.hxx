@@ -1,7 +1,7 @@
 #pragma once
 
-#include "IFsmImpl.hxx"
 #include "Fsm.hxx"
+#include "IFsmImpl.hxx"
 
 namespace example::interface
 {
@@ -20,4 +20,4 @@ public:
 private:
     Fsm fsm_;
 };
-}
+} // namespace example::interface

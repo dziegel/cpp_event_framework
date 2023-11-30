@@ -36,4 +36,4 @@ private:
 
     void State2ToState1TransitionAction(FsmBase::Event);
 };
-}
+} // namespace example::pimpl
