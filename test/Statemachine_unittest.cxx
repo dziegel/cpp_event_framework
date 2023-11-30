@@ -136,7 +136,9 @@ public:
         fsm_.on_handle_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event)
         { std::cout << fsm.Name() << " state " << state.Name() << " handle event " << event->Name() << std::endl; };
 
-        fsm_.on_unhandled_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event) {
+        fsm_.on_unhandled_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event)
+        {
+            fsm.Implementation()->on_unhandled_event_called_ = true;
             std::cout << fsm.Name() << " unhandled event " << event->Name() << " in state " << state.Name()
                       << std::endl;
         };
