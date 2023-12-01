@@ -12,12 +12,11 @@
 
 #include <memory>
 #include <mutex>
-#include <queue>
 #include <semaphore>
 
+#include <cpp_event_framework/Signal.hxx>
 #include <experimental/IActiveObject.hxx>
 #include <experimental/IEventQueue.hxx>
-#include <cpp_event_framework/Signal.hxx>
 
 namespace cpp_event_framework
 {
@@ -47,7 +46,7 @@ public:
 
     std::pair<IActiveObject::SPtr, Signal::SPtr> Dequeue() override
     {
-        sem_.aquire();
+        sem_.acquire();
 
         std::scoped_lock lock(mutex_);
         auto result = queue_.front();
@@ -57,7 +56,7 @@ public:
 
 private:
     std::deque<std::pair<IActiveObject::SPtr, Signal::SPtr>> queue_;
-    SemaphoreType sem_;
+    SemaphoreType sem_{0};
     MutexType mutex_;
 };
 } // namespace cpp_event_framework

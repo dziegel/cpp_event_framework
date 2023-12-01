@@ -19,7 +19,7 @@ class IActiveObjectDomain
 public:
     using SPtr = std::shared_ptr<IActiveObjectDomain>;
 
-    virtual ~IActiveObjectDomain();
+    virtual ~IActiveObjectDomain() = default;
 
     virtual void RegisterObject(const IActiveObject::SPtr& active_object) = 0;
 };

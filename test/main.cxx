@@ -8,6 +8,7 @@ extern void InterfaceStatemachineExampleMain();
 extern void PimplStatemachineExampleMain();
 extern void SimpleStatemachineExampleMain();
 extern void SignalsStatemachineExampleMain();
+extern void ActiveObjectFrameworkMain();
 
 int main(int, const char**)
 {
@@ -19,6 +20,7 @@ int main(int, const char**)
         PimplStatemachineExampleMain();
         SimpleStatemachineExampleMain();
         SignalsStatemachineExampleMain();
+        ActiveObjectFrameworkMain();
     }
     catch (const std::exception& ex)
     {

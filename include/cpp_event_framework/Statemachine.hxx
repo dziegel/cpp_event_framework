@@ -11,6 +11,7 @@
 
 #include <array>
 #include <cassert>
+#include <functional>
 #include <map>
 #include <memory>
 #include <span>
@@ -386,12 +387,12 @@ public:
      * @brief Deferred event callback, fired event deferral is requested
      *
      */
-    void (*on_defer_event_)(Ref, StateRef, Event) = nullptr;
+    std::function<void(Ref, StateRef, Event)> on_defer_event_;
     /**
      * @brief Deferred event callback, fired event recall is requested
      *
      */
-    void (*on_recall_deferred_events_)(Ref, StateRef) = nullptr;
+    std::function<void(Ref, StateRef)> on_recall_deferred_events_;
 
     /**
      * @brief Construct a new Statemachine object

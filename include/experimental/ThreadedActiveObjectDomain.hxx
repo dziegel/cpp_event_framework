@@ -30,7 +30,7 @@ public:
 
     ~ThreadedActiveObjectDomain() override
     {
-        queue_->PushFront(nullptr, nullptr);
+        queue_->PushBack(nullptr, nullptr);
         thread_.join();
     }
 

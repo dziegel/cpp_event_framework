@@ -16,6 +16,7 @@ add_executable(${CMAKE_PROJECT_NAME}
     examples/signals/Fsm.cxx
     examples/signals/FsmImpl.cxx
 
+    test/ActiveObjectFramework_unittest.cxx
     test/Statemachine_unittest.cxx
     test/Events_unittest.cxx
     test/main.cxx
@@ -74,7 +75,6 @@ target_compile_options(${CMAKE_PROJECT_NAME}
     $<$<AND:$<COMPILE_LANG_AND_ID:CXX,GNU>,$<VERSION_GREATER_EQUAL:$<CXX_COMPILER_VERSION>,10>>:-Wctor-dtor-privacy>
     $<$<AND:$<COMPILE_LANG_AND_ID:CXX,GNU>,$<VERSION_GREATER_EQUAL:$<CXX_COMPILER_VERSION>,10>>:-Wsuggest-override>
     $<$<AND:$<COMPILE_LANG_AND_ID:CXX,GNU>,$<VERSION_GREATER_EQUAL:$<CXX_COMPILER_VERSION>,10>>:-Wold-style-cast>
-    $<$<AND:$<COMPILE_LANG_AND_ID:CXX,GNU>,$<VERSION_GREATER_EQUAL:$<CXX_COMPILER_VERSION>,10>>:-Wmultiple-inheritance>
 )
 
 find_package(Doxygen)

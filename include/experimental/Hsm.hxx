@@ -10,40 +10,45 @@
 
 #pragma once
 
-#include <memory>
 #include <vector>
 
-#include <experimental/ActiveObjectBase.hxx>
 #include <cpp_event_framework/Signal.hxx>
 #include <cpp_event_framework/Statemachine.hxx>
+#include <experimental/ActiveObjectBase.hxx>
 
 namespace cpp_event_framework
 {
-template <typename ImplType>
+template <typename Fsm>
 class Hsm : public ActiveObjectBase
 {
 public:
     Hsm()
     {
-        hsm_.on_defer_event_ = [this](Fsm::StateRef, Fsm::Event event) { deferred_events_.emplace_back(event); };
-        hsm_.on_recall_deferred_events_ = [this]()
-        {
-            for (const auto& event : deferred_events_)
-            {
-                TakeHighPrio(event);
-            }
-            deferred_events_.clear();
-        };
+        fsm_.on_defer_event_ = [this](Fsm::Ref /*fsm*/, Fsm::StateRef, Fsm::Event event) { OnDeferEvent(event); };
+        fsm_.on_recall_deferred_events_ = [this](Fsm::Ref /*fsm*/, Fsm::StateRef) { OnRecallEvents(); };
     }
 
     void Dispatch(const Signal::SPtr& event) final
     {
-        hsm_.React(event);
+        fsm_.React(event);
     }
 
 protected:
-    using Fsm = Statemachine<ImplType, Signal::SPtr>;
-    Fsm hsm_;
+    Fsm fsm_;
+
+    void OnDeferEvent(Fsm::Event event)
+    {
+        deferred_events_.emplace_back(event);
+    }
+
+    void OnRecallEvents()
+    {
+        for (const auto& event : deferred_events_)
+        {
+            TakeHighPrio(event);
+        }
+        deferred_events_.clear();
+    }
 
 private:
     std::vector<Signal::SPtr> deferred_events_;

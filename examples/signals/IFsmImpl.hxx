@@ -32,8 +32,8 @@ class IFsmImpl
 public:
     virtual void State1Entry() = 0;
 
-    virtual void State2ToState1TransitionAction(FsmBase::Event) = 0;
+    virtual void State2ToState1TransitionAction(FsmBase::Event event) = 0;
 
-    virtual bool SomeGuardFunction(FsmBase::Event) = 0;
+    virtual bool SomeGuardFunction(FsmBase::Event event) = 0;
 };
 } // namespace example::signals
