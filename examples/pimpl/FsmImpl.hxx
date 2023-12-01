@@ -14,6 +14,8 @@ enum class EEvent : uint32_t
 
 class FsmImpl;
 using FsmBase = cpp_event_framework::Statemachine<FsmImpl, EEvent>;
+
+// Needed for "friend class Fsm;" below
 class Fsm;
 
 class FsmImpl
