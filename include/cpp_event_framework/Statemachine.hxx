@@ -192,7 +192,7 @@ public:
          *
          * @param target Target state
          */
-        constexpr explicit Transition(StateRef target) : target_(&target)
+        constexpr explicit Transition(StateRef target) noexcept : target_(&target)
         {
         }
         /**
@@ -201,7 +201,8 @@ public:
          *
          * @param target Target state
          */
-        constexpr Transition(StateRef target, DelegateActionType action) : target_(&target), delegate_action_(action)
+        constexpr Transition(StateRef target, DelegateActionType action) noexcept
+            : target_(&target), delegate_action_(action)
         {
         }
         /**
@@ -211,7 +212,7 @@ public:
          * @param target Target state
          * @param action Transition action
          */
-        constexpr Transition(StateRef target, ActionType action)
+        constexpr Transition(StateRef target, ActionType action) noexcept
             : target_(&target), single_action_(action), actions_(&single_action_, 1)
         {
         }

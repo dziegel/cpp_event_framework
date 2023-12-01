@@ -46,6 +46,12 @@ void FsmImpl::State2ToState1TransitionAction(FsmBase::Event /*event*/)
     std::cout << "State2ToState1TransitionAction" << std::endl;
 }
 
+bool FsmImpl::SomeGuardFunction(FsmBase::Event /*event*/)
+{
+    std::cout << "SomeGuardFunction" << std::endl;
+    return true;
+}
+
 // FSM code
 
 Fsm::Transition Fsm::State1Handler(ImplPtr /* impl */, Event event)
@@ -59,12 +65,16 @@ Fsm::Transition Fsm::State1Handler(ImplPtr /* impl */, Event event)
     }
 }
 
-Fsm::Transition Fsm::State2Handler(ImplPtr /* impl */, Event event)
+Fsm::Transition Fsm::State2Handler(ImplPtr impl, Event event)
 {
     switch (event)
     {
     case EEvent::kGo1:
-        return kState2State1Transition;
+        if (impl->SomeGuardFunction(event))
+        {
+            return kState2State1Transition;
+        }
+        return NoTransition();
     default:
         return UnhandledEvent();
     }

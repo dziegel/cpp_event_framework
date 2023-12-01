@@ -13,12 +13,16 @@ Fsm::Transition Fsm::State1Handler(ImplPtr /* impl */, Event event)
     }
 }
 
-Fsm::Transition Fsm::State2Handler(ImplPtr /* impl */, Event event)
+Fsm::Transition Fsm::State2Handler(ImplPtr impl, Event event)
 {
     switch (event)
     {
     case EEvent::kGo1:
-        return kState2State1Transition;
+        if (impl->SomeGuardFunction(event))
+        {
+            return kState2State1Transition;
+        }
+        return NoTransition();
     default:
         return UnhandledEvent();
     }

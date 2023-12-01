@@ -24,10 +24,7 @@ Fsm::Transition Fsm::State2Handler(ImplPtr impl, Event event)
         {
             return kState2State1Transition;
         }
-        else
-        {
-             return NoTransition();
-        }
+        return NoTransition();
     default:
         return UnhandledEvent();
     }
