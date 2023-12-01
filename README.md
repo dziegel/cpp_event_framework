@@ -149,7 +149,7 @@ Example of event usage in a switch/case statement (e.g. for use in statemachines
 
 It is also possible to use event pools. The first step is to declare a pool allocator:
 
-    class EventPoolAllocator : public cpp_event_framework::PoolAllocator<>
+    class EventPoolAllocator : public cpp_event_framework::PoolAllocator<EventPoolAllocator>
     {
     };
 

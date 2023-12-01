@@ -6,6 +6,12 @@ namespace example::signals
 {
 FsmImpl::FsmImpl()
 {
+    // Create a pool with elemen size calculated via PoolSizeCalculator, 10 elements
+    auto pool = cpp_event_framework::Pool<>::MakeShared(PoolSizeCalculator::kSptrSize, 10, "EventPool");
+
+    // Tell EventPoolAllocator to use pool created above
+    EventPoolAllocator::SetPool(pool);
+
     fsm_.Init(this, "FsmSignals", Fsm::kInitialState);
 
     fsm_.on_state_entry_ = [](Fsm::Ref fsm, Fsm::StateRef state)
