@@ -1,4 +1,4 @@
-/**
+ge/**
  * @file Statemachine.hxx
  * @author Dirk Ziegelmeier (dirk@ziegelmeier.net)
  * @brief
@@ -645,11 +645,11 @@ private:
 
     static const State kInTransition;
 
-    void SetInitialState(StatePtr impl, StatePtr initial)
+    void SetInitialState(StatePtr state, StatePtr initial)
     {
-        if ((impl->flags_ & EFlags::kHistory) != EFlags::kNone)
+        if ((state->flags_ & EFlags::kHistory) != EFlags::kNone)
         {
-            initial_[impl] = initial;
+            initial_[state] = initial;
         }
         else
         {
@@ -657,18 +657,18 @@ private:
         }
     }
 
-    StatePtr GetInitialState(StatePtr impl) const
+    StatePtr GetInitialState(StatePtr state) const
     {
-        if ((impl->flags_ & EFlags::kHistory) != EFlags::kNone)
+        if ((state->flags_ & EFlags::kHistory) != EFlags::kNone)
         {
-            auto search = initial_.find(impl);
+            auto search = initial_.find(state);
             if (search != initial_.end())
             {
                 return search->second;
             }
         }
 
-        return impl->initial_;
+        return state->initial_;
     }
 
     void ExitStatesFromUpTo(StatePtr from, StatePtr top)
