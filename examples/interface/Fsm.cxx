@@ -15,12 +15,19 @@ Fsm::Transition Fsm::State1Handler(ImplPtr /* impl */, Event event)
     }
 }
 
-Fsm::Transition Fsm::State2Handler(ImplPtr /* impl */, Event event)
+Fsm::Transition Fsm::State2Handler(ImplPtr impl, Event event)
 {
     switch (event)
     {
     case EEvent::kGo1:
-        return kState2State1Transition;
+        if (impl->SomeGuardFunction(event))
+        {
+            return kState2State1Transition;
+        }
+        else
+        {
+             return NoTransition();
+        }
     default:
         return UnhandledEvent();
     }
@@ -29,5 +36,5 @@ Fsm::Transition Fsm::State2Handler(ImplPtr /* impl */, Event event)
 const Fsm::State Fsm::kState1("State1", &State1Handler);
 const Fsm::State Fsm::kState2("State2", &State2Handler);
 const Fsm::StatePtr Fsm::kInitialState = &kState1; // initial state of the statemachine
-const Fsm::Transition Fsm::kState2State1Transition(kState1, &Fsm::Impl::State2ToState1TransitionAction);
+const Fsm::Transition Fsm::kState2State1Transition(kState1, &Impl::State2ToState1TransitionAction);
 } // namespace example::interface

@@ -17,6 +17,8 @@ public:
 
     void State2ToState1TransitionAction(FsmBase::Event) override;
 
+    bool SomeGuardFunction(FsmBase::Event) override;
+
 private:
     Fsm fsm_;
 };

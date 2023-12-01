@@ -43,4 +43,10 @@ void FsmImpl::State2ToState1TransitionAction(FsmBase::Event /*event*/)
 {
     std::cout << "State2ToState1TransitionAction" << std::endl;
 }
+
+bool FsmImpl::SomeGuardFunction(FsmBase::Event /*event*/)
+{
+    std::cout << "SomeGuardFunction" << std::endl;
+    return true;
+}
 } // namespace example::interface
