@@ -1,4 +1,4 @@
-ge/**
+/**
  * @file Statemachine.hxx
  * @author Dirk Ziegelmeier (dirk@ziegelmeier.net)
  * @brief
