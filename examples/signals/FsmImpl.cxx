@@ -6,8 +6,8 @@ namespace example::signals
 {
 FsmImpl::FsmImpl()
 {
-    // Create a pool with elemen size calculated via PoolSizeCalculator, 10 elements
-    auto pool = cpp_event_framework::Pool<>::MakeShared(PoolSizeCalculator::kSptrSize, 10, "EventPool");
+    // Create a pool with elemen size calculated via EventPoolElementSizeCalculator, 10 elements
+    auto pool = cpp_event_framework::Pool<>::MakeShared(EventPoolElementSizeCalculator::kSptrSize, 10, "EventPool");
 
     // Tell EventPoolAllocator to use pool created above
     EventPoolAllocator::SetPool(pool);

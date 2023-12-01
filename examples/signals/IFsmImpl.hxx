@@ -21,7 +21,7 @@ class Go2 : public cpp_event_framework::NextSignal<Go2, Go1>
 };
 
 // Calculate pool element size (max size)
-using PoolSizeCalculator = cpp_event_framework::SignalPoolElementSizeCalculator<Go1, Go2>;
+using EventPoolElementSizeCalculator = cpp_event_framework::SignalPoolElementSizeCalculator<Go1, Go2>;
 
 class IFsmImpl;
 using FsmBase = cpp_event_framework::Statemachine<IFsmImpl, const cpp_event_framework::Signal::SPtr&>;
