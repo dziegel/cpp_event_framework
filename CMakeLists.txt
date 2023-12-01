@@ -13,6 +13,9 @@ add_executable(${CMAKE_PROJECT_NAME}
 
     examples/plain/FsmImpl.cxx
 
+    examples/signals/Fsm.cxx
+    examples/signals/FsmImpl.cxx
+
     test/Statemachine_unittest.cxx
     test/Events_unittest.cxx
     test/main.cxx
