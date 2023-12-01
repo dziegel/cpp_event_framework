@@ -2,11 +2,11 @@
 
 #include "FsmImpl.hxx"
 
-namespace example::interface
+namespace example::signals
 {
 FsmImpl::FsmImpl()
 {
-    fsm_.Init(this, "FsmInterface", Fsm::kInitialState);
+    fsm_.Init(this, "FsmSignals", Fsm::kInitialState);
 
     fsm_.on_state_entry_ = [](Fsm::Ref fsm, Fsm::StateRef state)
     { std::cout << fsm.Name() << " enter state " << state.Name() << std::endl; };
@@ -14,24 +14,19 @@ FsmImpl::FsmImpl()
     fsm_.on_state_exit_ = [](Fsm::Ref fsm, Fsm::StateRef state)
     { std::cout << fsm.Name() << " exit state " << state.Name() << std::endl; };
 
-    fsm_.on_handle_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event) {
-        std::cout << fsm.Name() << " state " << state.Name() << " handle event " << static_cast<int>(event)
-                  << std::endl;
-    };
+    fsm_.on_handle_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event)
+    { std::cout << fsm.Name() << " state " << state.Name() << " handle event " << event->Name() << std::endl; };
 
     fsm_.on_unhandled_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event)
-    {
-        std::cout << fsm.Name() << " unhandled event " << static_cast<int>(event) << " in state " << state.Name()
-                  << std::endl;
-    };
+    { std::cout << fsm.Name() << " unhandled event " << event->Name() << " in state " << state.Name() << std::endl; };
 
     fsm_.Start();
 }
 
 void FsmImpl::Run()
 {
-    fsm_.React(EEvent::kGo2);
-    fsm_.React(EEvent::kGo1);
+    fsm_.React(Go2::MakeShared());
+    fsm_.React(Go1::MakeShared());
 }
 
 void FsmImpl::State1Entry()
@@ -49,10 +44,10 @@ bool FsmImpl::SomeGuardFunction(FsmBase::Event /*event*/)
     std::cout << fsm_.Name() << " SomeGuardFunction" << std::endl;
     return true;
 }
-} // namespace example::interface
+} // namespace example::signals
 
-void InterfaceStatemachineExampleMain()
+void SignalsStatemachineExampleMain()
 {
-    example::interface::FsmImpl s;
+    example::signals::FsmImpl s;
     s.Run();
 }

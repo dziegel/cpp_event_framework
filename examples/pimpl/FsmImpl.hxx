@@ -36,8 +36,8 @@ private:
 
     void State1Entry();
 
-    void State2ToState1TransitionAction(FsmBase::Event);
+    void State2ToState1TransitionAction(FsmBase::Event event);
 
-    bool SomeGuardFunction(FsmBase::Event);
+    bool SomeGuardFunction(FsmBase::Event event);
 };
 } // namespace example::pimpl

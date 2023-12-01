@@ -12,7 +12,7 @@ struct FsmImpl::Private
 
 FsmImpl::FsmImpl() : private_(std::make_unique<FsmImpl::Private>())
 {
-    private_->fsm.Init(this, "Fsm", Fsm::kInitialState);
+    private_->fsm.Init(this, "FsmPimpl", Fsm::kInitialState);
 
     private_->fsm.on_state_entry_ = [](Fsm::Ref fsm, Fsm::StateRef state)
     { std::cout << fsm.Name() << " enter state " << state.Name() << std::endl; };
@@ -44,17 +44,23 @@ void FsmImpl::Run()
 
 void FsmImpl::State1Entry()
 {
-    std::cout << "State1Entry" << std::endl;
+    std::cout << private_->fsm.Name() << "State1Entry" << std::endl;
 }
 
 void FsmImpl::State2ToState1TransitionAction(FsmBase::Event /*event*/)
 {
-    std::cout << "State2ToState1TransitionAction" << std::endl;
+    std::cout << private_->fsm.Name() << " State2ToState1TransitionAction" << std::endl;
 }
 
 bool FsmImpl::SomeGuardFunction(FsmBase::Event /*event*/)
 {
-    std::cout << "SomeGuardFunction" << std::endl;
+    std::cout << private_->fsm.Name() << " SomeGuardFunction" << std::endl;
     return true;
 }
 } // namespace example::pimpl
+
+void PimplStatemachineExampleMain()
+{
+    example::pimpl::FsmImpl s;
+    s.Run();
+}

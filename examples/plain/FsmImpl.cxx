@@ -6,7 +6,7 @@ namespace example::plain
 {
 FsmImpl::FsmImpl()
 {
-    fsm_.Init(this, "Fsm", Fsm::kInitialState);
+    fsm_.Init(this, "FsmPlain", Fsm::kInitialState);
 
     fsm_.on_state_entry_ = [](Fsm::Ref fsm, Fsm::StateRef state)
     { std::cout << fsm.Name() << " enter state " << state.Name() << std::endl; };
@@ -38,17 +38,17 @@ void FsmImpl::Run()
 
 void FsmImpl::State1Entry()
 {
-    std::cout << "State1Entry" << std::endl;
+    std::cout << fsm_.Name() << "State1Entry" << std::endl;
 }
 
 void FsmImpl::State2ToState1TransitionAction(FsmBase::Event /*event*/)
 {
-    std::cout << "State2ToState1TransitionAction" << std::endl;
+    std::cout << fsm_.Name() << " State2ToState1TransitionAction" << std::endl;
 }
 
 bool FsmImpl::SomeGuardFunction(FsmBase::Event /*event*/)
 {
-    std::cout << "SomeGuardFunction" << std::endl;
+    std::cout << fsm_.Name() << " SomeGuardFunction" << std::endl;
     return true;
 }
 

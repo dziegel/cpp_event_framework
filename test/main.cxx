@@ -2,9 +2,12 @@
 #include <exception>
 #include <iostream>
 
-void EventsFixtureMain();
-void StatemachineFixtureMain();
-void SimpleStatemachineExampleMain();
+extern void EventsFixtureMain();
+extern void StatemachineFixtureMain();
+extern void InterfaceStatemachineExampleMain();
+extern void PimplStatemachineExampleMain();
+extern void SimpleStatemachineExampleMain();
+extern void SignalsStatemachineExampleMain();
 
 int main(int, const char**)
 {
@@ -12,7 +15,10 @@ int main(int, const char**)
     {
         StatemachineFixtureMain();
         EventsFixtureMain();
+        InterfaceStatemachineExampleMain();
+        PimplStatemachineExampleMain();
         SimpleStatemachineExampleMain();
+        SignalsStatemachineExampleMain();
     }
     catch (const std::exception& ex)
     {

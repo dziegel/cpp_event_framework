@@ -3,7 +3,7 @@
 #include "Fsm.hxx"
 #include "IFsmImpl.hxx"
 
-namespace example::interface
+namespace example::signals
 {
 // Implements Fsm action interface
 class FsmImpl : public IFsmImpl
@@ -22,4 +22,4 @@ public:
 private:
     Fsm fsm_;
 };
-} // namespace example::interface
+} // namespace example::signals
