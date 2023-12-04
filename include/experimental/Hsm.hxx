@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <memory>
 #include <vector>
 
 #include <cpp_event_framework/Signal.hxx>
@@ -22,10 +23,12 @@ template <typename Fsm>
 class Hsm : public ActiveObjectBase
 {
 public:
+    using SPtr = std::shared_ptr<Hsm>;
+
     Hsm()
     {
-        fsm_.on_defer_event_ = [this](Fsm::Ref /*fsm*/, Fsm::StateRef, Fsm::Event event) { OnDeferEvent(event); };
-        fsm_.on_recall_deferred_events_ = [this](Fsm::Ref /*fsm*/, Fsm::StateRef) { OnRecallEvents(); };
+        fsm_.on_defer_event_ = [this](Fsm::StateRef, Fsm::Event event) { DeferEvent(event); };
+        fsm_.on_recall_deferred_events_ = [this](Fsm::StateRef) { RecallEvents(); };
     }
 
     void Dispatch(const Signal::SPtr& event) final
@@ -36,12 +39,15 @@ public:
 protected:
     Fsm fsm_;
 
-    void OnDeferEvent(Fsm::Event event)
+private:
+    std::vector<Signal::SPtr> deferred_events_;
+
+    void DeferEvent(Fsm::Event event)
     {
         deferred_events_.emplace_back(event);
     }
 
-    void OnRecallEvents()
+    void RecallEvents()
     {
         for (const auto& event : deferred_events_)
         {
@@ -49,8 +55,5 @@ protected:
         }
         deferred_events_.clear();
     }
-
-private:
-    std::vector<Signal::SPtr> deferred_events_;
 };
 } // namespace cpp_event_framework

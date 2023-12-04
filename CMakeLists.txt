@@ -5,6 +5,9 @@ project(cpp_event_framework)
 include(GNUInstallDirs REQUIRED)
 
 add_executable(${CMAKE_PROJECT_NAME}
+    examples/activeobject/Fsm.cxx
+    examples/activeobject/FsmImpl.cxx
+
     examples/interface/Fsm.cxx
     examples/interface/FsmImpl.cxx
 

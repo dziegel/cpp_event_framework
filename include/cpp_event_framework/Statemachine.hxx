@@ -387,12 +387,12 @@ public:
      * @brief Deferred event callback, fired event deferral is requested
      *
      */
-    std::function<void(Ref, StateRef, Event)> on_defer_event_;
+    std::function<void(StateRef, Event)> on_defer_event_;
     /**
      * @brief Deferred event callback, fired event recall is requested
      *
      */
-    std::function<void(Ref, StateRef)> on_recall_deferred_events_;
+    std::function<void(StateRef)> on_recall_deferred_events_;
 
     /**
      * @brief Construct a new Statemachine object
@@ -486,7 +486,7 @@ public:
             if (transition.target_ == &kDeferEvent)
             {
                 assert(on_defer_event_ != nullptr);
-                on_defer_event_(*this, *s, event);
+                on_defer_event_(*s, event);
                 working_ = false;
                 return;
             }
@@ -531,7 +531,7 @@ public:
     void RecallEvents()
     {
         assert(on_recall_deferred_events_ != nullptr);
-        on_recall_deferred_events_(*this, *current_state_);
+        on_recall_deferred_events_(*current_state_);
     }
 
     /**

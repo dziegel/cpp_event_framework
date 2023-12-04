@@ -143,15 +143,15 @@ public:
                       << std::endl;
         };
 
-        fsm_.on_defer_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event)
+        fsm_.on_defer_event_ = [this](Fsm::StateRef state, Fsm::Event event)
         {
-            fsm.Implementation()->on_defer_event_called_ = true;
+            on_defer_event_called_ = true;
             std::cout << "state " << state.Name() << " defer event " << event->Name() << std::endl;
         };
 
-        fsm_.on_recall_deferred_events_ = [](Fsm::Ref fsm, Fsm::StateRef state)
+        fsm_.on_recall_deferred_events_ = [this](Fsm::StateRef state)
         {
-            fsm.Implementation()->on_recall_event_called_ = true;
+            on_recall_event_called_ = true;
             std::cout << "state " << state.Name() << " recall deferred events" << std::endl;
         };
 
