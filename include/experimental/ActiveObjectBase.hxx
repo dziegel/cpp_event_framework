@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <memory>
+
 #include <cpp_event_framework/Signal.hxx>
 #include <experimental/IActiveObject.hxx>
 #include <experimental/IEventQueue.hxx>
@@ -28,13 +30,13 @@ public:
     void Take(const Signal::SPtr& event) final
     {
         assert(queue_ != nullptr);
-        queue_->PushBack(shared_from_this(), event);
+        queue_->PushBack(std::static_pointer_cast<IActiveObject>(shared_from_this()), event);
     }
 
     void TakeHighPrio(const Signal::SPtr& event) final
     {
         assert(queue_ != nullptr);
-        queue_->PushFront(shared_from_this(), event);
+        queue_->PushFront(std::static_pointer_cast<IActiveObject>(shared_from_this()), event);
     }
 
 private:
