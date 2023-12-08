@@ -14,17 +14,18 @@
 #include <memory>
 
 #include <cpp_event_framework/Signal.hxx>
+#include <experimental/IEventTarget.hxx>
 
 namespace cpp_event_framework
 {
 class IEventQueue;
 
-class IActiveObject : public std::enable_shared_from_this<IActiveObject>
+class IActiveObject : public IEventTarget
 {
 public:
     using SPtr = std::shared_ptr<IActiveObject>;
 
-    virtual ~IActiveObject() = default;
+    ~IActiveObject() override = default;
 
     /**
      * @brief Set the Queue object
@@ -32,20 +33,6 @@ public:
      * @param queue
      */
     virtual void SetQueue(const std::shared_ptr<IEventQueue>& queue) = 0;
-
-    /**
-     * @brief Take an event from ANY thread
-     *
-     * @param event
-     */
-    virtual void Take(const Signal::SPtr& event) = 0;
-
-    /**
-     * @brief Take an high-prio event from ANY thread (enqueued to front)
-     *
-     * @param event
-     */
-    virtual void TakeHighPrio(const Signal::SPtr& event) = 0;
 
     /**
      * @brief Dispatch event in active object domain
