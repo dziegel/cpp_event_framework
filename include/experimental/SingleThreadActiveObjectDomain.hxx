@@ -36,7 +36,7 @@ public:
         thread_.join();
     }
 
-    std::jthread& Thread() const
+    std::jthread& Thread()
     {
         return thread_;
     }
