@@ -1,5 +1,5 @@
 /**
- * @file ThreadedActiveObjectDomain.hxx
+ * @file SingleThreadActiveObjectDomain.hxx
  * @author Dirk Ziegelmeier (dirk@ziegelmeier.net)
  * @brief
  * @date 16-08-2023
@@ -12,29 +12,31 @@
 
 #include <memory>
 #include <thread>
+#include <semaphore>
 
 #include <experimental/ActiveObjectDomainBase.hxx>
 #include <experimental/ThreadSafeEventQueue.hxx>
 
 namespace cpp_event_framework
 {
-class ThreadedActiveObjectDomain : public ActiveObjectDomainBase
+template <typename SemaphoreType = std::counting_semaphore, typename MutexType = std::mutex>
+class SingleThreadActiveObjectDomain : public ActiveObjectDomainBase
 {
 public:
-    using SPtr = std::shared_ptr<ThreadedActiveObjectDomain>;
+    using SPtr = std::shared_ptr<SingleThreadActiveObjectDomain>;
 
-    ThreadedActiveObjectDomain()
-        : ActiveObjectDomainBase(std::make_shared<ThreadSafeEventQueue<>>()), thread_([this]() { Run(); })
+    SingleThreadActiveObjectDomain()
+        : ActiveObjectDomainBase(std::make_shared<ThreadSafeEventQueue<SemaphoreType, MutexType>>()), thread_([this]() { Run(); })
     {
     }
 
-    ~ThreadedActiveObjectDomain() override
+    ~SingleThreadActiveObjectDomain() override
     {
         queue_->PushBack(nullptr, nullptr);
         thread_.join();
     }
 
-    std::jthread& Thread()
+    std::jthread& Thread() const
     {
         return thread_;
     }

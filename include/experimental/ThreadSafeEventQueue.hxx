@@ -20,8 +20,8 @@
 
 namespace cpp_event_framework
 {
-template <typename SemaphoreType = std::binary_semaphore, typename MutexType = std::mutex>
-class ThreadSafeEventQueue : public IEventQueue
+template <typename SemaphoreType = std::counting_semaphore, typename MutexType = std::mutex>
+class ThreadSafeEventQueue final : public IEventQueue
 {
 public:
     using SPtr = std::shared_ptr<ThreadSafeEventQueue>;

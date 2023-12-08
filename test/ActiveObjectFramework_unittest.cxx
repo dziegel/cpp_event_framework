@@ -4,7 +4,7 @@
 #include "../examples/activeobject/FsmImpl.hxx"
 
 #include <experimental/Hsm.hxx>
-#include <experimental/ThreadedActiveObjectDomain.hxx>
+#include <experimental/SingleThreadActiveObjectDomain.hxx>
 
 using namespace std::chrono_literals;
 
@@ -17,7 +17,7 @@ void ActiveObjectFrameworkMain()
     // Tell EventPoolAllocator to use pool created above
     example::activeobject::EventPoolAllocator::SetPool(pool);
 
-    auto domain = std::make_shared<cpp_event_framework::ThreadedActiveObjectDomain>();
+    auto domain = std::make_shared<cpp_event_framework::SingleThreadActiveObjectDomain>();
 
     auto active_object = std::make_shared<example::activeobject::FsmImpl>();
     domain->RegisterObject(active_object);
