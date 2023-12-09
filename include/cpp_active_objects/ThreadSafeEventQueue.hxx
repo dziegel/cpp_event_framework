@@ -49,7 +49,8 @@ public:
      * @param event
      * @param priority Sort priority in queue, lower numbers = higher priority = "more to the front"
      */
-    void Enqueue(IActiveObject::SPtr target, cpp_event_framework::Signal::SPtr event, int priority = 0) override
+    void Enqueue(IActiveObject::SPtr target, cpp_event_framework::Signal::SPtr event,
+                 PriorityType priority = 0) override
     {
         {
             std::scoped_lock lock(mutex_);

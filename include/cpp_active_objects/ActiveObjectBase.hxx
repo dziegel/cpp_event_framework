@@ -42,7 +42,7 @@ public:
      * @param event
      * @param priority
      */
-    void Take(const cpp_event_framework::Signal::SPtr& event, int priority = 0) final
+    void Take(const cpp_event_framework::Signal::SPtr& event, PriorityType priority = 0) final
     {
         assert(queue_ != nullptr);
         queue_->Enqueue(std::static_pointer_cast<IActiveObject>(shared_from_this()), event, priority);

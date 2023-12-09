@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include "cpp_active_objects/IEventQueue.hxx"
+#include "cpp_active_objects/IEventTarget.hxx"
 #include <limits>
 #include <memory>
 #include <vector>
@@ -71,7 +73,7 @@ private:
     {
         for (const auto& event : deferred_events_)
         {
-            Take(event, std::numeric_limits<int>::min());
+            Take(event, std::numeric_limits<IEventTarget::PriorityType>::min());
         }
         deferred_events_.clear();
     }

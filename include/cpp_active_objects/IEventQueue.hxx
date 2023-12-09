@@ -32,6 +32,11 @@ public:
     using SPtr = std::shared_ptr<IEventQueue>;
 
     /**
+     * @brief PriorityType alias
+     */
+    using PriorityType = int;
+
+    /**
      * @brief Destroy the EventQueue
      *
      */
@@ -45,7 +50,7 @@ public:
      * @param priority Sort priority in queue, lower numbers = higher priority = "more to the front"
      */
     virtual void Enqueue(std::shared_ptr<IActiveObject> target, cpp_event_framework::Signal::SPtr event,
-                         int priority = 0) = 0;
+                         PriorityType priority = 0) = 0;
 
     /**
      * @brief Dequeue an ActiveObject-Event pair

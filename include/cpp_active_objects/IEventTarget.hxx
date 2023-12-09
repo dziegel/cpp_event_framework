@@ -31,6 +31,11 @@ public:
      */
     using SPtr = std::shared_ptr<IEventTarget>;
 
+    /**
+     * @brief PriorityType alias
+     */
+    using PriorityType = int;
+
     virtual ~IEventTarget() = default;
 
     /**
@@ -39,6 +44,6 @@ public:
      * @param event
      * @param priority Sort priority in queue, lower numbers = higher priority = "more to the front"
      */
-    virtual void Take(const cpp_event_framework::Signal::SPtr& event, int priority = 0) = 0;
+    virtual void Take(const cpp_event_framework::Signal::SPtr& event, PriorityType priority = 0) = 0;
 };
 } // namespace cpp_active_objects

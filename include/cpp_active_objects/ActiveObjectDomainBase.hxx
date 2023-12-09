@@ -12,6 +12,7 @@
 
 #include <limits>
 #include <memory>
+#include <type_traits>
 
 #include <cpp_active_objects/IActiveObjectDomain.hxx>
 #include <cpp_active_objects/IEventQueue.hxx>
@@ -50,6 +51,8 @@ protected:
      */
     explicit ActiveObjectDomainBase(IEventQueue::SPtr queue) : queue_(std::move(queue))
     {
+        static_assert(std::is_same_v<IEventQueue::PriorityType, IActiveObject::PriorityType>,
+                      "PriorityType of IEventQueue and IActiveObject must be equal");
     }
 
     /**
@@ -75,7 +78,7 @@ protected:
      */
     void Stop()
     {
-        queue_->Enqueue(nullptr, nullptr, std::numeric_limits<int>::max());
+        queue_->Enqueue(nullptr, nullptr, std::numeric_limits<IEventQueue::PriorityType>::max());
     }
 
 private:
