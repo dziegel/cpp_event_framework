@@ -1,13 +1,20 @@
-#include <chrono>
+/**
+ * @file Events_unittest.cxx
+ * @author Dirk Ziegelmeier (dirk@ziegelmeier.net)
+ * @brief
+ * @date 16-08-2023
+ *
+ * @copyright SPDX-License-Identifier: Apache-2.0
+ *
+ */
+
 #include <iostream>
 #include <ostream>
-#include <ratio>
-#include <thread>
+#include <vector>
 
 #include <cpp_event_framework/Pool.hxx>
 #include <cpp_event_framework/Signal.hxx>
 #include <cpp_event_framework/Statemachine.hxx>
-#include <vector>
 
 using namespace std::chrono_literals;
 

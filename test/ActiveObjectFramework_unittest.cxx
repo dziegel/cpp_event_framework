@@ -1,3 +1,13 @@
+/**
+ * @file ActiveObjectFrameworkMain.cxx
+ * @author Dirk Ziegelmeier (dirk@ziegelmeier.net)
+ * @brief
+ * @date 16-08-2023
+ *
+ * @copyright SPDX-License-Identifier: Apache-2.0
+ *
+ */
+
 #include <iostream>
 #include <memory>
 

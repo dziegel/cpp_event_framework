@@ -18,21 +18,43 @@
 
 namespace cpp_event_framework
 {
+/**
+ * @brief Base class of an active object domain
+ *
+ */
 class ActiveObjectDomainBase : public IActiveObjectDomain
 {
 public:
+    /**
+     * @brief Shared pointer alias
+     *
+     */
     using SPtr = std::shared_ptr<ActiveObjectDomainBase>;
 
+    /**
+     * @brief Assign an active object to this domain
+     *
+     * @param active_object
+     */
     void RegisterObject(const IActiveObject::SPtr& active_object) final
     {
         active_object->SetQueue(queue_);
     }
 
 protected:
+    /**
+     * @brief Constructor
+     *
+     * @param queue Queue to use
+     */
     explicit ActiveObjectDomainBase(IEventQueue::SPtr queue) : queue_(std::move(queue))
     {
     }
 
+    /**
+     * @brief Dequeue and dispatch event queue entries
+     *
+     */
     void Run()
     {
         while (true)
@@ -46,6 +68,16 @@ protected:
         }
     }
 
+    /**
+     * @brief Enqueue dummy entry to exit Run() loop
+     *
+     */
+    void Stop()
+    {
+        queue_->PushBack(nullptr, nullptr);
+    }
+
+private:
     IEventQueue::SPtr queue_;
 };
 } // namespace cpp_event_framework

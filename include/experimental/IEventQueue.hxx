@@ -1,11 +1,10 @@
 /**
  * @file IEventQueue.hxx
- * @author your name (you@domain.com)
+ * @author Dirk Ziegelmeier (dirk@ziegelmeier.net)
  * @brief
- * @version 0.1
- * @date 2023-11-19
+ * @date 16-08-2023
  *
- * @copyright Copyright (c) 2023
+ * @copyright SPDX-License-Identifier: Apache-2.0
  *
  */
 
@@ -26,6 +25,10 @@ class IActiveObject;
 class IEventQueue
 {
 public:
+    /**
+     * @brief Shared pointer alias
+     *
+     */
     using SPtr = std::shared_ptr<IEventQueue>;
 
     /**

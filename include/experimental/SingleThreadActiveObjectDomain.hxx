@@ -19,10 +19,22 @@
 
 namespace cpp_event_framework
 {
-template <typename SemaphoreType = std::binary_semaphore, typename MutexType = std::mutex>
+/**
+ * @brief A thread-safe event queue
+ *
+ * @tparam SemaphoreType Sempahore type to use - e.g. to be able to use own RT-capable implementation
+ * @tparam MutexType Mutex type to use - e.g. to be able to use own RT-capable implementation
+ * @tparam ThreadType Thread type to use - e.g. to be able to use own RT-capable implementation
+ */
+template <typename SemaphoreType = std::binary_semaphore, typename MutexType = std::mutex,
+          typename ThreadType = std::jthread>
 class SingleThreadActiveObjectDomain : public ActiveObjectDomainBase
 {
 public:
+    /**
+     * @brief Shared pointer alias
+     *
+     */
     using SPtr = std::shared_ptr<SingleThreadActiveObjectDomain>;
 
     SingleThreadActiveObjectDomain()
@@ -33,16 +45,21 @@ public:
 
     ~SingleThreadActiveObjectDomain() override
     {
-        queue_->PushBack(nullptr, nullptr);
+        Stop();
         thread_.join();
     }
 
-    std::jthread& Thread()
+    /**
+     * @brief Get thread object
+     *
+     * @return ThreadType&
+     */
+    ThreadType& Thread()
     {
         return thread_;
     }
 
 private:
-    std::jthread thread_;
+    ThreadType thread_;
 };
 } // namespace cpp_event_framework

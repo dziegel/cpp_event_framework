@@ -201,6 +201,7 @@ public:
          * Use Statemachine::TransitionTo() instead
          *
          * @param target Target state
+         * @param action Transition action
          */
         constexpr Transition(StateRef target, DelegateActionType action) noexcept
             : target_(&target), delegate_action_(action)

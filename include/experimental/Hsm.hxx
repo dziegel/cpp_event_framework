@@ -19,10 +19,20 @@
 
 namespace cpp_event_framework
 {
+/**
+ * @brief Base class for a statemachine using active-object pattern
+ * Supports deferred events.
+ *
+ * @tparam Fsm Statemachine to aggregate
+ */
 template <typename Fsm>
 class Hsm : public ActiveObjectBase
 {
 public:
+    /**
+     * @brief Shared pointer alias
+     *
+     */
     using SPtr = std::shared_ptr<Hsm>;
 
     Hsm()
@@ -31,12 +41,21 @@ public:
         fsm_.on_recall_deferred_events_ = [this](Fsm::StateRef) { RecallEvents(); };
     }
 
+    /**
+     * @brief Dispatch event in active object domain
+     *
+     * @param event
+     */
     void Dispatch(const Signal::SPtr& event) final
     {
         fsm_.React(event);
     }
 
 protected:
+    /**
+     * @brief Statemachine
+     *
+     */
     Fsm fsm_;
 
 private:

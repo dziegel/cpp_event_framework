@@ -20,12 +20,34 @@
 
 namespace cpp_event_framework
 {
+/**
+ * @brief A thread-safe event queue
+ *
+ * @tparam SemaphoreType Sempahore type to use - e.g. to be able to supply own RT-capable implementation
+ * @tparam MutexType Mutex type to use - e.g. to be able to supply own RT-capable implementation
+ */
 template <typename SemaphoreType = std::binary_semaphore, typename MutexType = std::mutex>
 class ThreadSafeEventQueue final : public IEventQueue
 {
 public:
+    /**
+     * @brief Shared pointer alias
+     *
+     */
     using SPtr = std::shared_ptr<ThreadSafeEventQueue>;
 
+    /**
+     * @brief Alias for queue entry type
+     *
+     */
+    using QueueEntry = std::pair<IActiveObject::SPtr, Signal::SPtr>;
+
+    /**
+     * @brief Enqueue back
+     *
+     * @param target
+     * @param event
+     */
     void PushBack(IActiveObject::SPtr target, Signal::SPtr event) override
     {
         {
@@ -35,6 +57,12 @@ public:
         sem_.release();
     }
 
+    /**
+     * @brief Enqueue front
+     *
+     * @param target
+     * @param event
+     */
     void PushFront(IActiveObject::SPtr target, Signal::SPtr event) override
     {
         {
@@ -44,7 +72,12 @@ public:
         sem_.release();
     }
 
-    std::pair<IActiveObject::SPtr, Signal::SPtr> Dequeue() override
+    /**
+     * @brief Dequeue an entry, possibly blocking until there is an entry in the queue
+     *
+     * @return std::pair<IActiveObject::SPtr, Signal::SPtr> Pair of active object and event
+     */
+    QueueEntry Dequeue() override
     {
         sem_.acquire();
 

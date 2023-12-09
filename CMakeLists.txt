@@ -85,7 +85,7 @@ if (DOXYGEN_FOUND)
     set(DOXYGEN_GENERATE_HTML YES)
     set(DOXYGEN_OUTPUT_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/doc)
     doxygen_add_docs(${CMAKE_PROJECT_NAME}_docs
-        include/cpp_event_framework
+        include
         ALL
     )
 endif()

@@ -1,11 +1,10 @@
 /**
  * @file IEventTarget.hxx
- * @author your name (you@domain.com)
+ * @author Dirk Ziegelmeier (dirḱ@ziegelmeier.net)
  * @brief
- * @version 0.1
  * @date 2023-11-19
  *
- * @copyright Copyright (c) 2023
+ * @copyright SPDX-License-Identifier: Apache-2.0
  *
  */
 
@@ -19,9 +18,17 @@ namespace cpp_event_framework
 {
 class IEventQueue;
 
+/**
+ * @brief An object taking events (from any thread)
+ *
+ */
 class IEventTarget : public std::enable_shared_from_this<IEventTarget>
 {
 public:
+    /**
+     * @brief Shared pointer alias
+     *
+     */
     using SPtr = std::shared_ptr<IEventTarget>;
 
     virtual ~IEventTarget() = default;

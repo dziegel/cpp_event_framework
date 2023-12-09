@@ -18,21 +18,40 @@
 
 namespace cpp_event_framework
 {
+/**
+ * @brief Base class for active objects
+ *
+ */
 class ActiveObjectBase : public IActiveObject
 {
 public:
+    /**
+     * @brief Assign object to a queue
+     *
+     * @param queue
+     */
     void SetQueue(const IEventQueue::SPtr& queue) final
     {
         assert(queue_ == nullptr);
         queue_ = queue;
     }
 
+    /**
+     * @brief Enqueue (back) a signal to be dispateched by this object
+     *
+     * @param event
+     */
     void Take(const Signal::SPtr& event) final
     {
         assert(queue_ != nullptr);
         queue_->PushBack(std::static_pointer_cast<IActiveObject>(shared_from_this()), event);
     }
 
+    /**
+     * @brief Enqueue (front) a signal to be dispateched by this object
+     *
+     * @param event
+     */
     void TakeHighPrio(const Signal::SPtr& event) final
     {
         assert(queue_ != nullptr);
