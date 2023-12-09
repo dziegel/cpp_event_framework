@@ -11,7 +11,6 @@
 #pragma once
 
 #include <memory>
-#include <semaphore>
 #include <thread>
 
 #include <cpp_active_objects/ActiveObjectDomainBase.hxx>
