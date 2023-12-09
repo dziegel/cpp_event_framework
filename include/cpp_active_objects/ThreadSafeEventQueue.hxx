@@ -14,11 +14,11 @@
 #include <mutex>
 #include <semaphore>
 
+#include <cpp_active_objects/IActiveObject.hxx>
+#include <cpp_active_objects/IEventQueue.hxx>
 #include <cpp_event_framework/Signal.hxx>
-#include <experimental/IActiveObject.hxx>
-#include <experimental/IEventQueue.hxx>
 
-namespace cpp_event_framework
+namespace cpp_active_objects
 {
 /**
  * @brief A thread-safe event queue
@@ -40,7 +40,7 @@ public:
      * @brief Alias for queue entry type
      *
      */
-    using QueueEntry = std::pair<IActiveObject::SPtr, Signal::SPtr>;
+    using QueueEntry = std::pair<IActiveObject::SPtr, cpp_event_framework::Signal::SPtr>;
 
     /**
      * @brief Enqueue back
@@ -48,7 +48,7 @@ public:
      * @param target
      * @param event
      */
-    void PushBack(IActiveObject::SPtr target, Signal::SPtr event) override
+    void PushBack(IActiveObject::SPtr target, cpp_event_framework::Signal::SPtr event) override
     {
         {
             std::scoped_lock lock(mutex_);
@@ -63,7 +63,7 @@ public:
      * @param target
      * @param event
      */
-    void PushFront(IActiveObject::SPtr target, Signal::SPtr event) override
+    void PushFront(IActiveObject::SPtr target, cpp_event_framework::Signal::SPtr event) override
     {
         {
             std::scoped_lock lock(mutex_);
@@ -88,8 +88,8 @@ public:
     }
 
 private:
-    std::deque<std::pair<IActiveObject::SPtr, Signal::SPtr>> queue_;
+    std::deque<std::pair<IActiveObject::SPtr, cpp_event_framework::Signal::SPtr>> queue_;
     SemaphoreType sem_{0};
     MutexType mutex_;
 };
-} // namespace cpp_event_framework
+} // namespace cpp_active_objects

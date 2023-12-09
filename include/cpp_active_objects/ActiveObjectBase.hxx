@@ -12,11 +12,11 @@
 
 #include <memory>
 
+#include <cpp_active_objects/IActiveObject.hxx>
+#include <cpp_active_objects/IEventQueue.hxx>
 #include <cpp_event_framework/Signal.hxx>
-#include <experimental/IActiveObject.hxx>
-#include <experimental/IEventQueue.hxx>
 
-namespace cpp_event_framework
+namespace cpp_active_objects
 {
 /**
  * @brief Base class for active objects
@@ -41,7 +41,7 @@ public:
      *
      * @param event
      */
-    void Take(const Signal::SPtr& event) final
+    void Take(const cpp_event_framework::Signal::SPtr& event) final
     {
         assert(queue_ != nullptr);
         queue_->PushBack(std::static_pointer_cast<IActiveObject>(shared_from_this()), event);
@@ -52,7 +52,7 @@ public:
      *
      * @param event
      */
-    void TakeHighPrio(const Signal::SPtr& event) final
+    void TakeHighPrio(const cpp_event_framework::Signal::SPtr& event) final
     {
         assert(queue_ != nullptr);
         queue_->PushFront(std::static_pointer_cast<IActiveObject>(shared_from_this()), event);
@@ -61,4 +61,4 @@ public:
 private:
     IEventQueue::SPtr queue_;
 };
-} // namespace cpp_event_framework
+} // namespace cpp_active_objects

@@ -14,7 +14,7 @@
 
 #include <cpp_event_framework/Signal.hxx>
 
-namespace cpp_event_framework
+namespace cpp_active_objects
 {
 class IActiveObject;
 
@@ -43,20 +43,20 @@ public:
      * @param target
      * @param event
      */
-    virtual void PushBack(std::shared_ptr<IActiveObject> target, Signal::SPtr event) = 0;
+    virtual void PushBack(std::shared_ptr<IActiveObject> target, cpp_event_framework::Signal::SPtr event) = 0;
     /**
      * @brief Enqueue an event at FRONT to be dispateched by a target
      *
      * @param target
      * @param event
      */
-    virtual void PushFront(std::shared_ptr<IActiveObject> target, Signal::SPtr event) = 0;
+    virtual void PushFront(std::shared_ptr<IActiveObject> target, cpp_event_framework::Signal::SPtr event) = 0;
 
     /**
      * @brief Dequeue an ActiveObject-Event pair
      *
      * @return std::pair<std::shared_ptr<IActiveObject>, Signal::SPtr>
      */
-    virtual std::pair<std::shared_ptr<IActiveObject>, Signal::SPtr> Dequeue() = 0;
+    virtual std::pair<std::shared_ptr<IActiveObject>, cpp_event_framework::Signal::SPtr> Dequeue() = 0;
 };
-} // namespace cpp_event_framework
+} // namespace cpp_active_objects

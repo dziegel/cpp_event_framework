@@ -1,12 +1,14 @@
 #pragma once
 
+#include <cpp_active_objects/Hsm.hxx>
+
 #include "Fsm.hxx"
 #include "IFsmImpl.hxx"
 
 namespace example::activeobject
 {
 // Implements Fsm action interface
-class FsmImpl : public cpp_event_framework::Hsm<example::activeobject::Fsm>, public IFsmImpl
+class FsmImpl : public cpp_active_objects::Hsm<example::activeobject::Fsm>, public IFsmImpl
 {
 public:
     FsmImpl();

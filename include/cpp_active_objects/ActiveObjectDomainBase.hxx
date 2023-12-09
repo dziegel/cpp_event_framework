@@ -12,11 +12,11 @@
 
 #include <memory>
 
+#include <cpp_active_objects/IActiveObjectDomain.hxx>
+#include <cpp_active_objects/IEventQueue.hxx>
 #include <cpp_event_framework/Signal.hxx>
-#include <experimental/IActiveObjectDomain.hxx>
-#include <experimental/IEventQueue.hxx>
 
-namespace cpp_event_framework
+namespace cpp_active_objects
 {
 /**
  * @brief Base class of an active object domain
@@ -80,4 +80,4 @@ protected:
 private:
     IEventQueue::SPtr queue_;
 };
-} // namespace cpp_event_framework
+} // namespace cpp_active_objects

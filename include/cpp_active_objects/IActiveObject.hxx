@@ -12,10 +12,10 @@
 
 #include <memory>
 
+#include <cpp_active_objects/IEventTarget.hxx>
 #include <cpp_event_framework/Signal.hxx>
-#include <experimental/IEventTarget.hxx>
 
-namespace cpp_event_framework
+namespace cpp_active_objects
 {
 class IEventQueue;
 
@@ -47,6 +47,6 @@ public:
      *
      * @param event
      */
-    virtual void Dispatch(const Signal::SPtr& event) = 0;
+    virtual void Dispatch(const cpp_event_framework::Signal::SPtr& event) = 0;
 };
-} // namespace cpp_event_framework
+} // namespace cpp_active_objects

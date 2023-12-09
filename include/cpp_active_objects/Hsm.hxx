@@ -13,11 +13,11 @@
 #include <memory>
 #include <vector>
 
+#include <cpp_active_objects/ActiveObjectBase.hxx>
 #include <cpp_event_framework/Signal.hxx>
 #include <cpp_event_framework/Statemachine.hxx>
-#include <experimental/ActiveObjectBase.hxx>
 
-namespace cpp_event_framework
+namespace cpp_active_objects
 {
 /**
  * @brief Base class for a statemachine using active-object pattern
@@ -46,7 +46,7 @@ public:
      *
      * @param event
      */
-    void Dispatch(const Signal::SPtr& event) final
+    void Dispatch(const cpp_event_framework::Signal::SPtr& event) final
     {
         fsm_.React(event);
     }
@@ -59,7 +59,7 @@ protected:
     Fsm fsm_;
 
 private:
-    std::vector<Signal::SPtr> deferred_events_;
+    std::vector<cpp_event_framework::Signal::SPtr> deferred_events_;
 
     void DeferEvent(Fsm::Event event)
     {
@@ -75,4 +75,4 @@ private:
         deferred_events_.clear();
     }
 };
-} // namespace cpp_event_framework
+} // namespace cpp_active_objects

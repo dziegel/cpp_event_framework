@@ -14,10 +14,10 @@
 #include <semaphore>
 #include <thread>
 
-#include <experimental/ActiveObjectDomainBase.hxx>
-#include <experimental/ThreadSafeEventQueue.hxx>
+#include <cpp_active_objects/ActiveObjectDomainBase.hxx>
+#include <cpp_active_objects/ThreadSafeEventQueue.hxx>
 
-namespace cpp_event_framework
+namespace cpp_active_objects
 {
 /**
  * @brief A thread-safe event queue
@@ -62,4 +62,4 @@ public:
 private:
     ThreadType thread_;
 };
-} // namespace cpp_event_framework
+} // namespace cpp_active_objects

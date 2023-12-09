@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include <experimental/IActiveObject.hxx>
+#include <cpp_active_objects/IActiveObject.hxx>
 
-namespace cpp_event_framework
+namespace cpp_active_objects
 {
 /**
  * @brief Interface of an Active Object Domain
@@ -36,4 +36,4 @@ public:
      */
     virtual void RegisterObject(const IActiveObject::SPtr& active_object) = 0;
 };
-} // namespace cpp_event_framework
+} // namespace cpp_active_objects

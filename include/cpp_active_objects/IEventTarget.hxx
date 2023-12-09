@@ -14,7 +14,7 @@
 
 #include <cpp_event_framework/Signal.hxx>
 
-namespace cpp_event_framework
+namespace cpp_active_objects
 {
 class IEventQueue;
 
@@ -38,13 +38,13 @@ public:
      *
      * @param event
      */
-    virtual void Take(const Signal::SPtr& event) = 0;
+    virtual void Take(const cpp_event_framework::Signal::SPtr& event) = 0;
 
     /**
      * @brief Take an high-prio event from ANY thread (enqueued to front)
      *
      * @param event
      */
-    virtual void TakeHighPrio(const Signal::SPtr& event) = 0;
+    virtual void TakeHighPrio(const cpp_event_framework::Signal::SPtr& event) = 0;
 };
-} // namespace cpp_event_framework
+} // namespace cpp_active_objects
