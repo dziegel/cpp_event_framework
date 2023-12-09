@@ -40,22 +40,12 @@ public:
      * @brief Enqueue (back) a signal to be dispateched by this object
      *
      * @param event
+     * @param priority
      */
-    void Take(const cpp_event_framework::Signal::SPtr& event) final
+    void Take(const cpp_event_framework::Signal::SPtr& event, int priority = 0) final
     {
         assert(queue_ != nullptr);
-        queue_->PushBack(std::static_pointer_cast<IActiveObject>(shared_from_this()), event);
-    }
-
-    /**
-     * @brief Enqueue (front) a signal to be dispateched by this object
-     *
-     * @param event
-     */
-    void TakeHighPrio(const cpp_event_framework::Signal::SPtr& event) final
-    {
-        assert(queue_ != nullptr);
-        queue_->PushFront(std::static_pointer_cast<IActiveObject>(shared_from_this()), event);
+        queue_->Enqueue(std::static_pointer_cast<IActiveObject>(shared_from_this()), event, priority);
     }
 
 private:

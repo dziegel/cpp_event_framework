@@ -43,31 +43,24 @@ public:
     using QueueEntry = std::pair<IActiveObject::SPtr, cpp_event_framework::Signal::SPtr>;
 
     /**
-     * @brief Enqueue back
+     * @brief Enqueue an event to be dispatched by a target
      *
      * @param target
      * @param event
+     * @param priority Sort priority in queue, lower numbers = higher priority = "more to the front"
      */
-    void PushBack(IActiveObject::SPtr target, cpp_event_framework::Signal::SPtr event) override
+    void Enqueue(IActiveObject::SPtr target, cpp_event_framework::Signal::SPtr event, int priority = 0) override
     {
         {
             std::scoped_lock lock(mutex_);
-            queue_.emplace_back(std::move(target), std::move(event));
-        }
-        sem_.release();
-    }
-
-    /**
-     * @brief Enqueue front
-     *
-     * @param target
-     * @param event
-     */
-    void PushFront(IActiveObject::SPtr target, cpp_event_framework::Signal::SPtr event) override
-    {
-        {
-            std::scoped_lock lock(mutex_);
-            queue_.emplace_front(std::move(target), std::move(event));
+            if (priority >= 0)
+            {
+                queue_.emplace_back(std::move(target), std::move(event));
+            }
+            else
+            {
+                queue_.emplace_front(std::move(target), std::move(event));
+            }
         }
         sem_.release();
     }

@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <limits>
 #include <memory>
 #include <vector>
 
@@ -70,7 +71,7 @@ private:
     {
         for (const auto& event : deferred_events_)
         {
-            TakeHighPrio(event);
+            Take(event, std::numeric_limits<int>::min());
         }
         deferred_events_.clear();
     }

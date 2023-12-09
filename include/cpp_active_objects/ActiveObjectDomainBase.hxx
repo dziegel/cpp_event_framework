@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <limits>
 #include <memory>
 
 #include <cpp_active_objects/IActiveObjectDomain.hxx>
@@ -74,7 +75,7 @@ protected:
      */
     void Stop()
     {
-        queue_->PushBack(nullptr, nullptr);
+        queue_->Enqueue(nullptr, nullptr, std::numeric_limits<int>::max());
     }
 
 private:

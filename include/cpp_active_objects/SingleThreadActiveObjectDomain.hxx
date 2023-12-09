@@ -15,19 +15,16 @@
 #include <thread>
 
 #include <cpp_active_objects/ActiveObjectDomainBase.hxx>
-#include <cpp_active_objects/ThreadSafeEventQueue.hxx>
+#include <cpp_active_objects/IEventQueue.hxx>
 
 namespace cpp_active_objects
 {
 /**
  * @brief A thread-safe event queue
  *
- * @tparam SemaphoreType Sempahore type to use - e.g. to be able to use own RT-capable implementation
- * @tparam MutexType Mutex type to use - e.g. to be able to use own RT-capable implementation
  * @tparam ThreadType Thread type to use - e.g. to be able to use own RT-capable implementation
  */
-template <typename SemaphoreType = std::binary_semaphore, typename MutexType = std::mutex,
-          typename ThreadType = std::jthread>
+template <typename ThreadType = std::jthread>
 class SingleThreadActiveObjectDomain : public ActiveObjectDomainBase
 {
 public:
@@ -37,9 +34,13 @@ public:
      */
     using SPtr = std::shared_ptr<SingleThreadActiveObjectDomain>;
 
-    SingleThreadActiveObjectDomain()
-        : ActiveObjectDomainBase(std::make_shared<ThreadSafeEventQueue<SemaphoreType, MutexType>>())
-        , thread_([this]() { Run(); })
+    /**
+     * @brief Constructor
+     *
+     * @param queue
+     */
+    explicit SingleThreadActiveObjectDomain(IEventQueue::SPtr queue)
+        : ActiveObjectDomainBase(std::move(queue)), thread_([this]() { Run(); })
     {
     }
 

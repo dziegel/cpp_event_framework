@@ -38,19 +38,14 @@ public:
     virtual ~IEventQueue() = default;
 
     /**
-     * @brief Enqueue an event at BACK to be dispateched by a target
+     * @brief Enqueue an event to be dispateched by a target
      *
      * @param target
      * @param event
+     * @param priority Sort priority in queue, lower numbers = higher priority = "more to the front"
      */
-    virtual void PushBack(std::shared_ptr<IActiveObject> target, cpp_event_framework::Signal::SPtr event) = 0;
-    /**
-     * @brief Enqueue an event at FRONT to be dispateched by a target
-     *
-     * @param target
-     * @param event
-     */
-    virtual void PushFront(std::shared_ptr<IActiveObject> target, cpp_event_framework::Signal::SPtr event) = 0;
+    virtual void Enqueue(std::shared_ptr<IActiveObject> target, cpp_event_framework::Signal::SPtr event,
+                         int priority = 0) = 0;
 
     /**
      * @brief Dequeue an ActiveObject-Event pair

@@ -13,6 +13,7 @@
 #include "../examples/activeobject/FsmImpl.hxx"
 
 #include <cpp_active_objects/SingleThreadActiveObjectDomain.hxx>
+#include <cpp_active_objects/ThreadSafeEventQueue.hxx>
 
 using namespace std::chrono_literals;
 
@@ -25,7 +26,8 @@ void ActiveObjectFrameworkMain()
     // Tell EventPoolAllocator to use pool created above
     example::activeobject::EventPoolAllocator::SetPool(pool);
 
-    auto domain = std::make_shared<cpp_active_objects::SingleThreadActiveObjectDomain<>>();
+    auto queue = std::make_shared<cpp_active_objects::ThreadSafeEventQueue<>>();
+    auto domain = std::make_shared<cpp_active_objects::SingleThreadActiveObjectDomain<>>(queue);
 
     auto active_object = std::make_shared<example::activeobject::FsmImpl>();
     domain->RegisterObject(active_object);
