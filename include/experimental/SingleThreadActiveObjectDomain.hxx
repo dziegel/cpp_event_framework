@@ -11,22 +11,23 @@
 #pragma once
 
 #include <memory>
-#include <thread>
 #include <semaphore>
+#include <thread>
 
 #include <experimental/ActiveObjectDomainBase.hxx>
 #include <experimental/ThreadSafeEventQueue.hxx>
 
 namespace cpp_event_framework
 {
-template <typename SemaphoreType = std::counting_semaphore, typename MutexType = std::mutex>
+template <typename SemaphoreType = std::binary_semaphore, typename MutexType = std::mutex>
 class SingleThreadActiveObjectDomain : public ActiveObjectDomainBase
 {
 public:
     using SPtr = std::shared_ptr<SingleThreadActiveObjectDomain>;
 
     SingleThreadActiveObjectDomain()
-        : ActiveObjectDomainBase(std::make_shared<ThreadSafeEventQueue<SemaphoreType, MutexType>>()), thread_([this]() { Run(); })
+        : ActiveObjectDomainBase(std::make_shared<ThreadSafeEventQueue<SemaphoreType, MutexType>>())
+        , thread_([this]() { Run(); })
     {
     }
 
