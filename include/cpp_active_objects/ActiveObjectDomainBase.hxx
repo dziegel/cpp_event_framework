@@ -63,12 +63,12 @@ protected:
     {
         while (true)
         {
-            const auto [target, event] = queue_->Dequeue();
-            if (target == nullptr)
+            const auto entry = queue_->Dequeue();
+            if (entry.target == nullptr)
             {
                 return;
             }
-            target->Dispatch(event);
+            entry.target->Dispatch(entry.event, entry.priority);
         }
     }
 

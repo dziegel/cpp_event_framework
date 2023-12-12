@@ -37,6 +37,16 @@ public:
     using PriorityType = int;
 
     /**
+     * @brief Type of queue entrie
+     */
+    struct QueueEntry
+    {
+        std::shared_ptr<IActiveObject> target;
+        cpp_event_framework::Signal::SPtr event;
+        PriorityType priority = 0;
+    };
+
+    /**
      * @brief Destroy the EventQueue
      *
      */
@@ -57,6 +67,6 @@ public:
      *
      * @return std::pair<std::shared_ptr<IActiveObject>, Signal::SPtr>
      */
-    virtual std::pair<std::shared_ptr<IActiveObject>, cpp_event_framework::Signal::SPtr> Dequeue() = 0;
+    virtual QueueEntry Dequeue() = 0;
 };
 } // namespace cpp_active_objects

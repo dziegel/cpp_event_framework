@@ -49,7 +49,7 @@ public:
      *
      * @param event
      */
-    void Dispatch(const cpp_event_framework::Signal::SPtr& event) final
+    void Dispatch(const cpp_event_framework::Signal::SPtr& event, PriorityType /*priority*/) override
     {
         fsm_.React(event);
     }

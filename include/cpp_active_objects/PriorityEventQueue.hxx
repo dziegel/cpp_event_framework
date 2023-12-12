@@ -12,6 +12,7 @@
 
 #include <memory>
 #include <mutex>
+#include <queue>
 #include <semaphore>
 
 #include <cpp_active_objects/IActiveObject.hxx>
@@ -27,14 +28,14 @@ namespace cpp_active_objects
  * @tparam MutexType Mutex type to use - e.g. to be able to supply own RT-capable implementation
  */
 template <typename SemaphoreType = std::binary_semaphore, typename MutexType = std::mutex>
-class ThreadSafeEventQueue final : public IEventQueue
+class PriorityEventQueue final : public IEventQueue
 {
 public:
     /**
      * @brief Shared pointer alias
      *
      */
-    using SPtr = std::shared_ptr<ThreadSafeEventQueue>;
+    using SPtr = std::shared_ptr<PriorityEventQueue>;
 
     /**
      * @brief Enqueue an event to be dispatched by a target
@@ -48,14 +49,7 @@ public:
     {
         {
             std::scoped_lock lock(mutex_);
-            if (priority >= 0)
-            {
-                queue_.emplace_back(std::move(target), std::move(event), priority);
-            }
-            else
-            {
-                queue_.emplace_front(std::move(target), std::move(event), priority);
-            }
+            queue_.emplace(std::move(target), std::move(event), priority);
         }
         sem_.release();
     }
@@ -70,13 +64,20 @@ public:
         sem_.acquire();
 
         std::scoped_lock lock(mutex_);
-        auto result = queue_.front();
-        queue_.pop_front();
+        auto result = queue_.top();
+        queue_.pop();
         return result;
     }
 
 private:
-    std::deque<QueueEntry> queue_;
+    struct QueueEntryLess
+    {
+        bool operator()(const QueueEntry& lhs, const QueueEntry& rhs)
+        {
+            return std::less<PriorityType>{}(lhs.priority, rhs.priority);
+        }
+    };
+    std::priority_queue<QueueEntry, std::vector<QueueEntry>, QueueEntryLess> queue_;
     SemaphoreType sem_{0};
     MutexType mutex_;
 };
