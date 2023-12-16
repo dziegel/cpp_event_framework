@@ -8,20 +8,21 @@
 namespace example::activeobject
 {
 // Implements Fsm action interface
-class FsmImpl : public cpp_active_objects::Hsm<example::activeobject::Fsm>, public IFsmImpl
+class FsmImpl : public cpp_active_objects::Hsm<example::activeobject::Fsm>, private IFsmImpl
 {
 public:
     FsmImpl();
-
-    void State1Entry() override;
-
-    void State2ToState1TransitionAction(FsmBase::Event event) override;
-
-    bool SomeGuardFunction(FsmBase::Event event) override;
 
     example::activeobject::FsmBase::StatePtr CurrentState()
     {
         return fsm_.CurrentState();
     }
+
+private:
+    void State1Entry() override;
+
+    void State2ToState1TransitionAction(FsmBase::Event event) override;
+
+    bool SomeGuardFunction(FsmBase::Event event) override;
 };
 } // namespace example::activeobject

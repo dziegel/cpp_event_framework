@@ -6,20 +6,20 @@
 namespace example::interface
 {
 // Implements Fsm action interface
-class FsmImpl : public IFsmImpl
+class FsmImpl : private IFsmImpl
 {
 public:
     FsmImpl();
 
     void Run();
 
+private:
+    Fsm fsm_;
+
     void State1Entry() override;
 
     void State2ToState1TransitionAction(FsmBase::Event event) override;
 
     bool SomeGuardFunction(FsmBase::Event event) override;
-
-private:
-    Fsm fsm_;
 };
 } // namespace example::interface
