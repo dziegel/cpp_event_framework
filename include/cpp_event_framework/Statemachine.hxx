@@ -574,6 +574,7 @@ public:
     {
         return Transition(kUnhandled);
     }
+
     /**
      * @brief Defer event until state is exited
      *
@@ -583,6 +584,7 @@ public:
     {
         return Transition(kDeferEvent);
     }
+
     /**
      * @brief Event was handled, but no transition shall be executed, with
      * optional action
@@ -594,8 +596,7 @@ public:
         return Transition(kNone);
     }
     /**
-     * @brief Event was handled, but no transition shall be executed, with
-     * optional action
+     * @brief Event was handled, but no transition shall be executed, with action
      *
      * @param action Action to execute
      * @return Transition
@@ -604,6 +605,18 @@ public:
     {
         return Transition(kNone, action);
     }
+    /**
+     * @brief Event was handled, but no transition shall be executed, with actions
+     *
+     * @param target Target state
+     * @param actions Actions to execute on transition
+     * @return Transition
+     */
+    static inline Transition NoTransition(std::span<const typename Transition::ActionType> actions)
+    {
+        return Transition(kNone, actions);
+    }
+
     /**
      * @brief Create transition to target state, with optional action
      *
@@ -615,7 +628,7 @@ public:
         return Transition(target);
     }
     /**
-     * @brief Create transition to target state, with optional action
+     * @brief Create transition to target state, with action
      *
      * @param target Target state
      * @param action Action to execute on transition
@@ -624,6 +637,18 @@ public:
     static inline Transition TransitionTo(StateRef target, typename Transition::DelegateActionType action)
     {
         return Transition(target, action);
+    }
+    /**
+     * @brief Create transition to target state, with multiple actions
+     *
+     * @param target Target state
+     * @param actions Actions to execute on transition
+     * @return Transition
+     */
+    static inline Transition TransitionTo(StateRef target,
+                                          std::span<const typename Transition::ActionType> actions) noexcept
+    {
+        return Transition(target, actions);
     }
 
     /**
