@@ -13,6 +13,7 @@
 #include <cassert>
 #include <cstdint>
 #include <memory>
+#include <ostream>
 #include <utility>
 
 #include <cpp_event_framework/Pool.hxx>
@@ -67,6 +68,14 @@ public:
     static SPtr FromSignal(const SPtr& event)
     {
         return event;
+    }
+
+    /**
+     * @brief Stream operator for logging
+     */
+    friend inline std::ostream& operator<<(std::ostream& os, const Signal::SPtr& event)
+    {
+        return os << event->Name();
     }
 
 protected:

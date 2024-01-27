@@ -345,6 +345,14 @@ public:
     };
 
     /**
+     * @brief Stream operator for logging (state)
+     */
+    friend inline std::ostream& operator<<(std::ostream& os, StateRef state)
+    {
+        return os << state.Name();
+    }
+
+    /**
      * @brief History statemachine state
      *
      */
@@ -663,6 +671,14 @@ public:
      * @brief Event deferral request
      */
     static const State kDeferEvent;
+
+    /**
+     * @brief Stream operator for logging (state)
+     */
+    friend inline std::ostream& operator<<(std::ostream& os, const Statemachine& sm)
+    {
+        return os << sm.Name();
+    }
 
 private:
     StatePtr current_state_ = nullptr;

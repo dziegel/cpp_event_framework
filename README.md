@@ -46,7 +46,7 @@ The integer "0" is the ID of the event and can be accessed via:
 
 Event instances have names:
 
-    std::cout << "This is " << anEventInstance->Name() << " with ID " << anEventInstance->Id() << std::endl;
+    std::cout << "This is " << anEventInstance << " with ID " << anEventInstance->Id() << std::endl;
 
 To simplify creation of following events, a NextSignal template is available:
 
@@ -120,7 +120,7 @@ Example of event usage in a switch/case statement (e.g. for use in statemachines
 
     static void DispatchEvent(const cpp_event_framework::Signal::SPtr& event)
     {
-        std::cout << "Dispatching " << event->Name() << std::endl;
+        std::cout << "Dispatching " << event << std::endl;
         switch (event->Id())
         {
         case SimpleTestEvent::kId:
@@ -435,16 +435,16 @@ Example:
 ### Logging
 
         fsm_.on_state_entry_ = [](Fsm::Ref fsm, Fsm::StateRef state)
-            { std::cout << fsm.Name() << " enter state " << state.Name() << std::endl; };
+            { std::cout << fsm << " enter state " << state << std::endl; };
 
         fsm_.on_state_exit_ = [](Fsm::Ref fsm, Fsm::StateRef state)
-            { std::cout << fsm.Name() << " exit state " << state.Name() << std::endl; };
+            { std::cout << fsm << " exit state " << state << std::endl; };
 
         fsm_.on_handle_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event)
-            { std::cout << fsm.Name() << " state " << state.Name() << " handle event " << event->Name() << std::endl; };
+            { std::cout << fsm << " state " << state << " handle event " << event << std::endl; };
 
         fsm_.on_unhandled_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event)
-            { std::cout << fsm.Name() << " unhandled event " << event->Name() << " in state " << state.Name() << std::endl; };
+            { std::cout << fsm << " unhandled event " << event << " in state " << state << std::endl; };
 
 ### Implementation variants
 

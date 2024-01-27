@@ -15,21 +15,16 @@ FsmImpl::FsmImpl() : private_(std::make_unique<FsmImpl::Private>())
     private_->fsm.Init(this, "FsmPimpl", Fsm::kInitialState);
 
     private_->fsm.on_state_entry_ = [](Fsm::Ref fsm, Fsm::StateRef state)
-    { std::cout << fsm.Name() << " enter state " << state.Name() << std::endl; };
+    { std::cout << fsm << " enter state " << state << std::endl; };
 
     private_->fsm.on_state_exit_ = [](Fsm::Ref fsm, Fsm::StateRef state)
-    { std::cout << fsm.Name() << " exit state " << state.Name() << std::endl; };
+    { std::cout << fsm << " exit state " << state << std::endl; };
 
-    private_->fsm.on_handle_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event) {
-        std::cout << fsm.Name() << " state " << state.Name() << " handle event " << static_cast<int>(event)
-                  << std::endl;
-    };
+    private_->fsm.on_handle_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event)
+    { std::cout << fsm << " state " << state << " handle event " << static_cast<int>(event) << std::endl; };
 
     private_->fsm.on_unhandled_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event)
-    {
-        std::cout << fsm.Name() << " unhandled event " << static_cast<int>(event) << " in state " << state.Name()
-                  << std::endl;
-    };
+    { std::cout << fsm << " unhandled event " << static_cast<int>(event) << " in state " << state << std::endl; };
 
     private_->fsm.Start();
 }
@@ -44,17 +39,17 @@ void FsmImpl::Run()
 
 void FsmImpl::State1Entry()
 {
-    std::cout << private_->fsm.Name() << "State1Entry" << std::endl;
+    std::cout << private_->fsm << "State1Entry" << std::endl;
 }
 
 void FsmImpl::State2ToState1TransitionAction(FsmBase::Event /*event*/)
 {
-    std::cout << private_->fsm.Name() << " State2ToState1TransitionAction" << std::endl;
+    std::cout << private_->fsm << " State2ToState1TransitionAction" << std::endl;
 }
 
 bool FsmImpl::SomeGuardFunction(FsmBase::Event /*event*/)
 {
-    std::cout << private_->fsm.Name() << " SomeGuardFunction" << std::endl;
+    std::cout << private_->fsm << " SomeGuardFunction" << std::endl;
     return true;
 }
 } // namespace example::pimpl

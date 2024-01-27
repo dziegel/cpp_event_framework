@@ -113,7 +113,7 @@ private:
         switch (event->Id())
         {
         case EvtGoGreen::kId:
-            return TransitionTo(kGreen, [](ImplPtr /*impl*/, Event /*event*/) { std::cout << "Walk" << std::endl; });
+            return TransitionTo(kGreen, [](ImplPtr /*impl*/, Event /*event*/) { std::cout << "Walk\n"; });
         case EvtGoYellow::kId:
             return NoTransition();
         default:
@@ -128,31 +128,30 @@ public:
     void SetUp()
     {
         fsm_.on_state_entry_ = [](Fsm::Ref fsm, Fsm::StateRef state)
-        { std::cout << fsm.Name() << " enter state " << state.Name() << std::endl; };
+        { std::cout << fsm << " enter state " << state << "\n"; };
 
         fsm_.on_state_exit_ = [](Fsm::Ref fsm, Fsm::StateRef state)
-        { std::cout << fsm.Name() << " exit state " << state.Name() << std::endl; };
+        { std::cout << fsm << " exit state " << state << "\n"; };
 
         fsm_.on_handle_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event)
-        { std::cout << fsm.Name() << " state " << state.Name() << " handle event " << event->Name() << std::endl; };
+        { std::cout << fsm << " state " << state << " handle event " << event << "\n"; };
 
         fsm_.on_unhandled_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event)
         {
             fsm.Implementation()->on_unhandled_event_called_ = true;
-            std::cout << fsm.Name() << " unhandled event " << event->Name() << " in state " << state.Name()
-                      << std::endl;
+            std::cout << fsm << " unhandled event " << event << " in state " << state << "\n";
         };
 
         fsm_.on_defer_event_ = [this](Fsm::StateRef state, Fsm::Event event)
         {
             on_defer_event_called_ = true;
-            std::cout << "state " << state.Name() << " defer event " << event->Name() << std::endl;
+            std::cout << "state " << state << " defer event " << event << "\n";
         };
 
         fsm_.on_recall_deferred_events_ = [this](Fsm::StateRef state)
         {
             on_recall_event_called_ = true;
-            std::cout << "state " << state.Name() << " recall deferred events" << std::endl;
+            std::cout << "state " << state << " recall deferred events\n";
         };
 
         fsm_.Init(this, "Fsm", &Fsm::kOff);
@@ -191,38 +190,38 @@ private:
     void FsmOffEntry()
     {
         off_entry_called_ = true;
-        std::cout << "Off entry" << std::endl;
+        std::cout << "Off entry\n";
     }
 
     void FsmOffExit()
     {
         off_exit_called_ = true;
         fsm_.RecallEvents();
-        std::cout << "Off exit" << std::endl;
+        std::cout << "Off exit\n";
     }
 
     void FsmOnEntry()
     {
         on_entry_called_ = true;
-        std::cout << "On entry" << std::endl;
+        std::cout << "On entry\n";
     }
 
     void FsmOnExit()
     {
         on_exit_called_ = true;
-        std::cout << "On exit" << std::endl;
+        std::cout << "On exit\n";
     }
 
     void FsmYellowRedTransitionAction1(Fsm::Event /*event*/)
     {
         yellow_red_transition1_called_ = true;
-        std::cout << "Don't walk 1" << std::endl;
+        std::cout << "Don't walk 1\n";
     }
 
     void FsmYellowRedTransitionAction2(Fsm::Event /*event*/)
     {
         yellow_red_transition2_called_ = true;
-        std::cout << "Don't walk 2" << std::endl;
+        std::cout << "Don't walk 2\n";
     }
 
 public:

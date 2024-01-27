@@ -15,16 +15,16 @@ FsmImpl::FsmImpl()
     fsm_.Init(this, "FsmSignals", Fsm::kInitialState);
 
     fsm_.on_state_entry_ = [](Fsm::Ref fsm, Fsm::StateRef state)
-    { std::cout << fsm.Name() << " enter state " << state.Name() << std::endl; };
+    { std::cout << fsm << " enter state " << state << "\n"; };
 
     fsm_.on_state_exit_ = [](Fsm::Ref fsm, Fsm::StateRef state)
-    { std::cout << fsm.Name() << " exit state " << state.Name() << std::endl; };
+    { std::cout << fsm << " exit state " << state << "\n"; };
 
     fsm_.on_handle_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event)
-    { std::cout << fsm.Name() << " state " << state.Name() << " handle event " << event->Name() << std::endl; };
+    { std::cout << fsm << " state " << state << " handle event " << event << "\n"; };
 
     fsm_.on_unhandled_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event)
-    { std::cout << fsm.Name() << " unhandled event " << event->Name() << " in state " << state.Name() << std::endl; };
+    { std::cout << fsm << " unhandled event " << event << " in state " << state << "\n"; };
 
     fsm_.Start();
 }
@@ -37,17 +37,17 @@ void FsmImpl::Run()
 
 void FsmImpl::State1Entry()
 {
-    std::cout << fsm_.Name() << "State1Entry" << std::endl;
+    std::cout << fsm_ << "State1Entry\n";
 }
 
 void FsmImpl::State2ToState1TransitionAction(FsmBase::Event /*event*/)
 {
-    std::cout << fsm_.Name() << " State2ToState1TransitionAction" << std::endl;
+    std::cout << fsm_ << " State2ToState1TransitionAction\n";
 }
 
 bool FsmImpl::SomeGuardFunction(FsmBase::Event /*event*/)
 {
-    std::cout << fsm_.Name() << " SomeGuardFunction" << std::endl;
+    std::cout << fsm_ << " SomeGuardFunction\n";
     return true;
 }
 } // namespace example::signals
