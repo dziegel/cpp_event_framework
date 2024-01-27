@@ -345,7 +345,7 @@ public:
     };
 
     /**
-     * @brief Stream operator for logging (state)
+     * @brief Stream operator for logging
      */
     friend inline std::ostream& operator<<(std::ostream& os, StateRef state)
     {
@@ -673,7 +673,7 @@ public:
     static const State kDeferEvent;
 
     /**
-     * @brief Stream operator for logging (state)
+     * @brief Stream operator for logging
      */
     friend inline std::ostream& operator<<(std::ostream& os, const Statemachine& sm)
     {
