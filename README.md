@@ -11,7 +11,7 @@ Header-only C++ event and statemachine framework
 - Simple to declare
 - Events have IDs that can be used in switch/case
 - Possibility to add data members to signal class
-- Events have names for logging
+- Events have names for logging (and an ostream operator<<)
 
 ### Statemachine
 
@@ -27,7 +27,8 @@ Header-only C++ event and statemachine framework
 - Suitable for small systems: state and transition declarations can be const and in RO section
 - Allow non-capturing lambdas as transition action
 - Logging support (state entry/exit/handler events)
-- States have names for logging
+- States have names for logging (and an ostream operator<<)
+- Statemachines have names for logging (and an ostream operator<<)
 
 ## Introduction to events
 
