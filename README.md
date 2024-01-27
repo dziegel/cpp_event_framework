@@ -29,6 +29,7 @@ Header-only C++ event and statemachine framework
 - Logging support (state entry/exit/handler events)
 - States have names for logging (and an ostream operator<<)
 - Statemachines have names for logging (and an ostream operator<<)
+- A statemachine generator is available, see [Statemachine Generation](#statemachine-generation)
 
 ## Introduction to events
 
