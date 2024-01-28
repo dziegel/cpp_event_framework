@@ -25,8 +25,8 @@ set(CPACK_PACKAGE_VERSION_PATCH "0")
 #     COMMENT cppcheck
 # )
 
-add_compile_options(-fsanitize=address)
-add_link_options(-fsanitize=address)
+add_compile_options(-fno-omit-frame-pointer -fsanitize=address -fstack-protector-all -fstack-clash-protection -fsanitize=undefined)
+add_link_options(-fno-omit-frame-pointer -fsanitize=address -fsanitize=leak -fsanitize=undefined)
 
 add_executable(${CMAKE_PROJECT_NAME}
     examples/activeobject/Fsm.cxx
