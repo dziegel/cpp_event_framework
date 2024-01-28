@@ -147,11 +147,11 @@ Example of event usage in a switch/case statement (e.g. for use in statemachines
         DispatchEvent(PayloadTestEvent::MakeShared(std::vector<uint8_t>({1, 2, 3})));
     }
 
-### Event pools
+### Event pools (custom allocators)
 
-It is also possible to use event pools. The first step is to declare a pool allocator:
+It is also possible to use event pools. The first step is to declare a custom allocator:
 
-    class EventPoolAllocator : public cpp_event_framework::PoolAllocator<EventPoolAllocator>
+    class EventPoolAllocator : public cpp_event_framework::CustomAllocator<EventPoolAllocator>
     {
     };
 
@@ -161,10 +161,10 @@ A helper template is available for this, its argument list must contain ALL sign
     using PoolSizeCalculator =
         cpp_event_framework::SignalPoolElementSizeCalculator<PooledSimpleTestEvent, PooledSimpleTestEvent2>;
 
-Using the size calculator, a pool can be instantiated and allocators can be assigned to it:
+Using the size calculator, a pool can be instantiated and assigned to the custom allocator:
 
     auto pool = cpp_event_framework::Pool<>::MakeShared(PoolSizeCalculator::kSptrSize, 10, "MyPool");
-    EventPoolAllocator::SetPool(pool);
+    EventPoolAllocator::SetAllocator(pool);
 
 Using a pool allocator, events can be now declared that are allocated via pools. Note the NextSignal template
 manages the event ID AND inherits the allocator from the previous signal!
@@ -190,6 +190,10 @@ The actual pool fill level can be checked like this:
         assert(pool->FillLevel() == 8);
     }
     assert(pool->FillLevel() == 10);
+
+Note the CustomAllocator<> takes a std::pmr::memory_resource as allocator because the whole allocation scheme is based on std::pmr::polymorphic_allocator!
+You can supply your own allocators that implement the std::pmr::memory_resource interface here.
+The predefined HeapAllocator is simply an allocator based on std::pmr::new_delete_resource.
 
 ## Introduction to statemachine framework
 
