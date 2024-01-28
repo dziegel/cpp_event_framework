@@ -14,9 +14,6 @@
 #include <cstdint>
 #include <memory>
 #include <ostream>
-#include <utility>
-
-#include <cpp_event_framework/Pool.hxx>
 
 namespace cpp_event_framework
 {
@@ -274,6 +271,69 @@ protected:
 };
 
 /**
+ * @brief Template magic to get max. element size for normal objects
+ */
+template <typename... ElementList>
+struct PoolElementSize;
+
+/**
+ * @brief Specialization with no template parameter
+ */
+template <>
+struct PoolElementSize<>
+{
+    /**
+     * @brief Hook for no template parameter (size 0)
+     */
+    static constexpr size_t kValue = 0;
+};
+
+/**
+ * @brief Template magic to get max. element size for normal objects
+ */
+template <typename Element, typename... ElementList>
+struct PoolElementSize<Element, ElementList...>
+{
+    /**
+     * @brief Max element size
+     */
+    static constexpr size_t kValue = std::max(sizeof(Element), PoolElementSize<ElementList...>::kValue);
+};
+
+/**
+ * @brief Template magic to get max. element size for shared objects
+ */
+template <typename... ElementList>
+struct SptrPoolElementSize;
+
+/**
+ * @brief Template magic to get max. element size for shared objects
+ */
+template <>
+struct SptrPoolElementSize<>
+{
+    /**
+     * @brief Hook for no template parameter (size 0)
+     */
+    static constexpr size_t kValue = 0;
+};
+
+/**
+ * @brief Template magic to get max. element size for shared objects
+ */
+template <typename Element, typename... ElementList>
+struct SptrPoolElementSize<Element, ElementList...>
+{
+    /**
+     * @brief Max element size
+     */
+    static constexpr size_t kValue =
+        std::max(sizeof(std::_Sp_counted_ptr_inplace<Element, std::pmr::polymorphic_allocator<Element>,
+                                                     std::__default_lock_policy>),
+                 SptrPoolElementSize<ElementList...>::kValue);
+};
+
+/**
  * @brief Helper class to calculate pool sizes
  *
  * @tparam Args List of all signals in this pool
@@ -284,12 +344,12 @@ struct SignalPoolElementSizeCalculator
     /**
      * @brief Max element (heap size)
      */
-    static constexpr uint32_t kHeapSize = PoolSize<Args...>::kValue;
+    static constexpr uint32_t kHeapSize = PoolElementSize<Args...>::kValue;
 
     /**
      * @brief Max element (heap size)
      */
-    static constexpr uint32_t kSptrSize = SptrPoolSize<Args...>::kValue;
+    static constexpr uint32_t kSptrSize = SptrPoolElementSize<Args...>::kValue;
 };
 
 template <typename... Args>
