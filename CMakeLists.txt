@@ -12,6 +12,21 @@ set(CPACK_PACKAGE_VERSION_MAJOR "1")
 set(CPACK_PACKAGE_VERSION_MINOR "0")
 set(CPACK_PACKAGE_VERSION_PATCH "0")
 
+# set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-header-filter=.*;-extra-arg=-Wno-unknown-warning-option;-checks=-*,clang-analyzer-*,-clang-analyzer-cplusplus*,-bugprone*,-clang-analyzer-cplusplus*,-cert*,-cppcoreguidelines*,-readability*,-modernize*,-portability*,-performance*")
+
+# find_program(CMAKE_CXX_CPPCHECK NAMES cppcheck)
+# if(CMAKE_CXX_CPPCHECK)
+# 	list(APPEND CMAKE_CXX_CPPCHECK "--enable=all")
+# 	list(APPEND CMAKE_CXX_CPPCHECK "-I${CMAKE_CURRENT_SOURCE_DIR}/include")
+# endif()
+
+# add_custom_target(check ALL cppcheck --enable=all --project=${CMAKE_CURRENT_SOURCE_DIR}/compile_commands.json
+#     DEPENDS ${CMAKE_PROJECT_NAME}
+#     COMMENT cppcheck
+# )
+
+add_compile_options(-fsanitize=address)
+add_link_options(-fsanitize=address)
 
 add_executable(${CMAKE_PROJECT_NAME}
     examples/activeobject/Fsm.cxx
