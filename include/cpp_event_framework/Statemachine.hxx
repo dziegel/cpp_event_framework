@@ -616,7 +616,6 @@ public:
     /**
      * @brief Event was handled, but no transition shall be executed, with actions
      *
-     * @param target Target state
      * @param actions Actions to execute on transition
      * @return Transition
      */

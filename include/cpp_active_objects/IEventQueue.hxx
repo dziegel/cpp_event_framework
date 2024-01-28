@@ -41,8 +41,17 @@ public:
      */
     struct QueueEntry
     {
+        /**
+         * @brief Dispatch target
+         */
         std::shared_ptr<IActiveObject> target;
+        /**
+         * @brief Event
+         */
         cpp_event_framework::Signal::SPtr event;
+        /**
+         * @brief Priority
+         */
         PriorityType priority = 0;
     };
 

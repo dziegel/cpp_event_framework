@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <deque>
 #include <memory>
 #include <mutex>
 #include <semaphore>

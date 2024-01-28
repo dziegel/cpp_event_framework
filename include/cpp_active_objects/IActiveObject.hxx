@@ -46,6 +46,7 @@ public:
      * @brief Dispatch event in active object domain
      *
      * @param event
+     * @param priority
      */
     virtual void Dispatch(const cpp_event_framework::Signal::SPtr& event, PriorityType priority) = 0;
 };
