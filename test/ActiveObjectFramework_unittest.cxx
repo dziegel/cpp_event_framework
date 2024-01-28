@@ -14,17 +14,17 @@
 
 #include <cpp_active_objects/SingleThreadActiveObjectDomain.hxx>
 #include <cpp_active_objects/ThreadSafeEventQueue.hxx>
+#include <cpp_event_framework/StaticPool.hxx>
 
 using namespace std::chrono_literals;
 
 void ActiveObjectFrameworkMain()
 {
-    // Create a pool with elemen size calculated via EventPoolElementSizeCalculator, 10 elements
-    auto pool = cpp_event_framework::Pool<>::MakeShared(
-        example::activeobject::EventPoolElementSizeCalculator::kSptrSize, 10, "EventPool");
+    cpp_event_framework::StaticPool<2, example::activeobject::EventPoolElementSizeCalculator::kSptrSize> pool(
+        "EventPool");
 
     // Tell EventPoolAllocator to use pool created above
-    example::activeobject::EventPoolAllocator::SetPool(pool);
+    example::activeobject::EventPoolAllocator::SetAllocator(&pool);
 
     auto queue = std::make_shared<cpp_active_objects::ThreadSafeEventQueue<>>();
     auto domain = std::make_shared<cpp_active_objects::SingleThreadActiveObjectDomain<>>(queue);

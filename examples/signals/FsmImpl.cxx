@@ -1,5 +1,7 @@
 #include <iostream>
 
+#include <cpp_event_framework/Pool.hxx>
+
 #include "FsmImpl.hxx"
 
 namespace example::signals
@@ -10,7 +12,7 @@ FsmImpl::FsmImpl()
     auto pool = cpp_event_framework::Pool<>::MakeShared(EventPoolElementSizeCalculator::kSptrSize, 10, "EventPool");
 
     // Tell EventPoolAllocator to use pool created above
-    EventPoolAllocator::SetPool(pool);
+    EventPoolAllocator::SetAllocator(pool);
 
     fsm_.Init(this, "FsmSignals", Fsm::kInitialState);
 

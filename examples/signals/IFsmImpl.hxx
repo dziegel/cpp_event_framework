@@ -1,13 +1,12 @@
 #pragma once
 
-#include <cpp_event_framework/Pool.hxx>
 #include <cpp_event_framework/Signal.hxx>
 #include <cpp_event_framework/Statemachine.hxx>
 
 namespace example::signals
 {
 // Declare pool allocator
-class EventPoolAllocator : public cpp_event_framework::PoolAllocator<EventPoolAllocator>
+class EventPoolAllocator : public cpp_event_framework::CustomAllocator<EventPoolAllocator>
 {
 };
 

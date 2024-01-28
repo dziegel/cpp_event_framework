@@ -13,6 +13,7 @@
 #include <cassert>
 #include <cstdint>
 #include <memory>
+#include <memory_resource>
 #include <ostream>
 
 namespace cpp_event_framework
@@ -92,56 +93,61 @@ private:
 };
 
 /**
- * @brief Use this allocator to use a Pool as event source
+ * @brief Use this allocator to use a custom allocator (e.g. pool) as event source
  *
  * @tparam T Name of inhering class
- * @tparam Pool Pool type to use
  */
-template <typename T, typename Pool = Pool<>>
-struct PoolAllocator
+template <typename T>
+class CustomAllocator
 {
+public:
     /**
-     * @brief Set the Pool to use
+     * @brief Set the allocator (plain pointer)
      */
-    static void SetPool(typename Pool::SPtr apool)
+    static void SetAllocator(std::pmr::memory_resource* alloc)
     {
-        assert(pool == nullptr);
-        pool = std::move(apool);
+        allocator = alloc;
     }
 
     /**
-     * @brief Get allocator
+     * @brief Set the allocator (shared pointer)
      */
-    template <typename Element>
-    static auto GetAllocator()
+    static void SetAllocator(std::shared_ptr<std::pmr::memory_resource> alloc)
     {
-        assert(pool != nullptr);
-        return typename Pool::template Allocator<Element>(*pool.get());
+        shared_allocator = std::move(alloc);
+        allocator = shared_allocator.get();
     }
 
     /**
-     * @brief Pool
+     * @brief Default heap-based allocator
      */
-    // NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
-    static typename Pool::SPtr pool;
+    static std::pmr::memory_resource* GetAllocator()
+    {
+        return allocator;
+    }
+
+private:
+    static std::pmr::memory_resource* allocator;
+    static std::shared_ptr<std::pmr::memory_resource> shared_allocator;
 };
+template <typename T>
+std::pmr::memory_resource* CustomAllocator<T>::allocator = nullptr;
 
-template <typename T, typename Pool>
-// NOLINTNEXTLINE(cppcoreguidelines-avoid-non-const-global-variables)
-typename Pool::SPtr PoolAllocator<T, Pool>::pool = nullptr;
+template <typename T>
+std::shared_ptr<std::pmr::memory_resource> CustomAllocator<T>::shared_allocator = nullptr;
 
 /**
  * @brief Use this allocator to allocate from heap
  */
-struct HeapAllocator
+class HeapAllocator
 {
+public:
     /**
-     * @brief Get the Allocator object
+     * @brief Default heap-based allocator
      */
-    template <typename Element>
-    static auto GetAllocator()
+    static std::pmr::memory_resource* GetAllocator()
     {
-        return std::allocator<Element>();
+        return std::pmr::new_delete_resource();
     }
 };
 
@@ -180,7 +186,7 @@ public:
     template <typename... Args>
     static SPtr MakeShared(Args... args)
     {
-        return std::allocate_shared<T>(Allocator::template GetAllocator<T>(), args...);
+        return std::allocate_shared<T, std::pmr::polymorphic_allocator<T>>(AllocatorType::GetAllocator(), args...);
     }
 
     /**

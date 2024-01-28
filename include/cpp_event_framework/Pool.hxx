@@ -14,6 +14,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <memory>
+#include <memory_resource>
 #include <mutex>
 #include <queue>
 #include <string>
@@ -25,7 +26,7 @@ namespace cpp_event_framework
  * @brief Pool of elements, especially useful for signals
  */
 template <typename MutexType = std::mutex, size_t kAlignment = sizeof(uint64_t)>
-class Pool
+class Pool : public std::pmr::memory_resource
 {
 public:
     /**
@@ -66,12 +67,12 @@ public:
     Pool& operator=(Pool&& rhs) = delete;
 
     /**
-     * @brief Allocate element from pool
-     *
-     * @return void*
+     * @brief std::pmr::memory_resource::do_allocate
      */
-    void* Allocate()
+    void* do_allocate(size_t bytes, size_t /*alignment*/) override
     {
+        assert(bytes <= element_size_);
+
         std::lock_guard lock(mutex_);
         auto* result = pool_.front();
         pool_.pop();
@@ -79,14 +80,20 @@ public:
     }
 
     /**
-     * @brief Return element to pool
-     *
-     * @param p Element to destroy
+     * @brief std::pmr::memory_resource::do_deallocate
      */
-    void Deallocate(void* p) noexcept
+    void do_deallocate(void* p, size_t /*bytes*/, size_t /*alignment*/) override
     {
         std::lock_guard lock(mutex_);
         pool_.push(p);
+    }
+
+    /**
+     * @brief std::pmr::memory_resource::do_is_equal
+     */
+    bool do_is_equal(const memory_resource& /*other*/) const noexcept override
+    {
+        return false;
     }
 
     /**
@@ -129,62 +136,6 @@ public:
     {
         return name_;
     }
-
-    /**
-     * @brief std::allocator for Pools
-     *
-     * @tparam T
-     */
-    template <class T>
-    struct Allocator
-    {
-        /**
-         * @brief Allocator traits
-         */
-        typedef T value_type;
-
-        /**
-         * @brief Construct a new Allocator object
-         *
-         * @param pool Pool to use
-         */
-        explicit Allocator(Pool& pool) noexcept : pool_(pool)
-        {
-        }
-
-        /**
-         * @brief Allocator traits
-         */
-        template <class U>
-        constexpr Allocator(const Allocator<U>& other) noexcept : pool_(other.pool_)
-        {
-        }
-
-        /**
-         * @brief Allocator traits
-         */
-        T* allocate(std::size_t n)
-        {
-            assert(n == 1);
-            assert(sizeof(T) <= pool_.ElementSize());
-            return static_cast<T*>(pool_.Allocate());
-        }
-
-        /**
-         * @brief Allocator traits
-         */
-        void deallocate(T* p, std::size_t n) noexcept
-        {
-            assert(n == 1);
-            pool_.Deallocate(p);
-        }
-
-        /**
-         * @brief Used pool
-         *
-         */
-        Pool& pool_;
-    };
 
     /**
      * @brief Helper function to create shared-pointer managed instance

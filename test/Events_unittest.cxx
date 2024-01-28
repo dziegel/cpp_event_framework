@@ -56,7 +56,7 @@ public:
     }
 };
 
-class EventPoolAllocator : public cpp_event_framework::PoolAllocator<EventPoolAllocator>
+class EventPoolAllocator : public cpp_event_framework::CustomAllocator<EventPoolAllocator>
 {
 };
 
@@ -95,7 +95,7 @@ public:
     static void PooledSignals()
     {
         auto pool = cpp_event_framework::Pool<>::MakeShared(PoolSizeCalculator::kSptrSize, 10, "MyPool");
-        EventPoolAllocator::SetPool(pool);
+        EventPoolAllocator::SetAllocator(pool);
 
         assert(pool->FillLevel() == 10);
         {
