@@ -4,6 +4,15 @@ project(cpp_event_framework)
 
 include(GNUInstallDirs REQUIRED)
 
+set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
+set(CPACK_PACKAGE_VENDOR "dirk@ziegelmeier.net")
+set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "C++20 event framework")
+set(CPACK_PACKAGE_VERSION "1.0.0")
+set(CPACK_PACKAGE_VERSION_MAJOR "1")
+set(CPACK_PACKAGE_VERSION_MINOR "0")
+set(CPACK_PACKAGE_VERSION_PATCH "0")
+
+
 add_executable(${CMAKE_PROJECT_NAME}
     examples/activeobject/Fsm.cxx
     examples/activeobject/FsmImpl.cxx
@@ -93,3 +102,10 @@ endif()
 install(DIRECTORY include/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
 )
+
+install(DIRECTORY doc/html/
+    DESTINATION ${CMAKE_INSTALL_DOCDIR}/
+)
+
+include(CPack)
+
