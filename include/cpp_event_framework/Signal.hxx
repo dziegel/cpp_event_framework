@@ -106,6 +106,7 @@ public:
      */
     static void SetAllocator(std::pmr::memory_resource* alloc)
     {
+        assert(allocator == nullptr);
         allocator = alloc;
     }
 
@@ -114,6 +115,7 @@ public:
      */
     static void SetAllocator(std::shared_ptr<std::pmr::memory_resource> alloc)
     {
+        assert(allocator == nullptr);
         shared_allocator = std::move(alloc);
         allocator = shared_allocator.get();
     }

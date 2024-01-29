@@ -97,9 +97,9 @@ public:
     /**
      * @brief std::pmr::memory_resource::do_is_equal
      */
-    bool do_is_equal(const memory_resource& /*other*/) const noexcept override
+    bool do_is_equal(const memory_resource& other) const noexcept override
     {
-        return false;
+        return *this == other;
     }
 
     /**
