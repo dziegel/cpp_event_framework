@@ -48,6 +48,6 @@ public:
      * @param event
      * @param priority
      */
-    virtual void Dispatch(const cpp_event_framework::Signal::SPtr& event, PriorityType priority) = 0;
+    virtual void Dispatch(const cpp_event_framework::Signal::SPtr& event) = 0;
 };
 } // namespace cpp_active_objects

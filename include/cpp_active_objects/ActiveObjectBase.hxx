@@ -37,15 +37,27 @@ public:
     }
 
     /**
-     * @brief Enqueue (back) a signal to be dispateched by this object
+     * @brief Enqueue (back) a signal to be dispatched by this object
      *
      * @param event
      * @param priority
      */
-    void Take(const cpp_event_framework::Signal::SPtr& event, PriorityType priority = 0) final
+    void Take(const cpp_event_framework::Signal::SPtr& event) final
     {
         assert(queue_ != nullptr);
-        queue_->Enqueue(std::static_pointer_cast<IActiveObject>(shared_from_this()), event, priority);
+        queue_->EnqueueBack(std::static_pointer_cast<IActiveObject>(shared_from_this()), event);
+    }
+
+    /**
+     * @brief Enqueue (back) a signal to be dispatched by this object
+     *
+     * @param event
+     * @param priority
+     */
+    void TakeHighPrio(const cpp_event_framework::Signal::SPtr& event) final
+    {
+        assert(queue_ != nullptr);
+        queue_->EnqueueFront(std::static_pointer_cast<IActiveObject>(shared_from_this()), event);
     }
 
 private:

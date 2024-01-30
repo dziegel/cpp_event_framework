@@ -12,6 +12,7 @@
 
 #include <deque>
 #include <memory>
+#include <memory_resource>
 #include <mutex>
 #include <semaphore>
 
@@ -28,35 +29,41 @@ namespace cpp_active_objects
  * @tparam MutexType Mutex type to use - e.g. to be able to supply own RT-capable implementation
  */
 template <typename SemaphoreType = std::binary_semaphore, typename MutexType = std::mutex>
-class ThreadSafeEventQueue final : public IEventQueue
+class EventQueue final : public IEventQueue
 {
 public:
     /**
      * @brief Shared pointer alias
      *
      */
-    using SPtr = std::shared_ptr<ThreadSafeEventQueue>;
+    using SPtr = std::shared_ptr<EventQueue>;
 
     /**
      * @brief Enqueue an event to be dispatched by a target
      *
      * @param target
      * @param event
-     * @param priority Sort priority in queue, lower numbers = higher priority = "more to the front"
      */
-    void Enqueue(IActiveObject::SPtr target, cpp_event_framework::Signal::SPtr event,
-                 PriorityType priority = 0) override
+    void EnqueueBack(IActiveObject::SPtr target, cpp_event_framework::Signal::SPtr event) override
     {
         {
             std::scoped_lock lock(mutex_);
-            if (priority >= 0)
-            {
-                queue_.emplace_back(std::move(target), std::move(event), priority);
-            }
-            else
-            {
-                queue_.emplace_front(std::move(target), std::move(event), priority);
-            }
+            queue_.emplace_back(std::move(target), std::move(event));
+        }
+        sem_.release();
+    }
+
+    /**
+     * @brief Enqueue an event to be dispatched by a target
+     *
+     * @param target
+     * @param event
+     */
+    void EnqueueFront(IActiveObject::SPtr target, cpp_event_framework::Signal::SPtr event) override
+    {
+        {
+            std::scoped_lock lock(mutex_);
+            queue_.emplace_front(std::move(target), std::move(event));
         }
         sem_.release();
     }
@@ -77,7 +84,7 @@ public:
     }
 
 private:
-    std::deque<QueueEntry> queue_;
+    std::pmr::deque<QueueEntry> queue_;
     SemaphoreType sem_{0};
     MutexType mutex_;
 };

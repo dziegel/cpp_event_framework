@@ -32,11 +32,6 @@ public:
     using SPtr = std::shared_ptr<IEventQueue>;
 
     /**
-     * @brief PriorityType alias
-     */
-    using PriorityType = int;
-
-    /**
      * @brief Type of queue entrie
      */
     struct QueueEntry
@@ -49,10 +44,6 @@ public:
          * @brief Event
          */
         cpp_event_framework::Signal::SPtr event;
-        /**
-         * @brief Priority
-         */
-        PriorityType priority = 0;
     };
 
     /**
@@ -62,14 +53,20 @@ public:
     virtual ~IEventQueue() = default;
 
     /**
-     * @brief Enqueue an event to be dispateched by a target
+     * @brief Enqueue an event to be dispatched by a target
      *
      * @param target
      * @param event
-     * @param priority Sort priority in queue, lower numbers = higher priority = "more to the front"
      */
-    virtual void Enqueue(std::shared_ptr<IActiveObject> target, cpp_event_framework::Signal::SPtr event,
-                         PriorityType priority = 0) = 0;
+    virtual void EnqueueBack(std::shared_ptr<IActiveObject> target, cpp_event_framework::Signal::SPtr event) = 0;
+
+    /**
+     * @brief Enqueue an event to be dispatched by a target
+     *
+     * @param target
+     * @param event
+     */
+    virtual void EnqueueFront(std::shared_ptr<IActiveObject> target, cpp_event_framework::Signal::SPtr event) = 0;
 
     /**
      * @brief Dequeue an ActiveObject-Event pair

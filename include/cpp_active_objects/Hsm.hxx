@@ -49,7 +49,7 @@ public:
      *
      * @param event
      */
-    void Dispatch(const cpp_event_framework::Signal::SPtr& event, PriorityType /*priority*/) override
+    void Dispatch(const cpp_event_framework::Signal::SPtr& event) override
     {
         fsm_.React(event);
     }
@@ -73,7 +73,7 @@ private:
     {
         for (const auto& event : deferred_events_)
         {
-            Take(event, std::numeric_limits<IEventTarget::PriorityType>::min());
+            TakeHighPrio(event);
         }
         deferred_events_.clear();
     }
