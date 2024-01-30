@@ -12,7 +12,6 @@
 
 #include <deque>
 #include <memory>
-#include <memory_resource>
 #include <mutex>
 #include <semaphore>
 
@@ -84,7 +83,7 @@ public:
     }
 
 private:
-    std::pmr::deque<QueueEntry> queue_;
+    std::deque<QueueEntry> queue_;
     SemaphoreType sem_{0};
     MutexType mutex_;
 };
