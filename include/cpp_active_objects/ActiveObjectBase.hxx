@@ -40,7 +40,6 @@ public:
      * @brief Enqueue (back) a signal to be dispatched by this object
      *
      * @param event
-     * @param priority
      */
     void Take(const cpp_event_framework::Signal::SPtr& event) final
     {
@@ -52,7 +51,6 @@ public:
      * @brief Enqueue (back) a signal to be dispatched by this object
      *
      * @param event
-     * @param priority
      */
     void TakeHighPrio(const cpp_event_framework::Signal::SPtr& event) final
     {

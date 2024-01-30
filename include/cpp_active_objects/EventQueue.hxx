@@ -1,5 +1,5 @@
 /**
- * @file ThreadSafeEventQueue.hxx
+ * @file EventQueue.hxx
  * @author Dirk Ziegelmeier (dirk@ziegelmeier.net)
  * @brief
  * @date 16-08-2023
