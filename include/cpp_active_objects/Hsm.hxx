@@ -10,9 +10,6 @@
 
 #pragma once
 
-#include "cpp_active_objects/IEventQueue.hxx"
-#include "cpp_active_objects/IEventTarget.hxx"
-#include <limits>
 #include <memory>
 #include <vector>
 
