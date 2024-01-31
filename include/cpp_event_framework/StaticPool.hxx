@@ -18,6 +18,8 @@
 #include <memory_resource>
 #include <mutex>
 
+#include <cpp_event_framework/Concepts.hxx>
+
 namespace cpp_event_framework
 {
 /**
@@ -29,8 +31,7 @@ namespace cpp_event_framework
  *         NamedRequirements: DefaultConstructible, Destructible, BasicLockable
  * @tparam Alignment Alignment requirement
  */
-template <uint32_t NumElements, size_t ElementSize, typename MutexType = std::mutex,
-          size_t Alignment = sizeof(uint64_t)>
+template <uint32_t NumElements, size_t ElementSize, Mutex MutexType = std::mutex, size_t Alignment = sizeof(uint64_t)>
 class StaticPool : public std::pmr::memory_resource
 {
 private:

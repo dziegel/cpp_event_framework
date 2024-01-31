@@ -20,6 +20,8 @@
 #include <string>
 #include <vector>
 
+#include <cpp_event_framework/Concepts.hxx>
+
 namespace cpp_event_framework
 {
 /**
@@ -29,7 +31,7 @@ namespace cpp_event_framework
  *         NamedRequirements: DefaultConstructible, Destructible, BasicLockable
  * @tparam Alignment Alignment requirement
  */
-template <typename MutexType = std::mutex, size_t Alignment = sizeof(uint64_t)>
+template <Mutex MutexType = std::mutex, size_t Alignment = sizeof(uint64_t)>
 class Pool : public std::pmr::memory_resource
 {
 public:

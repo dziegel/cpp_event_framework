@@ -17,6 +17,7 @@
 
 #include <cpp_active_objects/IActiveObject.hxx>
 #include <cpp_active_objects/IEventQueue.hxx>
+#include <cpp_event_framework/Concepts.hxx>
 #include <cpp_event_framework/Signal.hxx>
 
 namespace cpp_active_objects
@@ -29,7 +30,8 @@ namespace cpp_active_objects
  * @tparam MutexType Mutex type to use - e.g. to be able to supply own RT-capable implementation.
  *         NamedRequirements: DefaultConstructible, Destructible, BasicLockable
  */
-template <typename SemaphoreType = std::binary_semaphore, typename MutexType = std::mutex>
+template <cpp_event_framework::Semaphore SemaphoreType = std::binary_semaphore,
+          cpp_event_framework::Mutex MutexType = std::mutex>
 class EventQueue final : public IEventQueue
 {
 public:
