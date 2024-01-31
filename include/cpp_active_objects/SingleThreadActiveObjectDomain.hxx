@@ -39,7 +39,7 @@ public:
      * @param queue
      */
     explicit SingleThreadActiveObjectDomain(IEventQueue::SPtr queue)
-        : ActiveObjectDomainBase(std::move(queue)), thread_([this]() { Run(); })
+        : ActiveObjectDomainBase(std::move(queue)), thread_(RunWrapper, this)
     {
     }
 
@@ -60,6 +60,12 @@ public:
     }
 
 private:
+    static void RunWrapper(void* arg)
+    {
+        auto me = static_cast<SingleThreadActiveObjectDomain*>(arg);
+        me->Run();
+    }
+
     ThreadType thread_;
 };
 } // namespace cpp_active_objects

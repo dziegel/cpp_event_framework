@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <deque>
+#include <list>
 #include <memory>
 #include <mutex>
 #include <semaphore>
@@ -87,7 +87,7 @@ public:
     }
 
 private:
-    std::deque<QueueEntry> queue_;
+    std::list<QueueEntry> queue_;
     SemaphoreType sem_{0};
     MutexType mutex_;
 };

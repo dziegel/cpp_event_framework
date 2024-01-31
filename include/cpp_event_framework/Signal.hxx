@@ -93,6 +93,12 @@ private:
 };
 
 /**
+ * @brief Concept for a class derived from Signal
+ */
+template <typename T>
+concept SignalSubclass = std::is_base_of_v<Signal, T>;
+
+/**
  * @brief Use this allocator to use a custom allocator (e.g. pool) as event source
  *
  * @tparam T Name of inhering class
@@ -154,6 +160,16 @@ public:
 };
 
 /**
+ * @brief Concept for a provider of a polymorphic allocator (std::pmr::memory_resource)
+ */
+template <typename T>
+concept PolymorphicAllocatorProvider = requires(T a) {
+    {
+        a.GetAllocator()
+    } -> std::convertible_to<std::pmr::memory_resource*>;
+};
+
+/**
  * @brief Signal event template
  *
  * @tparam T Name of inheriting class
@@ -161,7 +177,8 @@ public:
  * @tparam AllocatorType Allocator to use
  * @tparam BaseType Base class to inherit from
  */
-template <typename T, Signal::IdType id, typename BaseType = Signal, typename AllocatorType = HeapAllocator>
+template <typename T, Signal::IdType id, SignalSubclass BaseType = Signal,
+          PolymorphicAllocatorProvider AllocatorType = HeapAllocator>
 class SignalBase : public BaseType
 {
 public:
@@ -188,7 +205,7 @@ public:
     template <typename... Args>
     static SPtr MakeShared(Args... args)
     {
-        return std::allocate_shared<T, std::pmr::polymorphic_allocator<T>>(AllocatorType::GetAllocator(), args...);
+        return std::allocate_shared<T, std::pmr::polymorphic_allocator<T>>(Allocator::GetAllocator(), args...);
     }
 
     /**
@@ -249,7 +266,7 @@ protected:
  * @tparam Previous Previous signal class
  * @tparam BaseType Base class to inherit from
  */
-template <typename T, typename Previous, typename BaseType = Signal>
+template <typename T, SignalSubclass Previous, SignalSubclass BaseType = Signal>
 class NextSignal : public SignalBase<T, Previous::kId + 1, BaseType, typename Previous::Allocator>
 {
 public:
