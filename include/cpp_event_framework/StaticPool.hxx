@@ -22,13 +22,19 @@ namespace cpp_event_framework
 {
 /**
  * @brief Pool of elements, especially useful for signals, with COMPILE TIME memory allocation
+ *
+ * @tparam NumElements Number of elements in pool
+ * @tparam ElementSize Size of a pool element
+ * @tparam MutexType Mutex type to use - e.g. to be able to supply own RT-capable implementation.
+ *         NamedRequirements: DefaultConstructible, Destructible, BasicLockable
+ * @tparam Alignment Alignment requirement
  */
 template <uint32_t NumElements, size_t ElementSize, typename MutexType = std::mutex,
-          size_t kAlignment = sizeof(uint64_t)>
+          size_t Alignment = sizeof(uint64_t)>
 class StaticPool : public std::pmr::memory_resource
 {
 private:
-    static constexpr size_t kAlignedElementSize = ((ElementSize + kAlignment) / kAlignment) * kAlignment;
+    static constexpr size_t kAlignedElementSize = ((ElementSize + Alignment) / Alignment) * Alignment;
     struct QueueElement
     {
         union
@@ -72,7 +78,7 @@ public:
      */
     void* do_allocate(size_t bytes, size_t /*alignment*/) override
     {
-        assert(bytes <= ElementSize);
+        assert(bytes <= kAlignedElementSize);
 
         std::lock_guard lock(mutex_);
         auto* result = first_;

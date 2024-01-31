@@ -24,8 +24,12 @@ namespace cpp_event_framework
 {
 /**
  * @brief Pool of elements, especially useful for signals
+ *
+ * @tparam MutexType Mutex type to use - e.g. to be able to supply own RT-capable implementation.
+ *         NamedRequirements: DefaultConstructible, Destructible, BasicLockable
+ * @tparam Alignment Alignment requirement
  */
-template <typename MutexType = std::mutex, size_t kAlignment = sizeof(uint64_t)>
+template <typename MutexType = std::mutex, size_t Alignment = sizeof(uint64_t)>
 class Pool : public std::pmr::memory_resource
 {
 public:
@@ -50,7 +54,7 @@ public:
      * @param name Pool name (logging)
      */
     Pool(size_t element_size, size_t count, std::string name)
-        : size_(count), element_size_(((element_size + kAlignment) / kAlignment) * kAlignment), name_(std::move(name))
+        : size_(count), element_size_(((element_size + Alignment) / Alignment) * Alignment), name_(std::move(name))
     {
         pool_mem_.resize(element_size_ * size_);
         for (size_t i = 0; i < count; i++)

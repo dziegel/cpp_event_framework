@@ -25,7 +25,9 @@ namespace cpp_active_objects
  * @brief A thread-safe event queue
  *
  * @tparam SemaphoreType Sempahore type to use - e.g. to be able to supply own RT-capable implementation
- * @tparam MutexType Mutex type to use - e.g. to be able to supply own RT-capable implementation
+ *         NamedRequirements: DefaultConstructible. No named requirements for release() and acquire() available.
+ * @tparam MutexType Mutex type to use - e.g. to be able to supply own RT-capable implementation.
+ *         NamedRequirements: DefaultConstructible, Destructible, BasicLockable
  */
 template <typename SemaphoreType = std::binary_semaphore, typename MutexType = std::mutex>
 class EventQueue final : public IEventQueue
