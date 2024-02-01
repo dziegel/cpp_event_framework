@@ -154,7 +154,7 @@ public:
             std::cout << "state " << state << " recall deferred events\n";
         };
 
-        fsm_.Init(this, "Fsm", &Fsm::kOff);
+        fsm_.Init(this, "Fsm");
     }
 
     bool off_entry_called_ = false;
@@ -228,7 +228,7 @@ public:
     void Main()
     {
         CheckAllFalse();
-        fsm_.Start();
+        fsm_.Start(&Fsm::kOff);
         assert(fsm_.CurrentState() == &Fsm::kOff);
         assert(off_entry_called_ == true);
         off_entry_called_ = false;
@@ -289,7 +289,7 @@ public:
 
     void History()
     {
-        fsm_.Start();
+        fsm_.Start(&Fsm::kOff);
         assert(fsm_.CurrentState() == &Fsm::kOff);
 
         fsm_.React(EvtTurnOn::MakeShared());

@@ -14,7 +14,7 @@ FsmImpl::FsmImpl()
     // Tell EventPoolAllocator to use pool created above
     EventPoolAllocator::SetAllocator(pool);
 
-    fsm_.Init(this, "FsmSignals", Fsm::kInitialState);
+    fsm_.Init(this, "FsmSignals");
 
     fsm_.on_state_entry_ = [](Fsm::Ref fsm, Fsm::StateRef state)
     { std::cout << fsm << " enter state " << state << "\n"; };
@@ -28,7 +28,7 @@ FsmImpl::FsmImpl()
     fsm_.on_unhandled_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event)
     { std::cout << fsm << " unhandled event " << event << " in state " << state << "\n"; };
 
-    fsm_.Start();
+    fsm_.Start(Fsm::kInitialState);
 }
 
 void FsmImpl::Run()

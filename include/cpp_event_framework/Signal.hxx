@@ -16,6 +16,8 @@
 #include <memory_resource>
 #include <ostream>
 
+#include <cpp_event_framework/Concepts.hxx>
+
 namespace cpp_event_framework
 {
 /**
@@ -143,31 +145,6 @@ std::pmr::memory_resource* CustomAllocator<T>::allocator = nullptr;
 
 template <typename T>
 std::shared_ptr<std::pmr::memory_resource> CustomAllocator<T>::shared_allocator = nullptr;
-
-/**
- * @brief Use this allocator to allocate from heap
- */
-class HeapAllocator
-{
-public:
-    /**
-     * @brief Default heap-based allocator
-     */
-    static std::pmr::memory_resource* GetAllocator()
-    {
-        return std::pmr::new_delete_resource();
-    }
-};
-
-/**
- * @brief Concept for a provider of a polymorphic allocator (std::pmr::memory_resource)
- */
-template <typename T>
-concept PolymorphicAllocatorProvider = requires(T a) {
-    {
-        a.GetAllocator()
-    } -> std::convertible_to<std::pmr::memory_resource*>;
-};
 
 /**
  * @brief Signal event template

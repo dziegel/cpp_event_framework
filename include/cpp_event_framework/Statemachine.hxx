@@ -14,8 +14,10 @@
 #include <functional>
 #include <map>
 #include <memory>
+#include <memory_resource>
 #include <span>
-#include <string>
+
+#include <cpp_event_framework/Concepts.hxx>
 
 namespace cpp_event_framework
 {
@@ -79,8 +81,11 @@ inline constexpr EStateFlags& operator&=(EStateFlags& lhs, EStateFlags rhs)
 /**
  * @brief Statemachine implementation
  *
+ * @tparam ImplType Statemachine implementation type
+ * @tparam EventType Event type
+ * @tparam HistoryMapAllocator Allocator for history map (only when history states are used)
  */
-template <typename ImplType, typename EventType>
+template <typename ImplType, typename EventType, PolymorphicAllocatorProvider HistoryMapAllocator = HeapAllocator>
 class Statemachine
 {
 public:
@@ -405,9 +410,10 @@ public:
 
     /**
      * @brief Construct a new Statemachine object
-     *
      */
-    Statemachine() = default;
+    Statemachine() : initial_(HistoryMapAllocator::GetAllocator())
+    {
+    }
     /**
      * @brief Copy constructor
      *
@@ -447,26 +453,23 @@ public:
      *
      * @param impl Statemachine implementation
      * @param name Statemachine name, useful for logging
-     * @param initial Initial state
      */
-    void Init(ImplPtr impl, std::string name, const State* initial)
+    void Init(ImplPtr impl, const char* name)
     {
         assert(impl != nullptr);
-        assert(initial != nullptr);
-        name_ = std::move(name);
+        name_ = name;
         impl_ = impl;
-        initial_[nullptr] = initial;
     }
     /**
      * @brief Start statemachine, enter initial state
      *
+     * @param initial Initial state
      */
-    void Start()
+    void Start(const State* initial)
     {
-        assert(impl_ != nullptr);             // Most probably you forgot to call Init()
-        assert(initial_[nullptr] != nullptr); // Most probably you forgot to call Init()
+        assert(impl_ != nullptr); // Most probably you forgot to call Init()
         current_state_ = &kInTransition;
-        EnterStatesFromDownTo(nullptr, initial_[nullptr]);
+        EnterStatesFromDownTo(nullptr, initial);
     }
 
     /**
@@ -566,9 +569,9 @@ public:
     /**
      * @brief Returns name
      *
-     * @return const std::string& Statemachine name
+     * @return const char* Statemachine name
      */
-    [[nodiscard]] const std::string& Name() const
+    [[nodiscard]] const char* Name() const
     {
         return name_;
     }
@@ -683,8 +686,8 @@ private:
     StatePtr current_state_ = nullptr;
     bool working_ = false;
     ImplPtr impl_ = nullptr;
-    std::string name_;
-    std::map<StatePtr, StatePtr> initial_;
+    const char* name_ = nullptr;
+    std::pmr::map<StatePtr, StatePtr> initial_;
 
     static const State kInTransition;
 
@@ -816,16 +819,16 @@ private:
     }
 };
 
-template <typename Impl, typename Event>
-const typename Statemachine<Impl, Event>::State Statemachine<Impl, Event>::kNone =
-    typename Statemachine<Impl, Event>::State("None", nullptr);
-template <typename Impl, typename Event>
-const typename Statemachine<Impl, Event>::State Statemachine<Impl, Event>::kUnhandled =
-    typename Statemachine<Impl, Event>::State("Unhandled", nullptr);
-template <typename Impl, typename Event>
-const typename Statemachine<Impl, Event>::State Statemachine<Impl, Event>::kInTransition =
-    typename Statemachine<Impl, Event>::State("InTransition", nullptr);
-template <typename Impl, typename Event>
-const typename Statemachine<Impl, Event>::State Statemachine<Impl, Event>::kDeferEvent =
-    typename Statemachine<Impl, Event>::State("Defer", nullptr);
+template <typename Impl, typename Event, PolymorphicAllocatorProvider Allocator>
+const typename Statemachine<Impl, Event, Allocator>::State Statemachine<Impl, Event, Allocator>::kNone =
+    typename Statemachine<Impl, Event, Allocator>::State("None", nullptr);
+template <typename Impl, typename Event, PolymorphicAllocatorProvider Allocator>
+const typename Statemachine<Impl, Event, Allocator>::State Statemachine<Impl, Event, Allocator>::kUnhandled =
+    typename Statemachine<Impl, Event, Allocator>::State("Unhandled", nullptr);
+template <typename Impl, typename Event, PolymorphicAllocatorProvider Allocator>
+const typename Statemachine<Impl, Event, Allocator>::State Statemachine<Impl, Event, Allocator>::kInTransition =
+    typename Statemachine<Impl, Event, Allocator>::State("InTransition", nullptr);
+template <typename Impl, typename Event, PolymorphicAllocatorProvider Allocator>
+const typename Statemachine<Impl, Event, Allocator>::State Statemachine<Impl, Event, Allocator>::kDeferEvent =
+    typename Statemachine<Impl, Event, Allocator>::State("Defer", nullptr);
 } // namespace cpp_event_framework

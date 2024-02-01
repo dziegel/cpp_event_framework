@@ -6,7 +6,7 @@ namespace example::activeobject
 {
 FsmImpl::FsmImpl()
 {
-    fsm_.Init(this, "ActiveObject", Fsm::kInitialState);
+    fsm_.Init(this, "ActiveObject");
 
     fsm_.on_state_entry_ = [](Fsm::Ref fsm, Fsm::StateRef state)
     { std::cout << fsm << " enter state " << state << "\n"; };
@@ -20,7 +20,7 @@ FsmImpl::FsmImpl()
     fsm_.on_unhandled_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event)
     { std::cout << fsm << " unhandled event " << event << " in state " << state << "\n"; };
 
-    fsm_.Start();
+    fsm_.Start(Fsm::kInitialState);
 }
 
 void FsmImpl::State1Entry()

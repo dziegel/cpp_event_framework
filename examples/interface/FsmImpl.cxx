@@ -6,7 +6,7 @@ namespace example::interface
 {
 FsmImpl::FsmImpl()
 {
-    fsm_.Init(this, "FsmInterface", Fsm::kInitialState);
+    fsm_.Init(this, "FsmInterface");
 
     fsm_.on_state_entry_ = [](Fsm::Ref fsm, Fsm::StateRef state)
     { std::cout << fsm << " enter state " << state << std::endl; };
@@ -20,7 +20,7 @@ FsmImpl::FsmImpl()
     fsm_.on_unhandled_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event)
     { std::cout << fsm << " unhandled event " << static_cast<int>(event) << " in state " << state << std::endl; };
 
-    fsm_.Start();
+    fsm_.Start(Fsm::kInitialState);
 }
 
 void FsmImpl::Run()
