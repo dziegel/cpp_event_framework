@@ -32,6 +32,9 @@ add_executable(${CMAKE_PROJECT_NAME}
     examples/activeobject/Fsm.cxx
     examples/activeobject/FsmImpl.cxx
 
+    examples/activeobject_embedded/Fsm.cxx
+    examples/activeobject_embedded/FsmImpl.cxx
+
     examples/interface/Fsm.cxx
     examples/interface/FsmImpl.cxx
 
@@ -44,6 +47,7 @@ add_executable(${CMAKE_PROJECT_NAME}
     examples/signals/FsmImpl.cxx
 
     test/ActiveObjectFramework_unittest.cxx
+    test/ActiveObjectFrameworkEmbedded_unittest.cxx
     test/Statemachine_unittest.cxx
     test/Events_unittest.cxx
     test/main.cxx

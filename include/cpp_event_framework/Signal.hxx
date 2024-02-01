@@ -71,16 +71,16 @@ public:
     /**
      * @brief Stream operator for logging
      */
-    friend inline std::ostream& operator<<(std::ostream& os, const Signal::SPtr& event)
+    friend inline std::ostream& operator<<(std::ostream& ostream, const Signal::SPtr& event)
     {
-        return os << event->Name();
+        return ostream << event->Name();
     }
 
 protected:
     /**
      * @brief Construct a new Signal object
      */
-    explicit Signal(IdType id) : id_(id)
+    explicit Signal(IdType signal_id) : id_(signal_id)
     {
     }
     /**
@@ -223,7 +223,6 @@ public:
     [[nodiscard]] const char* Name() const override
     {
         return typeid(T).name();
-        // return abi::__cxa_demangle(typeid(T).name(), nullptr, nullptr, nullptr);
     }
 
     /**
@@ -376,10 +375,4 @@ struct SignalPoolElementSizeCalculator
      */
     static constexpr uint32_t kSptrSize = SptrPoolElementSize<Args...>::kValue;
 };
-
-template <typename... Args>
-const uint32_t SignalPoolElementSizeCalculator<Args...>::kHeapSize;
-
-template <typename... Args>
-const uint32_t SignalPoolElementSizeCalculator<Args...>::kSptrSize;
 } // namespace cpp_event_framework

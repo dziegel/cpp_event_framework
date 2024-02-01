@@ -1,14 +1,14 @@
 #pragma once
 
-#include <cpp_active_objects/Hsm.hxx>
+#include <cpp_active_objects_embedded/Hsm.hxx>
 
 #include "Fsm.hxx"
 #include "IFsmImpl.hxx"
 
-namespace example::activeobject
+namespace example::activeobject_embedded
 {
 // Implements Fsm action interface
-class FsmImpl : public cpp_active_objects::Hsm<Fsm>, private IFsmImpl
+class FsmImpl : public cpp_active_objects_embedded::Hsm<Fsm>, private IFsmImpl
 {
 public:
     FsmImpl();
@@ -25,4 +25,4 @@ private:
 
     bool SomeGuardFunction(FsmBase::Event event) override;
 };
-} // namespace example::activeobject
+} // namespace example::activeobject_embedded
