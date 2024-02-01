@@ -116,14 +116,14 @@ if (DOXYGEN_FOUND)
         include
         ALL
     )
+
+    install(DIRECTORY doc/html/
+        DESTINATION ${CMAKE_INSTALL_DOCDIR}/
+    )
 endif()
 
 install(DIRECTORY include/
     DESTINATION ${CMAKE_INSTALL_INCLUDEDIR}
-)
-
-install(DIRECTORY doc/html/
-    DESTINATION ${CMAKE_INSTALL_DOCDIR}/
 )
 
 include(CPack)
