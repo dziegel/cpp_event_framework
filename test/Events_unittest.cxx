@@ -151,10 +151,13 @@ public:
 
         auto* elem2 = pool.do_allocate(kElementSize, 1);
         assert(elem2 != nullptr);
+        assert(elem2 != elem1);
         assert(pool.FillLevel() == kPoolSize - 2);
 
         auto* elem3 = pool.do_allocate(kElementSize, 1);
         assert(elem3 != nullptr);
+        assert(elem3 != elem1);
+        assert(elem3 != elem2);
         assert(pool.FillLevel() == kPoolSize - 3);
 
         pool.do_deallocate(elem2, 0, 0);
@@ -172,10 +175,13 @@ public:
 
         elem2 = pool.do_allocate(kElementSize, 1);
         assert(elem2 != nullptr);
+        assert(elem2 != elem1);
         assert(pool.FillLevel() == kPoolSize - 2);
 
         elem3 = pool.do_allocate(kElementSize, 1);
         assert(elem3 != nullptr);
+        assert(elem3 != elem1);
+        assert(elem3 != elem2);
         assert(pool.FillLevel() == kPoolSize - 3);
     }
 };

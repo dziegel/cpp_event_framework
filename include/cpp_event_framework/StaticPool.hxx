@@ -82,6 +82,8 @@ public:
         assert(bytes <= kAlignedElementSize);
 
         std::lock_guard lock(mutex_);
+        assert(FillLevel() != 0);
+
         auto* result = first_;
         first_ = result->next;
         fill_level_--;
@@ -96,9 +98,19 @@ public:
         auto ptr = static_cast<QueueElement*>(p);
 
         std::lock_guard lock(mutex_);
-        last_->next = ptr;
+        if (first_ == nullptr)
+        {
+            first_ = ptr;
+        }
+
+        if (last_ != nullptr)
+        {
+            last_->next = ptr;
+        }
         last_ = ptr;
+
         fill_level_++;
+        assert(FillLevel() <= NumElements);
     }
 
     /**
