@@ -15,6 +15,7 @@
 #include <cpp_event_framework/Pool.hxx>
 #include <cpp_event_framework/Signal.hxx>
 #include <cpp_event_framework/Statemachine.hxx>
+#include <cpp_event_framework/StaticPool.hxx>
 
 using namespace std::chrono_literals;
 
@@ -135,6 +136,48 @@ public:
         DispatchEvent(SimpleTestEvent2::MakeShared());
         DispatchEvent(PayloadTestEvent::MakeShared(std::vector<uint8_t>({1, 2, 3})));
     }
+
+    static void StaticPool()
+    {
+        constexpr auto kPoolSize = 3;
+        constexpr auto kElementSize = sizeof(PooledSimpleTestEvent);
+
+        cpp_event_framework::StaticPool<kPoolSize, kElementSize> pool("test");
+        assert(pool.FillLevel() == kPoolSize - 0);
+
+        auto* elem1 = pool.do_allocate(kElementSize, 1);
+        assert(elem1 != nullptr);
+        assert(pool.FillLevel() == kPoolSize - 1);
+
+        auto* elem2 = pool.do_allocate(kElementSize, 1);
+        assert(elem2 != nullptr);
+        assert(pool.FillLevel() == kPoolSize - 2);
+
+        auto* elem3 = pool.do_allocate(kElementSize, 1);
+        assert(elem3 != nullptr);
+        assert(pool.FillLevel() == kPoolSize - 3);
+
+        pool.do_deallocate(elem2, 0, 0);
+        assert(pool.FillLevel() == kPoolSize - 2);
+
+        pool.do_deallocate(elem1, 0, 0);
+        assert(pool.FillLevel() == kPoolSize - 1);
+
+        pool.do_deallocate(elem3, 0, 0);
+        assert(pool.FillLevel() == kPoolSize - 0);
+
+        elem1 = pool.do_allocate(kElementSize, 1);
+        assert(elem1 != nullptr);
+        assert(pool.FillLevel() == kPoolSize - 1);
+
+        elem2 = pool.do_allocate(kElementSize, 1);
+        assert(elem2 != nullptr);
+        assert(pool.FillLevel() == kPoolSize - 2);
+
+        elem3 = pool.do_allocate(kElementSize, 1);
+        assert(elem3 != nullptr);
+        assert(pool.FillLevel() == kPoolSize - 3);
+    }
 };
 
 void EventsFixtureMain()
@@ -143,4 +186,5 @@ void EventsFixtureMain()
     EventsFixture::SignalBaseClass();
     EventsFixture::PooledSignals();
     EventsFixture::UsageInSwitchCase();
+    EventsFixture::StaticPool();
 }
