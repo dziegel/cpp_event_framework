@@ -56,6 +56,9 @@ public:
         queue_->EnqueueFront(this, event);
     }
 
+protected:
+    ActiveObjectBase() = default;
+
 private:
     IEventQueue* queue_ = nullptr;
 };

@@ -41,6 +41,15 @@ public:
      */
     using SPtr = std::shared_ptr<EventQueue>;
 
+    EventQueue() = default;
+    ~EventQueue() = default;
+
+    // Non-copyable, non-movable
+    EventQueue(const EventQueue& rhs) = delete;
+    EventQueue(EventQueue&& rhs) = delete;
+    EventQueue& operator=(const EventQueue& rhs) = delete;
+    EventQueue& operator=(EventQueue&& rhs) = delete;
+
     /**
      * @brief Enqueue an event to be dispatched by a target
      *

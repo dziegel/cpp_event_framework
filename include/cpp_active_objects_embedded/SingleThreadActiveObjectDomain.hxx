@@ -36,6 +36,12 @@ public:
     {
     }
 
+    // Non-copyable, non-movable
+    SingleThreadActiveObjectDomain(const SingleThreadActiveObjectDomain& rhs) = delete;
+    SingleThreadActiveObjectDomain(SingleThreadActiveObjectDomain&& rhs) = delete;
+    SingleThreadActiveObjectDomain& operator=(const SingleThreadActiveObjectDomain& rhs) = delete;
+    SingleThreadActiveObjectDomain& operator=(SingleThreadActiveObjectDomain&& rhs) = delete;
+
     ~SingleThreadActiveObjectDomain() override
     {
         Stop();

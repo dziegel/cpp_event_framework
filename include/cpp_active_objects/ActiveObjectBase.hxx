@@ -58,6 +58,9 @@ public:
         queue_->EnqueueFront(std::static_pointer_cast<IActiveObject>(shared_from_this()), event);
     }
 
+protected:
+    ActiveObjectBase() = default;
+
 private:
     IEventQueue::SPtr queue_;
 };
