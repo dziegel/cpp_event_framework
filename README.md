@@ -478,6 +478,35 @@ Uses cpp_event_framework::Signal as events.
 
 <https://github.com/dziegel/cpp_statemachine_generator>
 
+## Active Object Framework
+
+A framework that implements the active object pattern is also available. It comes in two flavors:
+
+- Normal applications: Uses heap and std::shared_ptr<> for everything. Namespace: cpp_active_objects.
+- Embedded applications: No heap usage and std::shared_ptr<> only for signals. Namespace: cpp_active_objects_embedded.
+
+The framework consists of the following elements:
+
+### Interfaces to decouple components
+
+- IEventTarget: Base class for an object that can receive events. Hides that e.g. an event is queued and dispatched in another thread.
+- IActiveObject: Adds functions to assign a queue to enqueue events, and a function to dispatch queued events.
+- IActiveObjectDomain: Interface to register active objects in a domain.
+- IEventQueue: Interface of a queue to decouple IActiveObject from an actual queue implementation.
+
+### Base classes for Active Objects
+
+- ActiveObjectBase: Contains queue pointer and implements queuing of events.
+- Hsm: Base class to aggregate a statemachine. Implements event deferral.
+
+### Base class for an Active Object Domain
+
+- ActiveObjectDomainBase: Contains a queue pointer and implements thread function to dequeue and dispatch events from queue.
+
+### Single-threaded Active Object Domain
+
+- SingleThreadActiveObjectDomain: Contains a single worker thread that runs the Run() function of ActiveObjectDomainBase.
+
 ## License
 
 Apache-2.0
