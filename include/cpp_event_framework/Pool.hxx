@@ -79,7 +79,7 @@ public:
     {
         assert(bytes <= element_size_);
 
-        std::lock_guard lock(mutex_);
+        std::scoped_lock lock(mutex_);
         auto* result = pool_.front();
         pool_.pop();
         return result;
@@ -90,7 +90,7 @@ public:
      */
     void do_deallocate(void* p, size_t /*bytes*/, size_t /*alignment*/) override
     {
-        std::lock_guard lock(mutex_);
+        std::scoped_lock lock(mutex_);
         pool_.push(p);
     }
 
@@ -109,7 +109,6 @@ public:
      */
     size_t FillLevel()
     {
-        std::lock_guard lock(mutex_);
         return pool_.size();
     }
 

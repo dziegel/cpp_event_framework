@@ -81,7 +81,7 @@ public:
     {
         assert(bytes <= kAlignedElementSize);
 
-        std::lock_guard lock(mutex_);
+        std::scoped_lock lock(mutex_);
         assert(FillLevel() != 0);
 
         auto* result = first_;
@@ -97,7 +97,7 @@ public:
     {
         auto ptr = static_cast<QueueElement*>(p);
 
-        std::lock_guard lock(mutex_);
+        std::scoped_lock lock(mutex_);
         if (first_ == nullptr)
         {
             first_ = ptr;

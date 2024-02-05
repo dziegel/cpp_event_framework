@@ -86,7 +86,7 @@ public:
         sem_.acquire();
 
         std::scoped_lock lock(mutex_);
-        auto result = queue_.front();
+        auto result = std::move(queue_.front());
         queue_.pop_front();
         return result;
     }
