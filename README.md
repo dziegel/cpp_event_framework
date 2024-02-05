@@ -4,7 +4,7 @@ Header-only C++ event and statemachine framework
 
 ## Overview
 
-### Events
+### [Events](#introduction-to-events)
 
 - Shared pointers for easy handling
 - Allocatable from heap or pools
@@ -13,7 +13,7 @@ Header-only C++ event and statemachine framework
 - Possibility to add data members to signal class
 - Events have names for logging (and an ostream operator<<)
 
-### Statemachine
+### [Statemachine](#introduction-to-statemachine-framework)
 
 - Hierarchical state support. If a state does not handle an event, it is passed to parent state.
 - Entry/Exit funtions
@@ -30,6 +30,12 @@ Header-only C++ event and statemachine framework
 - States have names for logging (and an ostream operator<<)
 - Statemachines have names for logging (and an ostream operator<<)
 - A statemachine generator is available, see [Statemachine Generation](#statemachine-generation)
+
+### [Active Object Framework](#introduction-to-active-object-framework)
+
+- Implements active framework pattern
+- Embedded version available that works without heap usage
+- Domain implementation with single worker thread
 
 ## Introduction to events
 
@@ -478,7 +484,7 @@ Uses cpp_event_framework::Signal as events.
 
 <https://github.com/dziegel/cpp_statemachine_generator>
 
-## Active Object Framework
+## Introduction to Active Object Framework
 
 A framework that implements the active object pattern is also available. It comes in two flavors:
 
