@@ -172,6 +172,11 @@ Using the size calculator, a pool can be instantiated and assigned to the custom
     auto pool = cpp_event_framework::Pool<>::MakeShared(PoolSizeCalculator::kSptrSize, 10, "MyPool");
     EventPoolAllocator::SetAllocator(pool);
 
+or when using statically allocated pools (embedded systems):
+
+    cpp_event_framework::StaticPool<10, PoolSizeCalculator::kSptrSize> pool("MyPool");
+    EventPoolAllocator::SetAllocator(&pool);
+
 Using a pool allocator, events can be now declared that are allocated via pools. Note the NextSignal template
 manages the event ID AND inherits the allocator from the previous signal!
 In the following example, PooledSimpleTestEvent and PooledSimpleTestEvent2 are allocated via EventPoolAllocator.
