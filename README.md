@@ -29,7 +29,7 @@ Header-only C++ event and statemachine framework
 - Logging support (state entry/exit/handler events)
 - States have names for logging (and an ostream operator<<)
 - Statemachines have names for logging (and an ostream operator<<)
-- A statemachine generator is available, see [Statemachine Generation](#statemachine-generation)
+- A statemachine generator is available: <https://github.com/dziegel/cpp_statemachine_generator>
 
 ### [Active Object Framework](#introduction-to-active-object-framework)
 
@@ -479,10 +479,6 @@ Uses integers as events.
 Uses cpp_event_framework::Signal as events.
 
 <https://github.com/dziegel/cpp_event_framework/blob/main/test/Statemachine_unittest.cxx>
-
-## Statemachine generation
-
-<https://github.com/dziegel/cpp_statemachine_generator>
 
 ## Introduction to Active Object Framework
 
