@@ -14,6 +14,7 @@
 #include <thread>
 
 #include <cpp_active_objects/ActiveObjectDomainBase.hxx>
+#include <cpp_active_objects/EventQueue.hxx>
 #include <cpp_active_objects/IEventQueue.hxx>
 
 namespace cpp_active_objects
@@ -34,12 +35,19 @@ public:
     using SPtr = std::shared_ptr<SingleThreadActiveObjectDomain>;
 
     /**
-     * @brief Constructor
+     * @brief Constructor with custom queue
      *
      * @param queue
      */
     explicit SingleThreadActiveObjectDomain(IEventQueue::SPtr queue)
         : ActiveObjectDomainBase(std::move(queue)), thread_(RunWrapper, this)
+    {
+    }
+
+    /**
+     * @brief Constructor
+     */
+    SingleThreadActiveObjectDomain() : SingleThreadActiveObjectDomain(std::make_shared<EventQueue<>>())
     {
     }
 

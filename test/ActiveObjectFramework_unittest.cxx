@@ -12,7 +12,6 @@
 
 #include "../examples/activeobject/FsmImpl.hxx"
 
-#include <cpp_active_objects/EventQueue.hxx>
 #include <cpp_active_objects/SingleThreadActiveObjectDomain.hxx>
 #include <cpp_event_framework/Pool.hxx>
 
@@ -26,8 +25,7 @@ void ActiveObjectFrameworkMain()
     // Tell EventPoolAllocator to use pool created above
     example::activeobject::EventPoolAllocator::SetAllocator(pool);
 
-    auto queue = std::make_shared<cpp_active_objects::EventQueue<>>();
-    auto domain = std::make_shared<cpp_active_objects::SingleThreadActiveObjectDomain<>>(queue);
+    auto domain = std::make_shared<cpp_active_objects::SingleThreadActiveObjectDomain<>>();
 
     auto active_object = std::make_shared<example::activeobject::FsmImpl>();
     domain->RegisterObject(active_object);
