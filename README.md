@@ -287,8 +287,8 @@ The predefined HeapAllocator is simply an allocator based on std::pmr::new_delet
         public:
             StatemachineImplementation()
             {
-                fsm_.Init(this, "Fsm", &Fsm::kState1);
-                fsm_.Start();
+                fsm_.Init(this, "Fsm");
+                fsm_.Start(&Fsm::kState1);
             }
         
         [...]
