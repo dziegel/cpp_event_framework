@@ -514,6 +514,10 @@ The framework consists of the following elements:
 
 - SingleThreadActiveObjectDomain: Contains a single worker thread that runs the Run() function of ActiveObjectDomainBase.
 
+### Usage example
+
+<https://github.com/dziegel/cpp_event_framework/tree/main/examples/activeobject> together with <https://github.com/dziegel/cpp_event_framework/blob/main/test/ActiveObjectFramework_unittest.cxx>
+
 ## License
 
 Apache-2.0
