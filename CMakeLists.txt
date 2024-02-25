@@ -4,9 +4,12 @@ project(cpp_event_framework VERSION 1.1.0)
 
 include(GNUInstallDirs REQUIRED)
 
+set(CPACK_PACKAGING_INSTALL_PREFIX "/usr")
+
 set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")
 set(CPACK_PACKAGE_VENDOR "dirk@ziegelmeier.net")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "C++20 event framework")
+set(CPACK_GENERATOR "TGZ")
 
 # set(CMAKE_CXX_CLANG_TIDY "clang-tidy;-header-filter=.*;-extra-arg=-Wno-unknown-warning-option;-checks=-*,clang-analyzer-*,-clang-analyzer-cplusplus*,-bugprone*,-clang-analyzer-cplusplus*,-cert*,-cppcoreguidelines*,-readability*,-modernize*,-portability*,-performance*")
 
