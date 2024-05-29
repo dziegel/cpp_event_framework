@@ -16,6 +16,7 @@
 #include <memory>
 #include <memory_resource>
 #include <mutex>
+#include <ostream>
 #include <queue>
 #include <string>
 #include <vector>
@@ -107,7 +108,7 @@ public:
      *
      * @return size_t
      */
-    size_t FillLevel()
+    [[nodiscard]] size_t FillLevel() const
     {
         return pool_.size();
     }
@@ -150,6 +151,22 @@ public:
     static SPtr MakeShared(size_t element_size, size_t count, std::string name)
     {
         return std::make_shared<Pool>(element_size, count, std::move(name));
+    }
+
+    /**
+     * @brief Stream operator for logging
+     */
+    friend inline std::ostream& operator<<(std::ostream& ostream, const Pool<MutexType, Alignment>& pool)
+    {
+        return ostream << pool.Name() << " [" << pool.FillLevel() << "/" << pool.Size() << "]";
+    }
+
+    /**
+     * @brief Stream operator for logging
+     */
+    friend inline std::ostream& operator<<(std::ostream& ostream, const Pool<MutexType, Alignment>::SPtr& pool)
+    {
+        return ostream << *pool;
     }
 
 private:

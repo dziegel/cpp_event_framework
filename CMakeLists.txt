@@ -4,6 +4,8 @@ project(cpp_event_framework VERSION 1.1.0)
 
 include(GNUInstallDirs REQUIRED)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS true)
+
 set(CPACK_PACKAGING_INSTALL_PREFIX "/usr")
 
 set(CPACK_PACKAGE_NAME "${PROJECT_NAME}")

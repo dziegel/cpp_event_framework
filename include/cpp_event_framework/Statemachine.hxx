@@ -14,7 +14,6 @@
 #include <functional>
 #include <map>
 #include <memory>
-#include <memory_resource>
 #include <span>
 
 #include <cpp_event_framework/Concepts.hxx>

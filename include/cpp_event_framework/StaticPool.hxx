@@ -17,6 +17,7 @@
 #include <cstring>
 #include <memory_resource>
 #include <mutex>
+#include <ostream>
 
 #include <cpp_event_framework/Concepts.hxx>
 
@@ -31,11 +32,11 @@ namespace cpp_event_framework
  *         NamedRequirements: DefaultConstructible, Destructible, BasicLockable
  * @tparam Alignment Alignment requirement
  */
-template <uint32_t NumElements, size_t ElementSize, Mutex MutexType = std::mutex, size_t Alignment = sizeof(uint64_t)>
+template <uint32_t NumElements, size_t ElemSize, Mutex MutexType = std::mutex, size_t Alignment = sizeof(uint64_t)>
 class StaticPool : public std::pmr::memory_resource
 {
 private:
-    static constexpr size_t kAlignedElementSize = ((ElementSize + Alignment) / Alignment) * Alignment;
+    static constexpr size_t kAlignedElementSize = ((ElemSize + Alignment) / Alignment) * Alignment;
     struct QueueElement
     {
         union
@@ -122,11 +123,31 @@ public:
     }
 
     /**
+     * @brief Get pool size (max. number of elements)
+     *
+     * @return size_t
+     */
+    [[nodiscard]] size_t Size() const
+    {
+        return NumElements;
+    }
+
+    /**
+     * @brief Get size of pool elements
+     *
+     * @return size_t
+     */
+    [[nodiscard]] size_t ElementSize() const
+    {
+        return ElemSize;
+    }
+
+    /**
      * @brief Pool fill level (number of elements currently in pool)
      *
      * @return size_t
      */
-    size_t FillLevel()
+    [[nodiscard]] size_t FillLevel() const
     {
         return fill_level_;
     }
@@ -139,6 +160,22 @@ public:
     [[nodiscard]] const char* Name() const
     {
         return name_;
+    }
+
+    /**
+     * @brief Stream operator for logging
+     */
+    friend inline std::ostream& operator<<(std::ostream& ostream, const StaticPool& pool)
+    {
+        return ostream << pool.Name() << " [" << pool.FillLevel() << "/" << pool.Size() << "]";
+    }
+
+    /**
+     * @brief Stream operator for logging
+     */
+    friend inline std::ostream& operator<<(std::ostream& ostream, const StaticPool& pool)
+    {
+        return ostream << pool.Name() << " [" << pool.FillLevel() << "/" << pool.Size() << "]";
     }
 };
 } // namespace cpp_event_framework

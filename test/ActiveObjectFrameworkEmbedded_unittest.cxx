@@ -10,6 +10,8 @@
 
 #include "../examples/activeobject_embedded/FsmImpl.hxx"
 
+#include <iostream>
+
 #include <cpp_active_objects_embedded/EventQueue.hxx>
 #include <cpp_active_objects_embedded/SingleThreadActiveObjectDomain.hxx>
 #include <cpp_event_framework/StaticPool.hxx>
@@ -48,6 +50,8 @@ void ActiveObjectFrameworkEmbeddedMain()
 
     example::activeobject_embedded::FsmImpl active_object;
     domain.RegisterObject(&active_object);
+
+    std::cout << pool << std::endl;
 
     assert(active_object.CurrentState() == &example::activeobject_embedded::Fsm::kState1);
 

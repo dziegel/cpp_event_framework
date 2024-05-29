@@ -8,6 +8,7 @@
  *
  */
 
+#include <iostream>
 #include <memory>
 
 #include "../examples/activeobject/FsmImpl.hxx"
@@ -31,6 +32,8 @@ void ActiveObjectFrameworkMain()
     domain->RegisterObject(active_object);
 
     assert(active_object->CurrentState() == &example::activeobject::Fsm::kState1);
+
+    std::cout << pool << std::endl;
 
     active_object->Take(example::activeobject::Go2::MakeShared());
     std::this_thread::sleep_for(500ms);
