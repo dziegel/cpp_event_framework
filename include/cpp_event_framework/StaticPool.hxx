@@ -169,13 +169,5 @@ public:
     {
         return ostream << pool.Name() << " [" << pool.FillLevel() << "/" << pool.Size() << "]";
     }
-
-    /**
-     * @brief Stream operator for logging
-     */
-    friend inline std::ostream& operator<<(std::ostream& ostream, const StaticPool& pool)
-    {
-        return ostream << pool.Name() << " [" << pool.FillLevel() << "/" << pool.Size() << "]";
-    }
 };
 } // namespace cpp_event_framework
