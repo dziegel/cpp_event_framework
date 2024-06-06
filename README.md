@@ -22,7 +22,7 @@ Header-only C++ event, statemachine and active object framework
 - Unhandled event support
 - Deferred event support (needs external framework)
 - Independent of event type (can be int, enum, shared pointer...)
-- Designed to call member functions of a C++ class or interface
+- Designed to call member functions of a C++ interface
 - It is fairly simple to write statemachines "by hand" without a code generator
 - Suitable for small systems: state and transition declarations can be const and in RO section
 - Allow non-capturing lambdas as transition action
@@ -33,7 +33,7 @@ Header-only C++ event, statemachine and active object framework
 
 ### [Active Object Framework](#introduction-to-active-object-framework)
 
-- Implements active framework pattern
+- Implements active object framework pattern
 - Embedded version available that works without heap usage
 - Domain implementation with single worker thread
 
@@ -47,7 +47,7 @@ A simple event class which is allocated from heap is declared via a class that i
     {
     };
 
-The integer "0" is the ID of the event and can be accessed via:
+The integer template parameter "0" is the ID of the event and can be accessed via:
 
     SimpleTestEvent::kId                // static context
     SimpleTestEvent::MakeShared()->Id() // instance context
