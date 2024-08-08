@@ -762,7 +762,7 @@ private:
     {
         if (top != target)
         {
-            if (target->parent_ != nullptr)
+            if ((target->parent_ != nullptr) && (target->parent_ != top))
             {
                 EnterStatesFromDownTo(top, target->parent_);
             }
