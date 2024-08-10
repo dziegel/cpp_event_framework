@@ -180,9 +180,10 @@ public:
      * @param args Constructor args
      */
     template <typename... Args>
-    static SPtr MakeShared(Args... args)
+    static SPtr MakeShared(Args&&... args)
     {
-        return std::allocate_shared<T, std::pmr::polymorphic_allocator<T>>(Allocator::GetAllocator(), args...);
+        return std::allocate_shared<T, std::pmr::polymorphic_allocator<T>>(Allocator::GetAllocator(),
+                                                                           std::forward<Args>(args)...);
     }
 
     /**
