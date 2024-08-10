@@ -15,8 +15,10 @@
 #include <memory>
 #include <memory_resource>
 #include <ostream>
+#include <string_view>
 
 #include <cpp_event_framework/Concepts.hxx>
+#include <cpp_event_framework/DemangledTypeName.hxx>
 
 namespace cpp_event_framework
 {
@@ -63,6 +65,11 @@ public:
     [[nodiscard]] virtual const char* Name() const = 0;
 
     /**
+     * @brief Get demangled event name
+     */
+    [[nodiscard]] virtual std::string_view DemangledName() const = 0;
+
+    /**
      * @brief Cast from generic signal
      */
     static SPtr FromSignal(const SPtr& event)
@@ -75,7 +82,7 @@ public:
      */
     friend inline std::ostream& operator<<(std::ostream& ostream, const Signal::SPtr& event)
     {
-        return ostream << event->Name();
+        return ostream << event->DemangledName();
     }
 
 protected:
@@ -201,6 +208,14 @@ public:
     [[nodiscard]] const char* Name() const override
     {
         return typeid(T).name();
+    }
+
+    /**
+     * @brief Get demangled event name
+     */
+    [[nodiscard]] std::string_view DemangledName() const override
+    {
+        return GetDemangledTypeName<T>();
     }
 
     /**
