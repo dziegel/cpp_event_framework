@@ -64,11 +64,6 @@ public:
     [[nodiscard]] virtual const char* Name() const = 0;
 
     /**
-     * @brief Get demangled event name
-     */
-    [[nodiscard]] virtual const char* DemangledName() const = 0;
-
-    /**
      * @brief Cast from generic signal
      */
     static SPtr FromSignal(const SPtr& event)
@@ -81,7 +76,7 @@ public:
      */
     friend inline std::ostream& operator<<(std::ostream& ostream, const Signal::SPtr& event)
     {
-        return ostream << event->DemangledName();
+        return ostream << event->Name();
     }
 
 protected:
@@ -205,14 +200,6 @@ public:
      * @brief Get event name
      */
     [[nodiscard]] const char* Name() const override
-    {
-        return typeid(T).name();
-    }
-
-    /**
-     * @brief Get demangled event name
-     */
-    [[nodiscard]] const char* DemangledName() const override
     {
         return GetDemangledTypeName<T>();
     }
