@@ -23,7 +23,7 @@ namespace cpp_event_framework
 template <std::size_t... Idxs>
 constexpr auto SubstringAsArray(std::string_view str, std::index_sequence<Idxs...> /*idx*/)
 {
-    return std::array{str[Idxs]...};
+    return std::array{str[Idxs]..., '\0'};
 }
 
 template <typename T>
@@ -61,9 +61,9 @@ struct TypeNameHolder
 };
 
 template <typename T>
-constexpr auto GetDemangledTypeName()
+constexpr const char* GetDemangledTypeName()
 {
     constexpr auto& kValue = TypeNameHolder<T>::kValue;
-    return std::string_view{kValue.data(), kValue.size()};
+    return kValue.data();
 }
 } // namespace cpp_event_framework

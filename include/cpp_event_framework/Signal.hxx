@@ -15,7 +15,6 @@
 #include <memory>
 #include <memory_resource>
 #include <ostream>
-#include <string_view>
 
 #include <cpp_event_framework/Concepts.hxx>
 #include <cpp_event_framework/DemangledTypeName.hxx>
@@ -67,7 +66,7 @@ public:
     /**
      * @brief Get demangled event name
      */
-    [[nodiscard]] virtual std::string_view DemangledName() const = 0;
+    [[nodiscard]] virtual const char* DemangledName() const = 0;
 
     /**
      * @brief Cast from generic signal
@@ -213,7 +212,7 @@ public:
     /**
      * @brief Get demangled event name
      */
-    [[nodiscard]] std::string_view DemangledName() const override
+    [[nodiscard]] const char* DemangledName() const override
     {
         return GetDemangledTypeName<T>();
     }
