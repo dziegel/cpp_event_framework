@@ -376,6 +376,11 @@ public:
     };
 
     /**
+     * @brief State is changed (useful for logging)
+     *
+     */
+    void (*on_state_change_)(Ref, StateRef, StateRef) = nullptr;
+    /**
      * @brief State is entered (useful for logging)
      *
      */
@@ -530,6 +535,11 @@ public:
             {
                 on_unhandled_event_(*this, *start, event);
             }
+        }
+
+        if ((on_state_change_ != nullptr) && (start != current_state_))
+        {
+            on_state_change_(*this, *start, *current_state_);
         }
 
         working_ = false;

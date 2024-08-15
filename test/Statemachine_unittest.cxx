@@ -127,6 +127,9 @@ class StatemachineImpl
 public:
     void SetUp()
     {
+        fsm_.on_state_change_ = [](Fsm::Ref fsm, Fsm::StateRef old_state, Fsm::StateRef new_state)
+        { std::cout << fsm << " state changed " << old_state << " -> " << new_state << "\n"; };
+
         fsm_.on_state_entry_ = [](Fsm::Ref fsm, Fsm::StateRef state)
         { std::cout << fsm << " enter state " << state << "\n"; };
 
