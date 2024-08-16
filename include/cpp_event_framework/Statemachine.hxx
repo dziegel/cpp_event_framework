@@ -379,7 +379,7 @@ public:
      * @brief State is changed (useful for logging)
      *
      */
-    void (*on_state_change_)(Ref, StateRef, StateRef) = nullptr;
+    void (*on_state_change_)(Ref, Event, StateRef, StateRef) = nullptr;
     /**
      * @brief State is entered (useful for logging)
      *
@@ -539,7 +539,7 @@ public:
 
         if ((on_state_change_ != nullptr) && (start != current_state_))
         {
-            on_state_change_(*this, *start, *current_state_);
+            on_state_change_(*this, event, *start, *current_state_);
         }
 
         working_ = false;
