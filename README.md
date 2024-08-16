@@ -451,8 +451,8 @@ Example:
 
 ### Logging
 
-        fsm_.on_state_change_ = [](Fsm::Ref fsm, Fsm::StateRef old_state, Fsm::StateRef new_state)
-            { std::cout << fsm << ": " << old_state << " -> " << new_state << std::endl; };
+        fsm_.on_state_change_ = [](Fsm::Ref fsm, Fsm::Event event, Fsm::StateRef old_state, Fsm::StateRef new_state)
+            { std::cout << fsm << ": " << old_state << " --- " << event << " ---> " << new_state << std::endl; };
 
         fsm_.on_state_entry_ = [](Fsm::Ref fsm, Fsm::StateRef state)
             { std::cout << fsm << " enter state " << state << std::endl; };
