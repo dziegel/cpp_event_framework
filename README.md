@@ -1,4 +1,4 @@
-# cpp_event_framework
+# C++ event framework
 
 Header-only C++ event, statemachine and active object framework
 
