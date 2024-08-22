@@ -474,7 +474,7 @@ There are multiple possible implementation variants:
 
 2) Statemachine and implementation are tighly coupled, implementation uses PIMPL pattern to aggregate statemachine. Less clean, but does not need virtual calls for actions which might be interesting for embedded systems. See <https://github.com/dziegel/cpp_event_framework/tree/main/examples/pimpl>
 
-3) Statemachine and implementation are even more tighly coupled, implementation and statemachine code intermix. Least cleanest solution, also does not need virtual calls for actions. Use this only if you want to avoid interfaces AND PIMPL pattern, again this might be interesting for embedded systems. See <https://github.com/dziegel/cpp_event_framework/tree/main/examples/plain>
+3) Statemachine and implementation are even more tighly coupled, implementation and statemachine code intermix. Least clean solution, also does not need virtual calls for actions. Use this only if you want to avoid interfaces AND PIMPL pattern, again this might be interesting for embedded systems. Together with a static pool as event pool and the embedded version of the active object framework, no heap is used at all except for thread creation (rewrite SingleThreadActiveObjectDomain to avoid this, too). See <https://github.com/dziegel/cpp_event_framework/tree/main/examples/plain>
 
 ### Simple statemachine example
 
