@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include <array>
 #include <cassert>
 #include <functional>
 #include <map>
