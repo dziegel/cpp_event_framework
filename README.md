@@ -229,7 +229,6 @@ The predefined HeapAllocator is simply an allocator based on std::pmr::new_delet
         public:
             static const Fsm::State kState1;
             static const Fsm::State kState2;
-            static const Transition kState2ToState1Transition;
 
             static Transition State1Handler(ImplPtr /* impl */, Event event)
             {
@@ -247,7 +246,7 @@ The predefined HeapAllocator is simply an allocator based on std::pmr::new_delet
                 switch (event)
                 {
                 case EEvent::kGo1:
-                    return kState2ToState1Transition;
+                    return TransitionTo(kState2, &Fsm::Impl::State2ToState1Action);
                 default:
                     return UnhandledEvent();
                 }
@@ -275,8 +274,6 @@ The predefined HeapAllocator is simply an allocator based on std::pmr::new_delet
 
         const Fsm::State Fsm::kState1("State1", &Fsm::State1Handler);
         const Fsm::State Fsm::kState2("State2", &Fsm::State2Handler);
-
-        const Fsm::Transition Fsm::kState2ToState1Transition(Fsm::kState1, &Fsm::Impl::State2ToState1Action);
 
 6) Initialize with implementation, name and initial state, then and start statemachine.
     Starting the statemachine is a separate function since it calls the entry handler of the initial state (if present).
