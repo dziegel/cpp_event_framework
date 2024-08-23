@@ -185,6 +185,10 @@ public:
             {
                 delegate_action_(impl, event);
             }
+            if (single_action_ != nullptr)
+            {
+                (impl->*single_action_)(event);
+            }
             for (const auto& action : actions_)
             {
                 (impl->*action)(event);
@@ -224,8 +228,7 @@ public:
          * @param target Target state
          * @param action Transition action
          */
-        constexpr Transition(StateRef target, ActionType action) noexcept
-            : target_(&target), single_action_(action), actions_(&single_action_, 1)
+        constexpr Transition(StateRef target, ActionType action) noexcept : target_(&target), single_action_(action)
         {
         }
         /**
