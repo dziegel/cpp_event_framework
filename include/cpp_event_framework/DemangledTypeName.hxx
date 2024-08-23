@@ -20,12 +20,21 @@
 
 namespace cpp_event_framework
 {
+/**
+ * @brief Convert a string view to a std::array
+ *
+ * @tparam Idxs
+ */
 template <std::size_t... Idxs>
 constexpr auto SubstringAsArray(std::string_view str, std::index_sequence<Idxs...> /*idx*/)
 {
     return std::array{str[Idxs]..., '\0'};
 }
 
+/**
+ * @brief Convert type name to std::array
+ *
+ */
 template <typename T>
 constexpr auto TypeNameArray()
 {
@@ -54,12 +63,26 @@ constexpr auto TypeNameArray()
     return SubstringAsArray(kName, std::make_index_sequence<kName.size()>{});
 }
 
+/**
+ * @brief Static storage for type name class
+ *
+ */
 template <typename T>
 struct TypeNameHolder
 {
+    /**
+     * @brief Static storage for type name
+     *
+     */
     static constexpr auto kValue = TypeNameArray<T>();
 };
 
+/**
+ * @brief Get the Demangled type name as NULL terminated const char*
+ *
+ * @tparam T
+ * @return constexpr const char*
+ */
 template <typename T>
 constexpr const char* GetDemangledTypeName()
 {
