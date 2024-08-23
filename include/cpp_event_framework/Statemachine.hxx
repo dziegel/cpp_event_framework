@@ -193,6 +193,12 @@ public:
 
         /**
          * @brief Construct a new Statemachine Transition object
+         * Use Statemachine::UnhandledEvent() instead
+         *
+         */
+        constexpr Transition() noexcept = default;
+        /**
+         * @brief Construct a new Statemachine Transition object
          * Use Statemachine::TransitionTo() instead
          *
          * @param target Target state
@@ -508,9 +514,9 @@ public:
             }
 
             s = s->parent_;
-        } while ((transition.target_ == &kUnhandled) && (s != nullptr));
+        } while ((transition.target_ == nullptr) && (s != nullptr));
 
-        if ((transition.target_ != &kUnhandled))
+        if ((transition.target_ != nullptr))
         {
             if (transition.target_ != &kNone)
             {
@@ -592,7 +598,7 @@ public:
      */
     static inline Transition UnhandledEvent()
     {
-        return Transition(kUnhandled);
+        return Transition();
     }
 
     /**
@@ -674,10 +680,6 @@ public:
      * @brief No transition
      */
     static const State kNone;
-    /**
-     * @brief Unhandled transition
-     */
-    static const State kUnhandled;
     /**
      * @brief Event deferral request
      */
@@ -831,9 +833,6 @@ private:
 template <typename Impl, typename Event, PolymorphicAllocatorProvider Allocator>
 const typename Statemachine<Impl, Event, Allocator>::State Statemachine<Impl, Event, Allocator>::kNone =
     typename Statemachine<Impl, Event, Allocator>::State("None", nullptr);
-template <typename Impl, typename Event, PolymorphicAllocatorProvider Allocator>
-const typename Statemachine<Impl, Event, Allocator>::State Statemachine<Impl, Event, Allocator>::kUnhandled =
-    typename Statemachine<Impl, Event, Allocator>::State("Unhandled", nullptr);
 template <typename Impl, typename Event, PolymorphicAllocatorProvider Allocator>
 const typename Statemachine<Impl, Event, Allocator>::State Statemachine<Impl, Event, Allocator>::kInTransition =
     typename Statemachine<Impl, Event, Allocator>::State("InTransition", nullptr);
