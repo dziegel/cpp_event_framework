@@ -147,12 +147,6 @@ public:
     using ActionType = void (ImplType::*)(Event);
 
     /**
-     * @brief Type of action handler
-     *
-     */
-    using DelegateActionType = void (*)(ImplPtr, Event);
-
-    /**
      * @brief State machine transition class, used internally
      */
     class Transition
@@ -163,12 +157,6 @@ public:
          *
          */
         using ActionType = Statemachine::ActionType;
-
-        /**
-         * @brief Type of action handler (for compatibility, use Statemachine::DelegateActionType instead)
-         *
-         */
-        using DelegateActionType = Statemachine::DelegateActionType;
 
     private:
         // this class is for internal use by Statemachine only
@@ -187,10 +175,6 @@ public:
          */
         void ExecuteActions(ImplPtr impl, Event event)
         {
-            if (delegate_action_ != nullptr)
-            {
-                delegate_action_(impl, event);
-            }
             if (single_action_ != nullptr)
             {
                 (impl->*single_action_)(event);
@@ -223,17 +207,6 @@ public:
          * @param target Target state
          * @param action Transition action
          */
-        constexpr Transition(StateRef target, DelegateActionType action) noexcept
-            : target_(&target), delegate_action_(action)
-        {
-        }
-        /**
-         * @brief Construct a new Statemachine Transition object
-         * Use Statemachine::TransitionTo() instead
-         *
-         * @param target Target state
-         * @param action Transition action
-         */
         constexpr Transition(StateRef target, ActionType action) noexcept : target_(&target), single_action_(action)
         {
         }
@@ -255,12 +228,6 @@ public:
          * Provides storage for single transition actions
          */
         ActionType single_action_ = nullptr;
-        /**
-         * @brief Optional single lambda transition action
-         *
-         * std::function<> cannot be used here - not longer possible to store Transition in RO section!
-         */
-        DelegateActionType delegate_action_ = nullptr;
         /**
          * @brief Optional transition actions
          *
@@ -635,16 +602,6 @@ public:
      * @param action Action to execute
      * @return Transition
      */
-    static inline Transition NoTransition(DelegateActionType action)
-    {
-        return Transition(kNone, action);
-    }
-    /**
-     * @brief Event was handled, but no transition shall be executed, with action
-     *
-     * @param action Action to execute
-     * @return Transition
-     */
     static inline Transition NoTransition(ActionType action)
     {
         return Transition(kNone, action);
@@ -669,17 +626,6 @@ public:
     static inline Transition TransitionTo(StateRef target)
     {
         return Transition(target);
-    }
-    /**
-     * @brief Create transition to target state, with action
-     *
-     * @param target Target state
-     * @param action Action to execute on transition
-     * @return Transition
-     */
-    static inline Transition TransitionTo(StateRef target, DelegateActionType action)
-    {
-        return Transition(target, action);
     }
     /**
      * @brief Create transition to target state, with action

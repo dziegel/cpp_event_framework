@@ -155,6 +155,11 @@ private:
         std::cout << "Don't walk 2\n";
     }
 
+    void Walk(Fsm::Event /*event*/)
+    {
+        std::cout << "Walk\n";
+    }
+
 public:
     void Main()
     {
@@ -319,7 +324,7 @@ Fsm::Transition Fsm::FsmRedYellowHandler(ImplPtr /*impl*/, Event event)
     switch (event->Id())
     {
     case EvtGoGreen::kId:
-        return TransitionTo(kGreen, [](ImplPtr /*impl*/, Event /*event*/) { std::cout << "Walk\n"; });
+        return TransitionTo(kGreen, &Fsm::Impl::Walk);
     case EvtGoYellow::kId:
         return NoTransition();
     default:

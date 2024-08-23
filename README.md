@@ -25,7 +25,6 @@ Header-only C++ event, statemachine and active object framework
 - Designed to call member functions of a C++ interface
 - It is fairly simple to write statemachines "by hand" without a code generator
 - Suitable for small systems: state declarations can be const and in RO section
-- Allow non-capturing lambdas as transition action
 - Logging support (state entry/exit/handler events)
 - States have names for logging (and an ostream operator<<)
 - Statemachines have names for logging (and an ostream operator<<)
@@ -315,10 +314,6 @@ The predefined HeapAllocator is simply an allocator based on std::pmr::new_delet
         // Using class StatemachineImplementation member function
         return Fsm::TransitionTo(Fsm::kState1, &StatemachineImplementation::SomeAction);
 
-        // using non-capturing lambda
-        return Fsm::TransitionTo(Fsm::kState1,
-            [](Fsm::ImplPtr, Fsm::Event) { std::cout << "Transition action" << std::endl; });
-
 3) No transition - event is handled, but no state transition occurs:
 
         return Fsm::NoTransition();
@@ -327,9 +322,6 @@ The predefined HeapAllocator is simply an allocator based on std::pmr::new_delet
 
         // Using class StatemachineImplementation member function
         return Fsm::NoTransition(&StatemachineImplementation::SomeAction);
-
-        // using non-capturing lambda
-        return Fsm::NoTransition([](Fsm::ImplPtr, Fsm::Event) { std::cout << "Transition action" << std::endl; });
 
 5) Event is not handled in this state. In hierarchical statemachines, the event will be passed to parent state handler.
    When topmost state does not handle the event, fsm_.on_unhandled_event_ is called.
@@ -420,10 +412,9 @@ Example:
 
         void (Fsm::ImplPtr)()
 
-- Transition actions. The signature allows to use class member functions and non-capturing lambdas as actions. The argument "event" may be useful in actions because the action may depend on the event type or attributes of the event.
+- Transition actions. The signature allows to use class/interface member functions as actions. The argument "event" may be useful in actions because the action may depend on the event type or attributes of the event.
 
-        void (*)(Fsm::ImplPtr impl, Fsm::Event event) // Non-capturing lambda
-        void (Fsm::ImplPtr)(Fsm::Event event)         // C++
+        void (Fsm::ImplPtr)(Fsm::Event event)
 
 ### Logging
 
