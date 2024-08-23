@@ -141,6 +141,17 @@ public:
      *
      */
     using StateRef = const State&;
+    /**
+     * @brief Type of action handler
+     *
+     */
+    using ActionType = void (ImplType::*)(Event);
+
+    /**
+     * @brief Type of action handler
+     *
+     */
+    using DelegateActionType = void (*)(ImplPtr, Event);
 
     /**
      * @brief State machine transition class, used internally
@@ -149,24 +160,20 @@ public:
     {
     public:
         /**
-         * @brief Type of action handler
+         * @brief Type of action handler (for compatibility, use Statemachine::ActionType instead)
          *
          */
-        using ActionType = void (ImplType::*)(Event);
-        /**
-         * @brief Type of action handler
-         *
-         */
-        using DelegateActionType = void (*)(ImplPtr, Event);
+        using ActionType = Statemachine::ActionType;
 
         /**
-         * @brief Action container type
+         * @brief Type of action handler (for compatibility, use Statemachine::DelegateActionType instead)
          *
          */
-        template <size_t num>
-        class ActionContainer : public std::array<const ActionType, num>
-        {
-        };
+        using DelegateActionType = Statemachine::DelegateActionType;
+
+    private:
+        // this class is for internal use by Statemachine only
+        friend class Statemachine;
 
         /**
          * @brief Transition target
@@ -243,7 +250,6 @@ public:
         {
         }
 
-    private:
         /**
          * @brief Optional single transition action
          *
@@ -630,7 +636,17 @@ public:
      * @param action Action to execute
      * @return Transition
      */
-    static inline Transition NoTransition(typename Transition::DelegateActionType action)
+    static inline Transition NoTransition(DelegateActionType action)
+    {
+        return Transition(kNone, action);
+    }
+    /**
+     * @brief Event was handled, but no transition shall be executed, with action
+     *
+     * @param action Action to execute
+     * @return Transition
+     */
+    static inline Transition NoTransition(ActionType action)
     {
         return Transition(kNone, action);
     }
@@ -640,7 +656,7 @@ public:
      * @param actions Actions to execute on transition
      * @return Transition
      */
-    static inline Transition NoTransition(std::span<const typename Transition::ActionType> actions)
+    static inline Transition NoTransition(std::span<const ActionType> actions)
     {
         return Transition(kNone, actions);
     }
@@ -662,7 +678,18 @@ public:
      * @param action Action to execute on transition
      * @return Transition
      */
-    static inline Transition TransitionTo(StateRef target, typename Transition::DelegateActionType action)
+    static inline Transition TransitionTo(StateRef target, DelegateActionType action)
+    {
+        return Transition(target, action);
+    }
+    /**
+     * @brief Create transition to target state, with action
+     *
+     * @param target Target state
+     * @param action Action to execute on transition
+     * @return Transition
+     */
+    static inline Transition TransitionTo(StateRef target, ActionType action)
     {
         return Transition(target, action);
     }
@@ -673,20 +700,10 @@ public:
      * @param actions Actions to execute on transition
      * @return Transition
      */
-    static inline Transition TransitionTo(StateRef target,
-                                          std::span<const typename Transition::ActionType> actions) noexcept
+    static inline Transition TransitionTo(StateRef target, std::span<const ActionType> actions) noexcept
     {
         return Transition(target, actions);
     }
-
-    /**
-     * @brief No transition
-     */
-    static const State kNone;
-    /**
-     * @brief Event deferral request
-     */
-    static const State kDeferEvent;
 
     /**
      * @brief Stream operator for logging
@@ -704,6 +721,8 @@ private:
     std::pmr::map<StatePtr, StatePtr> initial_;
 
     static const State kInTransition;
+    static const State kNone;
+    static const State kDeferEvent;
 
     void SetInitialState(StatePtr state, StatePtr initial)
     {

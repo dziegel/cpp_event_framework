@@ -24,7 +24,7 @@ Header-only C++ event, statemachine and active object framework
 - Independent of event type (can be int, enum, shared pointer...)
 - Designed to call member functions of a C++ interface
 - It is fairly simple to write statemachines "by hand" without a code generator
-- Suitable for small systems: state and transition declarations can be const and in RO section
+- Suitable for small systems: state declarations can be const and in RO section
 - Allow non-capturing lambdas as transition action
 - Logging support (state entry/exit/handler events)
 - States have names for logging (and an ostream operator<<)
@@ -337,32 +337,6 @@ The predefined HeapAllocator is simply an allocator based on std::pmr::new_delet
 6) Defer event (needs external framework support)
 
         return Fsm::DeferEvent();
-
-### Predefining transitions (like states)
-
-    class Fsm : public FsmBase
-    {
-    public:
-        [...]
-        static const Fsm::Transition Fsm::kState2ToState1;
-
-        static const Fsm::Transition::ActionContainer<2> kState2ToState3Actions;
-        static const Fsm::Transition Fsm::kState2ToState3;
-
-        static const Fsm::Transition::ActionType kState2ToState4Actions[]; 
-        static const Fsm::Transition Fsm::kState2ToState4;
-    };
-
-    // Single action
-    const Fsm::Transition Fsm::kState2ToState1(kState1, &Fsm::Impl::FsmState2ToState1Action);
-
-    // Multiple actions (clean, std::array<> based)
-    const Fsm::Transition::ActionContainer<2> Fsm::kState2ToState3Actions = {&Fsm::Impl::FsmState2ToState3Action1, &Fsm::Impl::FsmState2ToState3Action2};
-    const Fsm::Transition Fsm::kState2ToState3(kState3, kState2ToState3Actions);
-
-    // Multiple actions (unclean, C-style array)
-    const Fsm::Transition::ActionType Fsm::kState2ToState4Actions[] = {&Fsm::Impl::FsmState2ToState4Action1, &Fsm::Impl::FsmState2ToState4Action2};
-    const Fsm::Transition Fsm::kState2ToState4(kState4, kState2ToState4Actions);
 
 ### Hierarchical states
 

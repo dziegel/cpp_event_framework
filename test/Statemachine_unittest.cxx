@@ -37,89 +37,17 @@ public:
     static const State kRedYellow;
 
 private:
-    static const Transition::ActionContainer<2> kYellowRedTransitionActions;
-    static const Transition kYellowRedTransition;
+    static Transition FsmOffHandler(ImplPtr /*impl*/, Event event);
 
-    static Transition FsmOffHandler(ImplPtr /*impl*/, Event event)
-    {
-        switch (event->Id())
-        {
-        case EvtTurnOn::kId:
-            return TransitionTo(kOn);
-        case EvtTurnOff::kId:
-            return NoTransition();
-        case EvtGoYellow::kId: // fall through
-        case EvtGoRed::kId:
-            return DeferEvent();
-        default:
-            return UnhandledEvent();
-        }
-    }
+    static Transition FsmOnHandler(ImplPtr /*impl*/, Event event);
 
-    static Transition FsmOnHandler(ImplPtr /*impl*/, Event event)
-    {
-        switch (event->Id())
-        {
-        case EvtTurnOff::kId:
-            return TransitionTo(kOff);
-        case EvtTurnOn::kId:
-            return NoTransition();
-        default:
-            return UnhandledEvent();
-        }
-    }
+    static Transition FsmGreenHandler(ImplPtr /*impl*/, Event event);
 
-    static Transition FsmGreenHandler(ImplPtr /*impl*/, Event event)
-    {
-        switch (event->Id())
-        {
-        case EvtGoYellow::kId:
-            return TransitionTo(kYellow);
-        case EvtGoGreen::kId:
-            return NoTransition();
-        default:
-            return UnhandledEvent();
-        }
-    }
+    static Transition FsmYellowHandler(ImplPtr /*impl*/, Event event);
 
-    static Transition FsmYellowHandler(ImplPtr /*impl*/, Event event)
-    {
-        switch (event->Id())
-        {
-        case EvtGoRed::kId:
-            return kYellowRedTransition;
-        case EvtGoYellow::kId:
-            return NoTransition();
-        default:
-            return UnhandledEvent();
-        }
-    }
+    static Transition FsmRedHandler(ImplPtr /*impl*/, Event event);
 
-    static Transition FsmRedHandler(ImplPtr /*impl*/, Event event)
-    {
-        switch (event->Id())
-        {
-        case EvtGoYellow::kId:
-            return TransitionTo(kRedYellow);
-        case EvtGoRed::kId:
-            return NoTransition();
-        default:
-            return UnhandledEvent();
-        }
-    }
-
-    static Transition FsmRedYellowHandler(ImplPtr /*impl*/, Event event)
-    {
-        switch (event->Id())
-        {
-        case EvtGoGreen::kId:
-            return TransitionTo(kGreen, [](ImplPtr /*impl*/, Event /*event*/) { std::cout << "Walk\n"; });
-        case EvtGoYellow::kId:
-            return NoTransition();
-        default:
-            return UnhandledEvent();
-        }
-    }
+    static Transition FsmRedYellowHandler(ImplPtr /*impl*/, Event event);
 };
 
 class StatemachineImpl
@@ -316,9 +244,88 @@ const Fsm::State Fsm::kYellow("Yellow", &FsmYellowHandler, &kOn);
 const Fsm::State Fsm::kRed("Red", &FsmRedHandler, &kOn);
 const Fsm::State Fsm::kRedYellow("RedYellow", &FsmRedYellowHandler, &kOn);
 
-const Fsm::Transition::ActionContainer<2> Fsm::kYellowRedTransitionActions = {
-    &Fsm::Impl::FsmYellowRedTransitionAction1, &Fsm::Impl::FsmYellowRedTransitionAction2};
-const Fsm::Transition Fsm::kYellowRedTransition(kRed, kYellowRedTransitionActions);
+Fsm::Transition Fsm::FsmOffHandler(ImplPtr /*impl*/, Event event)
+{
+    switch (event->Id())
+    {
+    case EvtTurnOn::kId:
+        return TransitionTo(kOn);
+    case EvtTurnOff::kId:
+        return NoTransition();
+    case EvtGoYellow::kId: // fall through
+    case EvtGoRed::kId:
+        return DeferEvent();
+    default:
+        return UnhandledEvent();
+    }
+}
+
+Fsm::Transition Fsm::FsmOnHandler(ImplPtr /*impl*/, Event event)
+{
+    switch (event->Id())
+    {
+    case EvtTurnOff::kId:
+        return TransitionTo(kOff);
+    case EvtTurnOn::kId:
+        return NoTransition();
+    default:
+        return UnhandledEvent();
+    }
+}
+
+Fsm::Transition Fsm::FsmGreenHandler(ImplPtr /*impl*/, Event event)
+{
+    switch (event->Id())
+    {
+    case EvtGoYellow::kId:
+        return TransitionTo(kYellow);
+    case EvtGoGreen::kId:
+        return NoTransition();
+    default:
+        return UnhandledEvent();
+    }
+}
+
+Fsm::Transition Fsm::FsmYellowHandler(ImplPtr /*impl*/, Event event)
+{
+    switch (event->Id())
+    {
+    case EvtGoRed::kId:
+        static const auto kYellowRedTransitionActions = std::to_array<Fsm::ActionType>(
+            {&Fsm::Impl::FsmYellowRedTransitionAction1, &Fsm::Impl::FsmYellowRedTransitionAction2});
+        return TransitionTo(kRed, kYellowRedTransitionActions);
+    case EvtGoYellow::kId:
+        return NoTransition();
+    default:
+        return UnhandledEvent();
+    }
+}
+
+Fsm::Transition Fsm::FsmRedHandler(ImplPtr /*impl*/, Event event)
+{
+    switch (event->Id())
+    {
+    case EvtGoYellow::kId:
+        return TransitionTo(kRedYellow);
+    case EvtGoRed::kId:
+        return NoTransition();
+    default:
+        return UnhandledEvent();
+    }
+}
+
+Fsm::Transition Fsm::FsmRedYellowHandler(ImplPtr /*impl*/, Event event)
+{
+    switch (event->Id())
+    {
+    case EvtGoGreen::kId:
+        return TransitionTo(kGreen, [](ImplPtr /*impl*/, Event /*event*/) { std::cout << "Walk\n"; });
+    case EvtGoYellow::kId:
+        return NoTransition();
+    default:
+        return UnhandledEvent();
+    }
+}
 
 void StatemachineFixtureMain()
 {
