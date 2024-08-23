@@ -20,7 +20,7 @@ FsmImpl::FsmImpl()
     fsm_.on_unhandled_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event)
     { std::cout << fsm << " unhandled event " << static_cast<int>(event) << " in state " << state << std::endl; };
 
-    fsm_.Start(Fsm::kInitialState);
+    fsm_.Start();
 }
 
 FsmImpl::~FsmImpl() = default;
@@ -77,7 +77,6 @@ Fsm::Transition Fsm::State2Handler(ImplPtr impl, Event event)
 
 const Fsm::State Fsm::kState1("State1", &State1Handler);
 const Fsm::State Fsm::kState2("State2", &State2Handler);
-const Fsm::StatePtr Fsm::kInitialState = &kState1; // initial state of the statemachine
 } // namespace example::plain
 
 void SimpleStatemachineExampleMain()

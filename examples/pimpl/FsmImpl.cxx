@@ -26,7 +26,7 @@ FsmImpl::FsmImpl() : private_(std::make_unique<FsmImpl::Private>())
     private_->fsm.on_unhandled_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event)
     { std::cout << fsm << " unhandled event " << static_cast<int>(event) << " in state " << state << std::endl; };
 
-    private_->fsm.Start(Fsm::kInitialState);
+    private_->fsm.Start();
 }
 
 FsmImpl::~FsmImpl() = default;

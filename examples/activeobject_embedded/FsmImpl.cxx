@@ -8,7 +8,7 @@ FsmImpl::FsmImpl()
 
     // No logging because printf or std::ostream use heap memory
 
-    fsm_.Start(Fsm::kInitialState);
+    fsm_.Start();
 }
 
 void FsmImpl::State1Entry()

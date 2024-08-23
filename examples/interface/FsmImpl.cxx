@@ -20,7 +20,7 @@ FsmImpl::FsmImpl()
     fsm_.on_unhandled_event_ = [](Fsm::Ref fsm, Fsm::StateRef state, Fsm::Event event)
     { std::cout << fsm << " unhandled event " << static_cast<int>(event) << " in state " << state << std::endl; };
 
-    fsm_.Start(Fsm::kInitialState);
+    fsm_.Start();
 }
 
 void FsmImpl::Run()
