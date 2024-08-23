@@ -304,6 +304,14 @@ public:
             return name_;
         }
 
+        /**
+         * @brief Stream operator for logging
+         */
+        friend inline std::ostream& operator<<(std::ostream& os, StateRef state)
+        {
+            return os << state.Name();
+        }
+
     protected:
         /**
          * @brief Construct a new Statemachine State object
@@ -328,14 +336,6 @@ public:
          */
         const char* name_ = "Unnamed";
     };
-
-    /**
-     * @brief Stream operator for logging
-     */
-    friend inline std::ostream& operator<<(std::ostream& os, StateRef state)
-    {
-        return os << state.Name();
-    }
 
     /**
      * @brief History statemachine state
