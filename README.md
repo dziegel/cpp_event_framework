@@ -246,7 +246,7 @@ The predefined HeapAllocator is simply an allocator based on std::pmr::new_delet
                 switch (event)
                 {
                 case EEvent::kGo1:
-                    return TransitionTo(kState2, &Fsm::Impl::State2ToState1Action);
+                    return TransitionTo(kState1, &Fsm::Impl::State2ToState1Action);
                 default:
                     return UnhandledEvent();
                 }
