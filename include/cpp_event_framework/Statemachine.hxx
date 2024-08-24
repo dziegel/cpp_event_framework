@@ -16,6 +16,7 @@
 #include <span>
 
 #include <cpp_event_framework/Concepts.hxx>
+#include <cpp_event_framework/HeapAllocator.hxx>
 
 namespace cpp_event_framework
 {
