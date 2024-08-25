@@ -25,7 +25,7 @@ Header-only C++ event, statemachine and active object framework
 - Designed to call member functions of a C++ interface
 - It is fairly simple to write statemachines "by hand" without a code generator
 - Suitable for small systems: state declarations can be const and in RO section
-- Logging support (state entry/exit/handler events)
+- Logging support (state entry/exit/handler/state change events)
 - States have names for logging (and an ostream operator<<)
 - Statemachines have names for logging (and an ostream operator<<)
 - A statemachine generator is available: <https://github.com/dziegel/cpp_statemachine_generator>
