@@ -335,7 +335,7 @@ public:
          * @brief Statename, optional, useful for logging
          *
          */
-        const char* name_ = "Unnamed";
+        const char* name_ = nullptr;
     };
 
     /**
