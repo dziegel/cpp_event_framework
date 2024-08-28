@@ -33,7 +33,7 @@ namespace cpp_event_framework
  * @tparam Alignment Alignment requirement
  */
 template <uint32_t NumElements, size_t ElemSize, Mutex MutexType = std::mutex, size_t Alignment = sizeof(uint64_t)>
-class StaticPool : public std::pmr::memory_resource
+class StaticPool final : public std::pmr::memory_resource
 {
 private:
     static constexpr size_t kAlignedElementSize = ((ElemSize + Alignment) / Alignment) * Alignment;
