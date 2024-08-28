@@ -2,29 +2,29 @@
 
 namespace example::pimpl
 {
-static Fsm::Transition State1Handler(Fsm::ImplPtr /* impl */, Fsm::Event event)
+Fsm::Transition Fsm::State1Handler(ImplPtr /* impl */, Event event)
 {
     switch (event)
     {
     case EEvent::kGo2:
-        return Fsm::TransitionTo(Fsm::kState2);
+        return TransitionTo(kState2);
     default:
-        return Fsm::NoTransition();
+        return NoTransition();
     }
 }
 
-static Fsm::Transition State2Handler(Fsm::ImplPtr impl, Fsm::Event event)
+Fsm::Transition Fsm::State2Handler(ImplPtr impl, Event event)
 {
     switch (event)
     {
     case EEvent::kGo1:
         if (impl->SomeGuardFunction(event))
         {
-            return Fsm::TransitionTo(Fsm::kState1, &Fsm::Impl::State2ToState1TransitionAction);
+            return TransitionTo(kState1, &Impl::State2ToState1TransitionAction);
         }
-        return Fsm::NoTransition();
+        return NoTransition();
     default:
-        return Fsm::UnhandledEvent();
+        return UnhandledEvent();
     }
 }
 

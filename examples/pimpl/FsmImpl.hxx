@@ -26,14 +26,18 @@ public:
 
     void Run();
 
+private:
+    struct Private;
+    std::unique_ptr<Private> private_;
+
+    // Give Fsm access to private entry/exit/transition actions
+    // (This is not needed if actions are public functions)
+    friend class Fsm;
+
     void State1Entry();
 
     void State2ToState1TransitionAction(FsmBase::Event event);
 
     bool SomeGuardFunction(FsmBase::Event event);
-
-private:
-    struct Private;
-    std::unique_ptr<Private> private_;
 };
 } // namespace example::pimpl
