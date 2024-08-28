@@ -389,7 +389,7 @@ Example:
 
             fsm_.on_recall_deferred_events_ = [this](Fsm::StateRef)
             {
-                for (auto& event : deferred_events)
+                for (auto& event : std::ranges::reverse_view(deferred_events))
                 {
                     fsm_.React(event);
                 }
