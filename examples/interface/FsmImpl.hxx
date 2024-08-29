@@ -6,7 +6,7 @@
 namespace example::interface
 {
 // Implements Fsm action interface
-class FsmImpl : private IFsmImpl
+class FsmImpl final : private IFsmImpl
 {
 public:
     FsmImpl();

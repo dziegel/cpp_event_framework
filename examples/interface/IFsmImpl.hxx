@@ -17,6 +17,8 @@ using FsmBase = cpp_event_framework::Statemachine<IFsmImpl, EEvent>;
 class IFsmImpl
 {
 public:
+    virtual ~IFsmImpl() = default;
+
     virtual void State1Entry() = 0;
 
     virtual void State2ToState1TransitionAction(FsmBase::Event) = 0;

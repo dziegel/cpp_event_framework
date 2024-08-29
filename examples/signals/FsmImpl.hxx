@@ -6,7 +6,7 @@
 namespace example::signals
 {
 // Implements Fsm action interface
-class FsmImpl : public IFsmImpl
+class FsmImpl final : public IFsmImpl
 {
 public:
     FsmImpl();

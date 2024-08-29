@@ -8,7 +8,7 @@
 namespace example::activeobject_embedded
 {
 // Implements Fsm action interface
-class FsmImpl : public cpp_active_objects_embedded::Hsm<Fsm>, private IFsmImpl
+class FsmImpl final : public cpp_active_objects_embedded::Hsm<Fsm>, private IFsmImpl
 {
 public:
     FsmImpl();
