@@ -424,6 +424,15 @@ Example:
 
         void (Fsm::ImplPtr)(Fsm::Event event)
 
+### Execution order
+
+The order of execution of guards/actions/entry/exit are as follows:
+
+- Evaluation of all necessary guards to select a transition
+- Exit actions from source state up to least common ancestor parent state
+- Transition actions
+- Entry actions from least common ancestor parent state to target state
+
 ### Logging
 
         fsm_.on_state_change_ = [](Fsm::Ref fsm, Fsm::Event event, Fsm::StateRef old_state, Fsm::StateRef new_state)
