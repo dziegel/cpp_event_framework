@@ -311,24 +311,32 @@ The predefined HeapAllocator is simply an allocator based on std::pmr::new_delet
 
 2) Transition to another state with transition action:
 
-        // Using class StatemachineImplementation member function
         return Fsm::TransitionTo(Fsm::kState1, &StatemachineImplementation::SomeAction);
 
-3) No transition - event is handled, but no state transition occurs:
+3) Transition to another state with MULTIPLE transition actions:
+
+        static const auto kActions = std::to_array<Fsm::ActionType>({&Fsm::Impl::Action1, &Fsm::Impl::Action2, &Fsm::Impl::Action3});
+        return Fsm::TransitionTo(Fsm::kState1, kActions);
+
+4) No transition - event is handled, but no state transition occurs:
 
         return Fsm::NoTransition();
 
-4) No state transition, but an action is executed:
+5) No state transition, but an action is executed:
 
-        // Using class StatemachineImplementation member function
         return Fsm::NoTransition(&StatemachineImplementation::SomeAction);
 
-5) Event is not handled in this state. In hierarchical statemachines, the event will be passed to parent state handler.
+6) No state transition, but MULTIPLE actions are executed:
+
+        static const auto kActions = std::to_array<Fsm::ActionType>({&Fsm::Impl::Action1, &Fsm::Impl::Action2, &Fsm::Impl::Action3});
+        return Fsm::NoTransition(kActions);
+
+7) Event is not handled in this state. In hierarchical statemachines, the event will be passed to parent state handler.
    When topmost state does not handle the event, fsm_.on_unhandled_event_ is called.
 
         return Fsm::UnhandledEvent();
 
-6) Defer event (needs external framework support)
+8) Defer event (needs external framework support)
 
         return Fsm::DeferEvent();
 
@@ -404,15 +412,15 @@ Example:
 
 ### Function signatures
 
-- State handlers. The ImplPtr allows to call implementation member functions.
+- State handlers
 
         Fsm::Transition (*)(Fsm::ImplPtr impl, Fsm::Event event)
 
-- Entry/Exit actions. Actions are member functions of a class.
+- Entry/Exit actions. Actions are member functions of an interface/class.
 
         void (Fsm::ImplPtr)()
 
-- Transition actions. The signature allows to use class/interface member functions as actions. The argument "event" may be useful in actions because the action may depend on the event type or attributes of the event.
+- Transition actions. Actions are member functions of an interface/class.
 
         void (Fsm::ImplPtr)(Fsm::Event event)
 
