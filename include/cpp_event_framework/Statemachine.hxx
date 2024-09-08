@@ -152,13 +152,6 @@ public:
      */
     class Transition
     {
-    public:
-        /**
-         * @brief Type of action handler (for compatibility, use Statemachine::ActionType instead)
-         *
-         */
-        using ActionType = Statemachine::ActionType;
-
     private:
         // this class is for internal use by Statemachine only
         friend class Statemachine;
