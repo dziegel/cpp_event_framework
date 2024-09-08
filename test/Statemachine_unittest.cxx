@@ -163,6 +163,13 @@ private:
 public:
     void Main()
     {
+        assert(Fsm::FindCommonParent(&Fsm::kGreen, &Fsm::kOn) == &Fsm::kOn);
+        assert(Fsm::FindCommonParent(&Fsm::kOn, &Fsm::kGreen) == &Fsm::kOn);
+        assert(Fsm::FindCommonParent(&Fsm::kOn, &Fsm::kOff) == nullptr);
+        assert(Fsm::FindCommonParent(&Fsm::kOff, &Fsm::kOn) == nullptr);
+        assert(Fsm::FindCommonParent(&Fsm::kGreen, &Fsm::kRed) == &Fsm::kOn);
+        assert(Fsm::FindCommonParent(&Fsm::kRed, &Fsm::kGreen) == &Fsm::kOn);
+
         CheckAllFalse();
         fsm_.Start(&Fsm::kOff);
         assert(fsm_.CurrentState() == &Fsm::kOff);

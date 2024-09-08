@@ -659,6 +659,30 @@ public:
         return os << sm.Name();
     }
 
+    static StatePtr FindCommonParent(StatePtr state1, StatePtr state2)
+    {
+        auto* state = state1;
+
+        while (state != nullptr)
+        {
+            auto* parent = state2;
+
+            while (parent != nullptr)
+            {
+                if (parent == state)
+                {
+                    return parent;
+                }
+
+                parent = parent->parent_;
+            }
+
+            state = state->parent_;
+        }
+
+        return nullptr;
+    }
+
 private:
     StatePtr current_state_ = nullptr;
     bool working_ = false;
@@ -749,6 +773,7 @@ private:
             EnterState(*target);
         }
     }
+
     void EnterStatesFromDownTo(StatePtr top, StatePtr target)
     {
         EnterStatesFromDownToRecursive(top, target->parent_);
@@ -772,29 +797,6 @@ private:
             EnterState(*target);
             current_state_ = target;
         }
-    }
-    static StatePtr FindCommonParent(StatePtr state1, StatePtr state2)
-    {
-        auto* state = state1->parent_;
-
-        while (state != nullptr)
-        {
-            auto* parent = state2->parent_;
-
-            while (parent != nullptr)
-            {
-                if (parent == state)
-                {
-                    return parent;
-                }
-
-                parent = parent->parent_;
-            }
-
-            state = state->parent_;
-        }
-
-        return nullptr;
     }
 };
 
