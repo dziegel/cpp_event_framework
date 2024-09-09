@@ -25,6 +25,10 @@ class EvtTurnOff : public cpp_event_framework::NextSignal<EvtTurnOff, EvtTurnOn>
 {
 };
 
+class EvtSelfTransition : public cpp_event_framework::NextSignal<EvtSelfTransition, EvtTurnOff>
+{
+};
+
 class StatemachineImpl;
 class Fsm : public cpp_event_framework::Statemachine<StatemachineImpl, const cpp_event_framework::Signal::SPtr&>
 {
@@ -177,6 +181,16 @@ public:
         off_entry_called_ = false;
         CheckAllFalse();
 
+        fsm_.React(EvtSelfTransition::MakeShared());
+        assert(fsm_.CurrentState() == &Fsm::kOff);
+        assert(off_entry_called_ == true);
+        off_entry_called_ = false;
+        assert(off_exit_called_ == true);
+        off_exit_called_ = false;
+        assert(on_recall_event_called_ == true);
+        on_recall_event_called_ = false;
+        CheckAllFalse();
+
         fsm_.React(EvtTurnOn::MakeShared());
         assert(off_exit_called_ == true);
         assert(on_entry_called_ == true);
@@ -207,8 +221,16 @@ public:
         assert(fsm_.CurrentState() == &Fsm::kRedYellow);
         CheckAllFalse();
 
+        fsm_.React(EvtSelfTransition::MakeShared());
+        assert(fsm_.CurrentState() == &Fsm::kRedYellow);
+        CheckAllFalse();
+
         fsm_.React(EvtGoGreen::MakeShared());
         assert(fsm_.CurrentState() == &Fsm::kGreen);
+        CheckAllFalse();
+
+        fsm_.React(EvtGoRed::MakeShared());
+        assert(fsm_.CurrentState() == &Fsm::kRed);
         CheckAllFalse();
 
         fsm_.React(EvtTurnOff::MakeShared());
@@ -267,6 +289,9 @@ Fsm::Transition Fsm::FsmOffHandler(ImplPtr /*impl*/, Event event)
     case EvtGoYellow::kId: // fall through
     case EvtGoRed::kId:
         return DeferEvent();
+    case EvtSelfTransition::kId:
+        // Self transition, entry + exit must be called
+        return TransitionTo(kOff);
     default:
         return UnhandledEvent();
     }
@@ -280,6 +305,8 @@ Fsm::Transition Fsm::FsmOnHandler(ImplPtr /*impl*/, Event event)
         return TransitionTo(kOff);
     case EvtTurnOn::kId:
         return NoTransition();
+    case EvtGoRed::kId:
+        return TransitionTo(kRed);
     default:
         return UnhandledEvent();
     }
@@ -293,6 +320,8 @@ Fsm::Transition Fsm::FsmGreenHandler(ImplPtr /*impl*/, Event event)
         return TransitionTo(kYellow);
     case EvtGoGreen::kId:
         return NoTransition();
+    case EvtSelfTransition::kId:
+        return TransitionTo(kGreen);
     default:
         return UnhandledEvent();
     }
@@ -308,6 +337,8 @@ Fsm::Transition Fsm::FsmYellowHandler(ImplPtr /*impl*/, Event event)
         return TransitionTo(kRed, kYellowRedTransitionActions);
     case EvtGoYellow::kId:
         return NoTransition();
+    case EvtSelfTransition::kId:
+        return TransitionTo(kYellow);
     default:
         return UnhandledEvent();
     }
@@ -321,6 +352,8 @@ Fsm::Transition Fsm::FsmRedHandler(ImplPtr /*impl*/, Event event)
         return TransitionTo(kRedYellow);
     case EvtGoRed::kId:
         return NoTransition();
+    case EvtSelfTransition::kId:
+        return TransitionTo(kRed);
     default:
         return UnhandledEvent();
     }
@@ -334,6 +367,8 @@ Fsm::Transition Fsm::FsmRedYellowHandler(ImplPtr /*impl*/, Event event)
         return TransitionTo(kGreen, &Fsm::Impl::Walk);
     case EvtGoYellow::kId:
         return NoTransition();
+    case EvtSelfTransition::kId:
+        return TransitionTo(kRedYellow);
     default:
         return UnhandledEvent();
     }

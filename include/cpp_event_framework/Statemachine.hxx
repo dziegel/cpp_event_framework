@@ -448,6 +448,7 @@ public:
     {
         assert(impl_ != nullptr); // Most probably you forgot to call Init()
         current_state_ = &kInTransition;
+        initial_.clear();
         EnterStatesFromDownTo(nullptr, initial);
     }
 
@@ -713,33 +714,45 @@ private:
         return state->initial_;
     }
 
+    void ExitState(StatePtr state)
+    {
+        if (on_state_exit_ != nullptr)
+        {
+            on_state_exit_(*this, *state);
+        }
+
+        if (state->on_exit_ != nullptr)
+        {
+            (impl_->*state->on_exit_)();
+        }
+    }
+
     void ExitStatesFromUpTo(StatePtr from, StatePtr top)
     {
         const auto* state = from;
 
-        while (state != top)
+        if (state == top)
         {
-            // Save history state
-            if (state->parent_ != nullptr)
+            ExitState(state);
+        }
+        else
+        {
+            while (state != top)
             {
-                if ((state->parent_->flags_ & EFlags::kHistory) != EFlags::kNone)
+                // Save history state
+                if (state->parent_ != nullptr)
                 {
-                    SetInitialState(state->parent_, state);
+                    if ((state->parent_->flags_ & EFlags::kHistory) != EFlags::kNone)
+                    {
+                        SetInitialState(state->parent_, state);
+                    }
                 }
-            }
 
-            if (on_state_exit_ != nullptr)
-            {
-                on_state_exit_(*this, *state);
-            }
+                ExitState(state);
 
-            if (state->on_exit_ != nullptr)
-            {
-                (impl_->*state->on_exit_)();
-            }
-
-            state = state->parent_;
-        };
+                state = state->parent_;
+            };
+        }
     }
 
     void EnterState(StateRef state) const
@@ -769,7 +782,10 @@ private:
 
     void EnterStatesFromDownTo(StatePtr top, StatePtr target)
     {
-        EnterStatesFromDownToRecursive(top, target->parent_);
+        if (top != target)
+        {
+            EnterStatesFromDownToRecursive(top, target->parent_);
+        }
 
         if (GetInitialState(target) != nullptr)
         {
