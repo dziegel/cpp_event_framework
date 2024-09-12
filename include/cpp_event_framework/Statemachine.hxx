@@ -751,7 +751,7 @@ private:
                 ExitState(state);
 
                 state = state->parent_;
-            };
+            }
         }
     }
 

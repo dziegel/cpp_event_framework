@@ -20,7 +20,6 @@
 #include <cpp_event_framework/DemangledTypeName.hxx>
 #include <cpp_event_framework/HeapAllocator.hxx>
 
-
 namespace cpp_event_framework
 {
 /**
@@ -234,7 +233,7 @@ protected:
      * @param args arguments
      */
     template <typename... Args>
-    SignalBase(Args... args) : BaseType(kId, args...)
+    explicit SignalBase(Args... args) : BaseType(kId, args...)
     {
     }
 };
@@ -270,7 +269,8 @@ protected:
      * @param args arguments
      */
     template <typename... Args>
-    NextSignal(Args... args) : SignalBase<T, Previous::kId + 1, BaseType, typename Previous::Allocator>(args...)
+    explicit NextSignal(Args... args)
+        : SignalBase<T, Previous::kId + 1, BaseType, typename Previous::Allocator>(args...)
     {
     }
 };
