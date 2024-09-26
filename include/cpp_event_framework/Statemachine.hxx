@@ -495,6 +495,11 @@ public:
                 const auto* old_state = current_state_;
                 current_state_ = &kInTransition;
 
+                if ((on_state_change_ != nullptr) && (old_state != transition.target_))
+                {
+                    on_state_change_(*this, event, *old_state, *transition.target_);
+                }
+
                 ExitStatesFromUpTo(old_state, common_parent);
                 transition.ExecuteActions(impl_, event);
                 EnterStatesFromDownTo(common_parent, transition.target_);
@@ -511,11 +516,6 @@ public:
             {
                 on_unhandled_event_(*this, *start, event);
             }
-        }
-
-        if ((on_state_change_ != nullptr) && (start != current_state_))
-        {
-            on_state_change_(*this, event, *start, *current_state_);
         }
 
         working_ = false;
