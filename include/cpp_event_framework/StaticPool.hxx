@@ -108,10 +108,7 @@ public:
         {
             last_->next = ptr;
         }
-        else
-        {
-            last_ = ptr;
-        }
+        last_ = ptr;
 
         fill_level_++;
         assert(FillLevel() <= NumElements);
