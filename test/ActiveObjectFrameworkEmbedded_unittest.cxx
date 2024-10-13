@@ -10,10 +10,13 @@
 
 #include "../examples/activeobject_embedded/FsmImpl.hxx"
 
+#include <cstddef>
 #include <iostream>
+#include <vector>
 
 #include <cpp_active_objects_embedded/EventQueue.hxx>
 #include <cpp_active_objects_embedded/SingleThreadActiveObjectDomain.hxx>
+#include <cpp_event_framework/Signal.hxx>
 #include <cpp_event_framework/StaticPool.hxx>
 
 using namespace std::chrono_literals;
@@ -35,18 +38,30 @@ void ActiveObjectFrameworkEmbeddedMain()
 {
     malloc_called = false;
     cpp_active_objects_embedded::EventQueue<10> queue;
+
+    cpp_event_framework::StaticPool<3, example::activeobject_embedded::EventPoolElementSizeCalculator::kSptrSize> pool(
+        "EmbeddedEventPool");
+    // Tell EventPoolAllocator to use pool created above
+    example::activeobject_embedded::EventPoolAllocator::SetAllocator(&pool);
     assert(!malloc_called);
+
+    // Test getting all events from queue and release them all afterwards
+    // Tests pool full -> empty -> full
+    for (int i = 0; i < 3; i++)
+    {
+        std::vector<cpp_event_framework::Signal::SPtr> events;
+        for (size_t j = 0; j < pool.Size(); j++)
+        {
+            events.emplace_back(example::activeobject_embedded::Go2::MakeShared());
+        }
+        events.clear();
+    }
 
     // SingleThreadActiveObjectDomain uses jthread - thread creation uses heap.
     // You need to write your own heapless SingleThreadActiveObjectDomain here if desired.
     cpp_active_objects_embedded::SingleThreadActiveObjectDomain domain(&queue);
 
     malloc_called = false;
-
-    cpp_event_framework::StaticPool<2, example::activeobject_embedded::EventPoolElementSizeCalculator::kSptrSize> pool(
-        "EmbeddedEventPool");
-    // Tell EventPoolAllocator to use pool created above
-    example::activeobject_embedded::EventPoolAllocator::SetAllocator(&pool);
 
     example::activeobject_embedded::FsmImpl active_object;
     domain.RegisterObject(&active_object);

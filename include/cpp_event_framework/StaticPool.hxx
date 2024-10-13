@@ -87,6 +87,10 @@ public:
 
         auto* result = first_;
         first_ = result->next;
+        if (first_ == nullptr)
+        {
+            last_ = nullptr;
+        }
         fill_level_--;
         return result;
     }
@@ -109,6 +113,7 @@ public:
             last_->next = ptr;
         }
         last_ = ptr;
+        ptr->next = nullptr;
 
         fill_level_++;
         assert(FillLevel() <= NumElements);
