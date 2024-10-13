@@ -49,7 +49,6 @@ private:
     std::array<QueueElement, NumElements> pool_mem_ = {};
     MutexType mutex_;
     QueueElement* first_ = nullptr;
-    QueueElement* last_ = nullptr;
     const char* name_ = nullptr;
     std::atomic<size_t> fill_level_ = NumElements;
 
@@ -59,12 +58,13 @@ public:
      *
      * @param name Pool name (logging)
      */
-    explicit StaticPool(const char* name) : first_(&pool_mem_.at(0)), last_(first_), name_(name)
+    explicit StaticPool(const char* name) : first_(&pool_mem_.at(0)), name_(name)
     {
+        auto prev = first_;
         for (size_t i = 1; i < NumElements; i++)
         {
-            last_->next = &pool_mem_.at(i);
-            last_ = last_->next;
+            prev->next = &pool_mem_.at(i);
+            prev = prev->next;
         }
     }
 
@@ -87,10 +87,6 @@ public:
 
         auto* result = first_;
         first_ = result->next;
-        if (first_ == nullptr)
-        {
-            last_ = nullptr;
-        }
         fill_level_--;
         return result;
     }
@@ -103,18 +99,8 @@ public:
         auto ptr = static_cast<QueueElement*>(p);
 
         std::scoped_lock lock(mutex_);
-        if (first_ == nullptr)
-        {
-            first_ = ptr;
-        }
-
-        if (last_ != nullptr)
-        {
-            last_->next = ptr;
-        }
-        last_ = ptr;
-        ptr->next = nullptr;
-
+        ptr->next = first_;
+        first_ = ptr;
         fill_level_++;
         assert(FillLevel() <= NumElements);
     }
