@@ -11,6 +11,7 @@
 #pragma once
 
 #include <memory>
+#include <ranges>
 #include <vector>
 
 #include <cpp_active_objects_embedded/ActiveObjectBase.hxx>
@@ -68,7 +69,7 @@ private:
 
     void RecallEvents()
     {
-        for (const auto& event : deferred_events_)
+        for (const auto& event : std::ranges::reverse_view(deferred_events_))
         {
             TakeHighPrio(event);
         }
