@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <cassert>
 #include <cstdint>
 #include <memory>
 #include <memory_resource>
@@ -107,7 +106,7 @@ concept SignalSubclass = std::is_base_of_v<Signal, T>;
  *
  * @tparam T Name of inhering class
  */
-template <typename T>
+template <typename T, AssertionProvider AssertionProviderType = DefaultAssertionProvider>
 class CustomAllocator
 {
 public:
@@ -116,7 +115,7 @@ public:
      */
     static void SetAllocator(std::pmr::memory_resource* alloc)
     {
-        assert(allocator == nullptr);
+        AssertionProviderType::Assert(allocator == nullptr);
         allocator = alloc;
     }
 
@@ -125,7 +124,7 @@ public:
      */
     static void SetAllocator(std::shared_ptr<std::pmr::memory_resource> alloc)
     {
-        assert(allocator == nullptr);
+        AssertionProviderType::Assert(allocator == nullptr);
         shared_allocator = std::move(alloc);
         allocator = shared_allocator.get();
     }
@@ -142,11 +141,11 @@ private:
     static std::pmr::memory_resource* allocator;
     static std::shared_ptr<std::pmr::memory_resource> shared_allocator;
 };
-template <typename T>
-std::pmr::memory_resource* CustomAllocator<T>::allocator = nullptr;
+template <typename T, AssertionProvider AssertionProviderType>
+std::pmr::memory_resource* CustomAllocator<T, AssertionProviderType>::allocator = nullptr;
 
-template <typename T>
-std::shared_ptr<std::pmr::memory_resource> CustomAllocator<T>::shared_allocator = nullptr;
+template <typename T, AssertionProvider AssertionProviderType>
+std::shared_ptr<std::pmr::memory_resource> CustomAllocator<T, AssertionProviderType>::shared_allocator = nullptr;
 
 /**
  * @brief Signal event template
@@ -157,7 +156,8 @@ std::shared_ptr<std::pmr::memory_resource> CustomAllocator<T>::shared_allocator 
  * @tparam BaseType Base class to inherit from
  */
 template <typename T, Signal::IdType id, SignalSubclass BaseType = Signal,
-          PolymorphicAllocatorProvider AllocatorType = HeapAllocator>
+          PolymorphicAllocatorProvider AllocatorType = HeapAllocator,
+          AssertionProvider AssertionProviderType = DefaultAssertionProvider>
 class SignalBase : public BaseType
 {
 public:
@@ -193,7 +193,7 @@ public:
      */
     static SPtr FromSignal(const Signal::SPtr& event)
     {
-        assert(Check(event));
+        AssertionProviderType::Assert(Check(event));
         return std::static_pointer_cast<T>(event);
     }
 

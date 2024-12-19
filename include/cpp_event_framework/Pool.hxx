@@ -10,7 +10,6 @@
 
 #pragma once
 
-#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <memory>
@@ -32,7 +31,8 @@ namespace cpp_event_framework
  *         NamedRequirements: DefaultConstructible, Destructible, BasicLockable
  * @tparam Alignment Alignment requirement
  */
-template <Mutex MutexType = std::mutex, size_t Alignment = sizeof(uint64_t)>
+template <Mutex MutexType = std::mutex, size_t Alignment = sizeof(uint64_t),
+          AssertionProvider AssertionProviderType = DefaultAssertionProvider>
 class Pool : public std::pmr::memory_resource
 {
 public:
@@ -78,9 +78,10 @@ public:
      */
     void* do_allocate(size_t bytes, size_t /*alignment*/) override
     {
-        assert(bytes <= element_size_);
+        AssertionProviderType::Assert(bytes <= element_size_);
 
         std::scoped_lock lock(mutex_);
+        AssertionProviderType::Assert(!pool_.empty());
         auto* result = pool_.front();
         pool_.pop();
         return result;

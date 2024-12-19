@@ -11,7 +11,6 @@
 #pragma once
 
 #include <atomic>
-#include <cassert>
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
@@ -32,7 +31,8 @@ namespace cpp_event_framework
  *         NamedRequirements: DefaultConstructible, Destructible, BasicLockable
  * @tparam Alignment Alignment requirement
  */
-template <uint32_t NumElements, size_t ElemSize, Mutex MutexType = std::mutex, size_t Alignment = sizeof(uint64_t)>
+template <uint32_t NumElements, size_t ElemSize, Mutex MutexType = std::mutex,
+          AssertionProvider AssertionProviderType = DefaultAssertionProvider, size_t Alignment = sizeof(uint64_t)>
 class StaticPool final : public std::pmr::memory_resource
 {
 private:
@@ -80,10 +80,10 @@ public:
      */
     void* do_allocate(size_t bytes, size_t /*alignment*/) override
     {
-        assert(bytes <= kAlignedElementSize);
+        AssertionProviderType::Assert(bytes <= kAlignedElementSize);
 
         std::scoped_lock lock(mutex_);
-        assert(FillLevel() != 0);
+        AssertionProviderType::Assert(FillLevel() != 0);
 
         auto* result = first_;
         first_ = result->next;
@@ -102,7 +102,7 @@ public:
         ptr->next = first_;
         first_ = ptr;
         fill_level_++;
-        assert(FillLevel() <= NumElements);
+        AssertionProviderType::Assert(FillLevel() <= NumElements);
     }
 
     /**

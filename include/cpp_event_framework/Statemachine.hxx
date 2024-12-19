@@ -9,7 +9,6 @@
 
 #pragma once
 
-#include <cassert>
 #include <functional>
 #include <map>
 #include <memory>
@@ -84,7 +83,8 @@ inline constexpr EStateFlags& operator&=(EStateFlags& lhs, EStateFlags rhs)
  * @tparam EventType Event type
  * @tparam HistoryMapAllocator Allocator for history map (only when history states are used)
  */
-template <typename ImplType, typename EventType, PolymorphicAllocatorProvider HistoryMapAllocator = HeapAllocator>
+template <typename ImplType, typename EventType, PolymorphicAllocatorProvider HistoryMapAllocator = HeapAllocator,
+          AssertionProvider AssertionProviderType = DefaultAssertionProvider>
 class Statemachine
 {
 public:
@@ -435,7 +435,7 @@ public:
      */
     void Init(ImplPtr impl, const char* name)
     {
-        assert(impl != nullptr);
+        AssertionProviderType::Assert(impl != nullptr);
         name_ = name;
         impl_ = impl;
     }
@@ -446,7 +446,7 @@ public:
      */
     void Start(const State* initial)
     {
-        assert(impl_ != nullptr); // Most probably you forgot to call Init()
+        AssertionProviderType::Assert(impl_ != nullptr); // Most probably you forgot to call Init()
         current_state_ = &kInTransition;
         initial_.clear();
         EnterStatesFromDownTo(nullptr, initial);
@@ -459,8 +459,8 @@ public:
      */
     void React(Event event)
     {
-        assert(current_state_ != nullptr); // Most probably you forgot to call Start()
-        assert(!working_);                 // Most probably you are recursively calling React()
+        AssertionProviderType::Assert(current_state_ != nullptr); // Most probably you forgot to call Start()
+        AssertionProviderType::Assert(!working_);                 // Most probably you are recursively calling React()
         working_ = true;
 
         Transition transition(kInTransition);
@@ -477,7 +477,7 @@ public:
 
             if (transition.target_ == &kDeferEvent)
             {
-                assert(on_defer_event_ != nullptr);
+                AssertionProviderType::Assert(on_defer_event_ != nullptr);
                 on_defer_event_(*s, event);
                 working_ = false;
                 return;
@@ -527,7 +527,7 @@ public:
      */
     void RecallEvents()
     {
-        assert(on_recall_deferred_events_ != nullptr);
+        AssertionProviderType::Assert(on_recall_deferred_events_ != nullptr);
         on_recall_deferred_events_(*current_state_);
     }
 
@@ -809,13 +809,19 @@ private:
     }
 };
 
-template <typename Impl, typename Event, PolymorphicAllocatorProvider Allocator>
-const typename Statemachine<Impl, Event, Allocator>::State Statemachine<Impl, Event, Allocator>::kNone =
-    typename Statemachine<Impl, Event, Allocator>::State("None", nullptr);
-template <typename Impl, typename Event, PolymorphicAllocatorProvider Allocator>
-const typename Statemachine<Impl, Event, Allocator>::State Statemachine<Impl, Event, Allocator>::kInTransition =
-    typename Statemachine<Impl, Event, Allocator>::State("InTransition", nullptr);
-template <typename Impl, typename Event, PolymorphicAllocatorProvider Allocator>
-const typename Statemachine<Impl, Event, Allocator>::State Statemachine<Impl, Event, Allocator>::kDeferEvent =
-    typename Statemachine<Impl, Event, Allocator>::State("Defer", nullptr);
+template <typename Impl, typename Event, PolymorphicAllocatorProvider Allocator,
+          AssertionProvider AssertionProviderType>
+const typename Statemachine<Impl, Event, Allocator, AssertionProviderType>::State
+    Statemachine<Impl, Event, Allocator, AssertionProviderType>::kNone =
+        typename Statemachine<Impl, Event, Allocator, AssertionProviderType>::State("None", nullptr);
+template <typename Impl, typename Event, PolymorphicAllocatorProvider Allocator,
+          AssertionProvider AssertionProviderType>
+const typename Statemachine<Impl, Event, Allocator, AssertionProviderType>::State
+    Statemachine<Impl, Event, Allocator, AssertionProviderType>::kInTransition =
+        typename Statemachine<Impl, Event, Allocator, AssertionProviderType>::State("InTransition", nullptr);
+template <typename Impl, typename Event, PolymorphicAllocatorProvider Allocator,
+          AssertionProvider AssertionProviderType>
+const typename Statemachine<Impl, Event, Allocator, AssertionProviderType>::State
+    Statemachine<Impl, Event, Allocator, AssertionProviderType>::kDeferEvent =
+        typename Statemachine<Impl, Event, Allocator, AssertionProviderType>::State("Defer", nullptr);
 } // namespace cpp_event_framework
