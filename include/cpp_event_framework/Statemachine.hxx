@@ -770,42 +770,36 @@ private:
 
     void EnterStatesFromDownToRecursive(StatePtr top, StatePtr target)
     {
-        if (top != target)
+        // Don't enter topmost state
+        if ((target != nullptr) && (top != target))
         {
-            if ((target->parent_ != nullptr) && (target->parent_ != top))
-            {
-                EnterStatesFromDownTo(top, target->parent_);
-            }
+            EnterStatesFromDownToRecursive(top, target->parent_);
             EnterState(*target);
         }
     }
 
     void EnterStatesFromDownTo(StatePtr top, StatePtr target)
     {
+        // Enter all states up to parent
         if (top != target)
         {
             EnterStatesFromDownToRecursive(top, target->parent_);
         }
 
-        if (GetInitialState(target) != nullptr)
-        {
-            EnterState(*target);
+        // Alywas enter target state (we may have exited it, possibly a self transition)
+        EnterState(*target);
 
-            const auto* state = GetInitialState(target);
-            const auto* current_target = state;
-            while (state != nullptr)
-            {
-                current_target = state;
-                EnterState(*state);
-                state = GetInitialState(state);
-            }
-            current_state_ = current_target;
-        }
-        else
+        // Is target a hierarchical state? If so, enter initial state
+        const auto* state = GetInitialState(target);
+        while (state != nullptr)
         {
-            EnterState(*target);
-            current_state_ = target;
+            target = state;
+            EnterState(*state);
+            state = GetInitialState(state);
         }
+
+        // We have reached the target state
+        current_state_ = target;
     }
 };
 
