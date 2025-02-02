@@ -34,7 +34,7 @@ enum class EStateFlags
  * @param rhs
  * @return EStateFlags&
  */
-inline constexpr EStateFlags operator|(EStateFlags lhs, EStateFlags rhs)
+constexpr EStateFlags operator|(EStateFlags lhs, EStateFlags rhs)
 {
     using T = std::underlying_type_t<EStateFlags>;
     return static_cast<EStateFlags>(static_cast<T>(lhs) | static_cast<T>(rhs));
@@ -46,7 +46,7 @@ inline constexpr EStateFlags operator|(EStateFlags lhs, EStateFlags rhs)
  * @param rhs
  * @return EStateFlags&
  */
-inline constexpr EStateFlags& operator|=(EStateFlags& lhs, EStateFlags rhs)
+constexpr EStateFlags& operator|=(EStateFlags& lhs, EStateFlags rhs)
 {
     lhs = lhs | rhs;
     return lhs;
@@ -58,7 +58,7 @@ inline constexpr EStateFlags& operator|=(EStateFlags& lhs, EStateFlags rhs)
  * @param rhs
  * @return EStateFlags&
  */
-inline constexpr EStateFlags operator&(EStateFlags lhs, EStateFlags rhs)
+constexpr EStateFlags operator&(EStateFlags lhs, EStateFlags rhs)
 {
     using T = std::underlying_type_t<EStateFlags>;
     return static_cast<EStateFlags>(static_cast<T>(lhs) & static_cast<T>(rhs));
@@ -70,7 +70,7 @@ inline constexpr EStateFlags operator&(EStateFlags lhs, EStateFlags rhs)
  * @param rhs
  * @return EStateFlags&
  */
-inline constexpr EStateFlags& operator&=(EStateFlags& lhs, EStateFlags rhs)
+constexpr EStateFlags& operator&=(EStateFlags& lhs, EStateFlags rhs)
 {
     lhs = lhs & rhs;
     return lhs;
@@ -169,10 +169,6 @@ public:
          */
         void ExecuteActions(ImplPtr impl, Event event)
         {
-            if (single_action_ != nullptr)
-            {
-                (impl->*single_action_)(event);
-            }
             for (const auto& action : actions_)
             {
                 (impl->*action)(event);
@@ -201,7 +197,10 @@ public:
          * @param target Target state
          * @param action Transition action
          */
-        constexpr Transition(StateRef target, ActionType action) noexcept : target_(&target), single_action_(action)
+        constexpr Transition(StateRef target, ActionType action) noexcept
+            : target_(&target)
+            , single_action_(action)
+            , actions_(std::span<const ActionType>(&single_action_, action != nullptr ? 1 : 0))
         {
         }
         /**
@@ -217,6 +216,30 @@ public:
         }
 
         /**
+         * @brief operator=
+         */
+        constexpr Transition& operator=(const Transition& rhs)
+        {
+            if (this != &rhs)
+            {
+                target_ = rhs.target_;
+                single_action_ = rhs.single_action_;
+                if (single_action_ == nullptr)
+                {
+                    // external buffer was supplied or no action at all
+                    actions_ = rhs.actions_;
+                }
+                else
+                {
+                    // internal buffer was used, but size may be 1 or 0
+                    actions_ = {&single_action_, rhs.actions_.size()};
+                }
+            }
+
+            return *this;
+        }
+
+        /**
          * @brief Optional single transition action
          *
          * Provides storage for single transition actions
@@ -224,7 +247,6 @@ public:
         ActionType single_action_ = nullptr;
         /**
          * @brief Optional transition actions
-         *
          */
         std::span<const ActionType> actions_;
     };
@@ -238,28 +260,23 @@ public:
     public:
         /**
          * @brief Type of on_entry / on_exit handler
-         *
          */
         using EntryExitType = void (Impl::*)();
         /**
          * @brief Type of event handler
-         *
          */
         using HandlerType = Transition (*)(ImplPtr, Event);
 
         /**
          * @brief Flags indicating state properties
-         *
          */
-        const EFlags flags_ = EFlags::kNone;
+        EFlags flags_ = EFlags::kNone;
         /**
          * @brief Optional parent state
-         *
          */
         StatePtr const parent_ = nullptr;
         /**
          * @brief Optional initial substate
-         *
          */
         StatePtr const initial_ = nullptr;
 
@@ -268,17 +285,9 @@ public:
          */
         std::span<const EntryExitType> const on_entry_;
         /**
-         * @brief Optional single entry action
-         */
-        EntryExitType const on_single_entry_ = nullptr;
-        /**
          * @brief Optional list of exit actions
          */
         std::span<const EntryExitType> const on_exit_;
-        /**
-         * @brief Optional single exit action
-         */
-        EntryExitType const on_single_exit_ = nullptr;
         /**
          * @brief Statemachine handler, must be assigned
          */
@@ -288,8 +297,11 @@ public:
          * @brief Construct a new Statemachine State object
          */
         constexpr State(const char* name, HandlerType handler, StatePtr parent = nullptr, StatePtr initial = nullptr,
-                        EntryExitType on_entry = nullptr, EntryExitType on_exit = nullptr) noexcept
-            : State(name, handler, parent, initial, on_entry, {}, on_exit, {}, EFlags::kNone)
+                        EntryExitType on_entry = nullptr, EntryExitType on_exit = nullptr,
+                        EFlags flags = EFlags::kNone) noexcept
+            : State(name, handler, parent, initial, on_entry,
+                    std::span<const EntryExitType>(&on_single_entry_, on_entry != nullptr ? 1 : 0), on_exit,
+                    std::span<const EntryExitType>(&on_single_exit_, on_exit != nullptr ? 1 : 0), flags)
         {
         }
 
@@ -297,9 +309,49 @@ public:
          * @brief Construct a new Statemachine State object
          */
         constexpr State(const char* name, HandlerType handler, StatePtr parent, StatePtr initial,
-                        std::span<const EntryExitType> on_entry, std::span<const EntryExitType> on_exit) noexcept
-            : State(name, handler, parent, initial, nullptr, on_entry, nullptr, on_exit, EFlags::kNone)
+                        std::span<const EntryExitType> on_entry, std::span<const EntryExitType> on_exit,
+                        EFlags flags = EFlags::kNone) noexcept
+            : State(name, handler, parent, initial, nullptr, on_entry, nullptr, on_exit, flags)
         {
+        }
+
+        /**
+         * @brief operator=
+         */
+        constexpr State& operator=(const State& rhs)
+        {
+            if (this != &rhs)
+            {
+                name_ = rhs.name_;
+                handler_ = rhs.handler_;
+                parent_ = rhs.parent_;
+                initial_ = rhs.initial_;
+                on_single_entry_ = rhs.on_single_exit_;
+                on_single_exit_ = rhs.on_single_exit_;
+                flags_ = rhs.flags_;
+                if (on_single_entry_ == nullptr)
+                {
+                    // external buffer was supplied or no action at all
+                    on_entry_ = rhs.on_entry_;
+                }
+                else
+                {
+                    // internal buffer was used, but size may be 1 or 0
+                    on_entry_ = {&on_single_entry_, rhs.on_entry_.size()};
+                }
+                if (on_single_exit_ == nullptr)
+                {
+                    // external buffer was supplied or no action at all
+                    on_exit_ = rhs.on_exit_;
+                }
+                else
+                {
+                    // internal buffer was used, but size may be 1 or 0
+                    on_exit_ = {&on_single_exit_, rhs.on_exit_.size()};
+                }
+            }
+
+            return *this;
         }
 
         /**
@@ -320,10 +372,7 @@ public:
             return os << state.Name();
         }
 
-    protected:
-        /**
-         * @brief Construct a new Statemachine State object
-         */
+    private:
         constexpr State(const char* name, HandlerType handler, StatePtr parent, StatePtr initial,
                         EntryExitType on_single_entry, std::span<const EntryExitType> on_entry,
                         EntryExitType on_single_exit, std::span<const EntryExitType> on_exit, EFlags flags) noexcept
@@ -331,21 +380,21 @@ public:
             , parent_(parent)
             , initial_(initial)
             , on_entry_(on_entry)
-            , on_single_entry_(on_single_entry)
             , on_exit_(on_exit)
-            , on_single_exit_(on_single_exit)
             , handler_(handler)
+            , on_single_entry_(on_single_entry)
+            , on_single_exit_(on_single_exit)
             , name_(name)
         {
         }
 
-    private:
+        EntryExitType on_single_entry_ = nullptr;
+        EntryExitType on_single_exit_ = nullptr;
         const char* name_ = nullptr;
     };
 
     /**
      * @brief History statemachine state
-     *
      */
     class HistoryState : public State
     {
@@ -356,7 +405,7 @@ public:
         constexpr HistoryState(const char* name, typename State::HandlerType handler, StatePtr parent = nullptr,
                                StatePtr initial = nullptr, typename State::EntryExitType on_entry = nullptr,
                                typename State::EntryExitType on_exit = nullptr) noexcept
-            : State(name, handler, parent, initial, on_entry, {}, on_exit, {}, EFlags::kHistory)
+            : State(name, handler, parent, initial, on_entry, on_exit, EFlags::kHistory)
         {
         }
 
@@ -366,45 +415,38 @@ public:
         constexpr HistoryState(const char* name, typename State::HandlerType handler, StatePtr parent, StatePtr initial,
                                std::span<typename State::EntryExitType> on_entry,
                                std::span<typename State::EntryExitType> on_exit) noexcept
-            : State(name, handler, parent, initial, nullptr, on_entry, nullptr, on_exit, EFlags::kNone)
+            : State(name, handler, parent, initial, on_entry, on_exit, EFlags::kNone)
         {
         }
     };
 
     /**
      * @brief State is changed (useful for logging)
-     *
      */
     void (*on_state_change_)(Ref, Event, StateRef, StateRef) = nullptr;
     /**
      * @brief State is entered (useful for logging)
-     *
      */
     void (*on_state_entry_)(Ref, StateRef) = nullptr;
     /**
      * @brief State is left (useful for logging)
-     *
      */
     void (*on_state_exit_)(Ref, StateRef) = nullptr;
     /**
      * @brief Event is passed to a state (useful for logging)
-     *
      */
     void (*on_handle_event_)(Ref, StateRef, Event) = nullptr;
     /**
      * @brief Unhandled event callback, fired when top-level state does not handle
      * event
-     *
      */
     void (*on_unhandled_event_)(Ref, StateRef, Event) = nullptr;
     /**
      * @brief Deferred event callback, fired event deferral is requested
-     *
      */
     std::function<void(StateRef, Event)> on_defer_event_;
     /**
      * @brief Deferred event callback, fired event recall is requested
-     *
      */
     std::function<void(StateRef)> on_recall_deferred_events_;
 
@@ -429,7 +471,6 @@ public:
 
     /**
      * @brief Destroy the Statemachine object
-     *
      */
     ~Statemachine() = default;
 
@@ -544,7 +585,6 @@ public:
 
     /**
      * @brief Recall deferred events
-     *
      */
     void RecallEvents()
     {
@@ -587,7 +627,7 @@ public:
      *
      * @return Transition
      */
-    static inline Transition UnhandledEvent()
+    static Transition UnhandledEvent()
     {
         return Transition();
     }
@@ -597,7 +637,7 @@ public:
      *
      * @return Transition
      */
-    static inline Transition DeferEvent()
+    static Transition DeferEvent()
     {
         return Transition(kDeferEvent);
     }
@@ -608,7 +648,7 @@ public:
      *
      * @return Transition
      */
-    static inline Transition NoTransition()
+    static Transition NoTransition()
     {
         return Transition(kNone);
     }
@@ -618,7 +658,7 @@ public:
      * @param action Action to execute
      * @return Transition
      */
-    static inline Transition NoTransition(ActionType action)
+    static Transition NoTransition(ActionType action)
     {
         return Transition(kNone, action);
     }
@@ -628,7 +668,7 @@ public:
      * @param actions Actions to execute on transition
      * @return Transition
      */
-    static inline Transition NoTransition(std::span<const ActionType> actions)
+    static Transition NoTransition(std::span<const ActionType> actions)
     {
         return Transition(kNone, actions);
     }
@@ -639,7 +679,7 @@ public:
      * @param target Target state
      * @return Transition
      */
-    static inline Transition TransitionTo(StateRef target)
+    static Transition TransitionTo(StateRef target)
     {
         return Transition(target);
     }
@@ -650,7 +690,7 @@ public:
      * @param action Action to execute on transition
      * @return Transition
      */
-    static inline Transition TransitionTo(StateRef target, ActionType action)
+    static Transition TransitionTo(StateRef target, ActionType action)
     {
         return Transition(target, action);
     }
@@ -661,7 +701,7 @@ public:
      * @param actions Actions to execute on transition
      * @return Transition
      */
-    static inline Transition TransitionTo(StateRef target, std::span<const ActionType> actions) noexcept
+    static Transition TransitionTo(StateRef target, std::span<const ActionType> actions) noexcept
     {
         return Transition(target, actions);
     }
@@ -669,7 +709,7 @@ public:
     /**
      * @brief Stream operator for logging
      */
-    friend inline std::ostream& operator<<(std::ostream& os, const Statemachine& sm)
+    friend std::ostream& operator<<(std::ostream& os, const Statemachine& sm)
     {
         return os << sm.Name();
     }
@@ -742,10 +782,6 @@ private:
             on_state_exit_(*this, *state);
         }
 
-        if (state->on_single_exit_ != nullptr)
-        {
-            (impl_->*state->on_single_exit_)();
-        }
         for (const auto& on_ex : state->on_exit_)
         {
             (impl_->*on_ex)();
@@ -787,10 +823,6 @@ private:
             on_state_entry_(*this, state);
         }
 
-        if (state.on_single_entry_ != nullptr)
-        {
-            (impl_->*state.on_single_entry_)();
-        }
         for (const auto& on_en : state.on_entry_)
         {
             (impl_->*on_en)();
