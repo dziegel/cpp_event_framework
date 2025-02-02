@@ -1,6 +1,6 @@
 # C++ event framework
 
-Header-only C++ event, statemachine and active object framework
+Header-only C++ event, statemachine, active object framework and statemachine generator
 
 ## Overview
 
