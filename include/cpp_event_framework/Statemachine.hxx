@@ -264,15 +264,21 @@ public:
         StatePtr const initial_ = nullptr;
 
         /**
-         * @brief Optional entry action
-         *
+         * @brief Optional list of entry actions
          */
-        EntryExitType const on_entry_ = nullptr;
+        std::span<const EntryExitType> const on_entry_;
         /**
-         * @brief Optional exit action
-         *
+         * @brief Optional single entry action
          */
-        EntryExitType const on_exit_ = nullptr;
+        EntryExitType const on_single_entry_ = nullptr;
+        /**
+         * @brief Optional list of exit actions
+         */
+        std::span<const EntryExitType> const on_exit_;
+        /**
+         * @brief Optional single exit action
+         */
+        EntryExitType const on_single_exit_ = nullptr;
         /**
          * @brief Statemachine handler, must be assigned
          */
@@ -280,11 +286,19 @@ public:
 
         /**
          * @brief Construct a new Statemachine State object
-         *
          */
         constexpr State(const char* name, HandlerType handler, StatePtr parent = nullptr, StatePtr initial = nullptr,
                         EntryExitType on_entry = nullptr, EntryExitType on_exit = nullptr) noexcept
-            : State(name, handler, parent, initial, on_entry, on_exit, EFlags::kNone)
+            : State(name, handler, parent, initial, on_entry, {}, on_exit, {}, EFlags::kNone)
+        {
+        }
+
+        /**
+         * @brief Construct a new Statemachine State object
+         */
+        constexpr State(const char* name, HandlerType handler, StatePtr parent, StatePtr initial,
+                        std::span<const EntryExitType> on_entry, std::span<const EntryExitType> on_exit) noexcept
+            : State(name, handler, parent, initial, nullptr, on_entry, nullptr, on_exit, EFlags::kNone)
         {
         }
 
@@ -301,7 +315,7 @@ public:
         /**
          * @brief Stream operator for logging
          */
-        friend inline std::ostream& operator<<(std::ostream& os, StateRef state)
+        friend std::ostream& operator<<(std::ostream& os, StateRef state)
         {
             return os << state.Name();
         }
@@ -309,25 +323,23 @@ public:
     protected:
         /**
          * @brief Construct a new Statemachine State object
-         *
          */
         constexpr State(const char* name, HandlerType handler, StatePtr parent, StatePtr initial,
-                        EntryExitType on_entry, EntryExitType on_exit, EFlags flags) noexcept
+                        EntryExitType on_single_entry, std::span<const EntryExitType> on_entry,
+                        EntryExitType on_single_exit, std::span<const EntryExitType> on_exit, EFlags flags) noexcept
             : flags_(flags)
             , parent_(parent)
             , initial_(initial)
             , on_entry_(on_entry)
+            , on_single_entry_(on_single_entry)
             , on_exit_(on_exit)
+            , on_single_exit_(on_single_exit)
             , handler_(handler)
             , name_(name)
         {
         }
 
     private:
-        /**
-         * @brief Statename, optional, useful for logging
-         *
-         */
         const char* name_ = nullptr;
     };
 
@@ -339,13 +351,22 @@ public:
     {
     public:
         /**
-         * @brief Construct a new Statemachine State object
-         *
+         * @brief Construct a new History State
          */
         constexpr HistoryState(const char* name, typename State::HandlerType handler, StatePtr parent = nullptr,
                                StatePtr initial = nullptr, typename State::EntryExitType on_entry = nullptr,
                                typename State::EntryExitType on_exit = nullptr) noexcept
-            : State(name, handler, parent, initial, on_entry, on_exit, EFlags::kHistory)
+            : State(name, handler, parent, initial, on_entry, {}, on_exit, {}, EFlags::kHistory)
+        {
+        }
+
+        /**
+         * @brief Construct a new History State
+         */
+        constexpr HistoryState(const char* name, typename State::HandlerType handler, StatePtr parent, StatePtr initial,
+                               std::span<typename State::EntryExitType> on_entry,
+                               std::span<typename State::EntryExitType> on_exit) noexcept
+            : State(name, handler, parent, initial, nullptr, on_entry, nullptr, on_exit, EFlags::kNone)
         {
         }
     };
@@ -721,9 +742,13 @@ private:
             on_state_exit_(*this, *state);
         }
 
-        if (state->on_exit_ != nullptr)
+        if (state->on_single_exit_ != nullptr)
         {
-            (impl_->*state->on_exit_)();
+            (impl_->*state->on_single_exit_)();
+        }
+        for (const auto& on_ex : state->on_exit_)
+        {
+            (impl_->*on_ex)();
         }
     }
 
@@ -762,9 +787,13 @@ private:
             on_state_entry_(*this, state);
         }
 
-        if (state.on_entry_ != nullptr)
+        if (state.on_single_entry_ != nullptr)
         {
-            (impl_->*state.on_entry_)();
+            (impl_->*state.on_single_entry_)();
+        }
+        for (const auto& on_en : state.on_entry_)
+        {
+            (impl_->*on_en)();
         }
     }
 

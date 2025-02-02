@@ -41,6 +41,9 @@ public:
     static const State kRedYellow;
 
 private:
+    static const std::array<State::EntryExitType, 2> FsmOffEntryActions;
+    static const std::array<State::EntryExitType, 2> FsmOffExitActions;
+
     static Transition FsmOffHandler(ImplPtr /*impl*/, Event event);
 
     static Transition FsmOnHandler(ImplPtr /*impl*/, Event event);
@@ -93,7 +96,9 @@ public:
     }
 
     bool off_entry_called_ = false;
+    bool off_entry2_called_ = false;
     bool off_exit_called_ = false;
+    bool off_exit2_called_ = false;
     bool on_entry_called_ = false;
     bool on_exit_called_ = false;
     bool yellow_red_transition1_called_ = false;
@@ -112,7 +117,9 @@ private:
     void CheckAllFalse() const
     {
         assert(off_entry_called_ == false);
+        assert(off_entry2_called_ == false);
         assert(off_exit_called_ == false);
+        assert(off_exit2_called_ == false);
         assert(on_entry_called_ == false);
         assert(on_exit_called_ == false);
         assert(yellow_red_transition1_called_ == false);
@@ -127,12 +134,22 @@ private:
         off_entry_called_ = true;
         std::cout << "Off entry\n";
     }
+    void FsmOffEntry2()
+    {
+        off_entry2_called_ = true;
+        std::cout << "Off entry2\n";
+    }
 
     void FsmOffExit()
     {
         off_exit_called_ = true;
         fsm_.RecallEvents();
         std::cout << "Off exit\n";
+    }
+    void FsmOffExit2()
+    {
+        off_exit2_called_ = true;
+        std::cout << "Off exit2\n";
     }
 
     void FsmOnEntry()
@@ -179,26 +196,34 @@ public:
         assert(fsm_.CurrentState() == &Fsm::kOff);
         assert(off_entry_called_ == true);
         off_entry_called_ = false;
+        assert(off_entry2_called_ == true);
+        off_entry2_called_ = false;
         CheckAllFalse();
 
         fsm_.React(EvtSelfTransition::MakeShared());
         assert(fsm_.CurrentState() == &Fsm::kOff);
         assert(off_entry_called_ == true);
         off_entry_called_ = false;
+        assert(off_entry2_called_ == true);
+        off_entry2_called_ = false;
         assert(off_exit_called_ == true);
         off_exit_called_ = false;
+        assert(off_exit2_called_ == true);
+        off_exit2_called_ = false;
         assert(on_recall_event_called_ == true);
         on_recall_event_called_ = false;
         CheckAllFalse();
 
         fsm_.React(EvtTurnOn::MakeShared());
         assert(off_exit_called_ == true);
-        assert(on_entry_called_ == true);
-        assert(on_recall_event_called_ == true);
-        assert(fsm_.CurrentState() == &Fsm::kGreen);
         off_exit_called_ = false;
+        assert(off_exit2_called_ == true);
+        off_exit2_called_ = false;
+        assert(on_entry_called_ == true);
         on_entry_called_ = false;
+        assert(on_recall_event_called_ == true);
         on_recall_event_called_ = false;
+        assert(fsm_.CurrentState() == &Fsm::kGreen);
         CheckAllFalse();
 
         fsm_.React(EvtTurnOn::MakeShared());
@@ -211,10 +236,10 @@ public:
 
         fsm_.React(EvtGoRed::MakeShared());
         assert(yellow_red_transition1_called_ == true);
-        assert(yellow_red_transition2_called_ == true);
-        assert(fsm_.CurrentState() == &Fsm::kRed);
         yellow_red_transition1_called_ = false;
+        assert(yellow_red_transition2_called_ == true);
         yellow_red_transition2_called_ = false;
+        assert(fsm_.CurrentState() == &Fsm::kRed);
         CheckAllFalse();
 
         fsm_.React(EvtGoYellow::MakeShared());
@@ -235,10 +260,12 @@ public:
 
         fsm_.React(EvtTurnOff::MakeShared());
         assert(on_exit_called_ == true);
-        assert(off_entry_called_ == true);
-        assert(fsm_.CurrentState() == &Fsm::kOff);
         on_exit_called_ = false;
+        assert(off_entry_called_ == true);
         off_entry_called_ = false;
+        assert(off_entry2_called_ == true);
+        off_entry2_called_ = false;
+        assert(fsm_.CurrentState() == &Fsm::kOff);
         CheckAllFalse();
 
         fsm_.React(EvtGoGreen::MakeShared());
@@ -271,7 +298,11 @@ public:
     }
 };
 
-const Fsm::State Fsm::kOff("Off", &FsmOffHandler, nullptr, nullptr, &Fsm::Impl::FsmOffEntry, &Fsm::Impl::FsmOffExit);
+const std::array<Fsm::State::EntryExitType, 2> Fsm::FsmOffEntryActions =
+    std::to_array<Fsm::State::EntryExitType>({&Fsm::Impl::FsmOffEntry, &Fsm::Impl::FsmOffEntry2});
+const std::array<Fsm::State::EntryExitType, 2> Fsm::FsmOffExitActions =
+    std::to_array<Fsm::State::EntryExitType>({&Fsm::Impl::FsmOffExit, &Fsm::Impl::FsmOffExit2});
+const Fsm::State Fsm::kOff("Off", &FsmOffHandler, nullptr, nullptr, FsmOffEntryActions, FsmOffExitActions);
 const Fsm::HistoryState Fsm::kOn("On", &FsmOnHandler, nullptr, &kGreen, &Fsm::Impl::FsmOnEntry, &Fsm::Impl::FsmOnExit);
 const Fsm::State Fsm::kGreen("Green", &FsmGreenHandler, &kOn);
 const Fsm::State Fsm::kYellow("Yellow", &FsmYellowHandler, &kOn);
