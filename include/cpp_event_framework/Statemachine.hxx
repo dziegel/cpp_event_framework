@@ -224,15 +224,15 @@ public:
             {
                 target_ = rhs.target_;
                 single_action_ = rhs.single_action_;
-                if (single_action_ == nullptr)
+                if (single_action_ != nullptr)
                 {
-                    // external buffer was supplied or no action at all
-                    actions_ = rhs.actions_;
+                    // internal buffer was used
+                    actions_ = {&single_action_, 1};
                 }
                 else
                 {
-                    // internal buffer was used, but size may be 1 or 0
-                    actions_ = {&single_action_, rhs.actions_.size()};
+                    // external buffer was supplied or no action at all
+                    actions_ = rhs.actions_;
                 }
             }
 
@@ -329,25 +329,25 @@ public:
                 on_single_entry_ = rhs.on_single_exit_;
                 on_single_exit_ = rhs.on_single_exit_;
                 flags_ = rhs.flags_;
-                if (on_single_entry_ == nullptr)
+                if (on_single_entry_ != nullptr)
+                {
+                    // internal buffer was used
+                    on_entry_ = {&on_single_entry_, 1};
+                }
+                else
                 {
                     // external buffer was supplied or no action at all
                     on_entry_ = rhs.on_entry_;
                 }
-                else
+                if (on_single_exit_ != nullptr)
                 {
-                    // internal buffer was used, but size may be 1 or 0
-                    on_entry_ = {&on_single_entry_, rhs.on_entry_.size()};
+                    // internal buffer was used
+                    on_exit_ = {&on_single_exit_, 1};
                 }
-                if (on_single_exit_ == nullptr)
+                else
                 {
                     // external buffer was supplied or no action at all
                     on_exit_ = rhs.on_exit_;
-                }
-                else
-                {
-                    // internal buffer was used, but size may be 1 or 0
-                    on_exit_ = {&on_single_exit_, rhs.on_exit_.size()};
                 }
             }
 
