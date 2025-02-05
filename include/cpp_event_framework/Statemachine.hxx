@@ -856,7 +856,7 @@ private:
         {
             target = state;
             EnterState(*state);
-            state = GetInitialState(state);
+            state = GetInitialState(target);
         }
 
         // We have reached the target state
