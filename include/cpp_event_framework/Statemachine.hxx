@@ -415,7 +415,7 @@ public:
         constexpr HistoryState(const char* name, typename State::HandlerType handler, StatePtr parent, StatePtr initial,
                                std::span<const typename State::EntryExitType> on_entry,
                                std::span<const typename State::EntryExitType> on_exit) noexcept
-            : State(name, handler, parent, initial, on_entry, on_exit, EFlags::kNone)
+            : State(name, handler, parent, initial, on_entry, on_exit, EFlags::kHistory)
         {
         }
     };
