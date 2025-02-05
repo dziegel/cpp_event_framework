@@ -413,8 +413,8 @@ public:
          * @brief Construct a new History State
          */
         constexpr HistoryState(const char* name, typename State::HandlerType handler, StatePtr parent, StatePtr initial,
-                               std::span<typename State::EntryExitType> on_entry,
-                               std::span<typename State::EntryExitType> on_exit) noexcept
+                               std::span<const typename State::EntryExitType> on_entry,
+                               std::span<const typename State::EntryExitType> on_exit) noexcept
             : State(name, handler, parent, initial, on_entry, on_exit, EFlags::kNone)
         {
         }
