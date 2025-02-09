@@ -74,7 +74,7 @@ public:
     /**
      * @brief Stream operator for logging
      */
-    friend inline std::ostream& operator<<(std::ostream& ostream, const Signal::SPtr& event)
+    friend std::ostream& operator<<(std::ostream& ostream, const Signal::SPtr& event)
     {
         return ostream << event->Name();
     }

@@ -156,7 +156,7 @@ public:
     /**
      * @brief Stream operator for logging
      */
-    friend inline std::ostream& operator<<(std::ostream& ostream, const StaticPool& pool)
+    friend std::ostream& operator<<(std::ostream& ostream, const StaticPool& pool)
     {
         return ostream << pool.Name() << " [" << pool.FillLevel() << "/" << pool.Size() << "]";
     }

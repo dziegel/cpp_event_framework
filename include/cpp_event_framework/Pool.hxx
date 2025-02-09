@@ -157,7 +157,7 @@ public:
     /**
      * @brief Stream operator for logging
      */
-    friend inline std::ostream& operator<<(std::ostream& ostream, const Pool<MutexType, Alignment>& pool)
+    friend std::ostream& operator<<(std::ostream& ostream, const Pool<MutexType, Alignment>& pool)
     {
         return ostream << pool.Name() << " [" << pool.FillLevel() << "/" << pool.Size() << "]";
     }
@@ -165,7 +165,7 @@ public:
     /**
      * @brief Stream operator for logging
      */
-    friend inline std::ostream& operator<<(std::ostream& ostream, const Pool<MutexType, Alignment>::SPtr& pool)
+    friend std::ostream& operator<<(std::ostream& ostream, const Pool<MutexType, Alignment>::SPtr& pool)
     {
         return ostream << *pool;
     }
