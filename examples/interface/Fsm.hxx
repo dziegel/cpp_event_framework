@@ -11,7 +11,7 @@ public:
     static const State kState1;
     static const State kState2;
 
-    inline void Start()
+    void Start()
     {
         FsmBase::Start(&kState1);
     }

@@ -261,7 +261,7 @@ public:
         /**
          * @brief Type of on_entry / on_exit handler
          */
-        using EntryExitType = void (Impl::*)();
+        using EntryExitType = void (Impl::*)(Event);
         /**
          * @brief Type of event handler
          */
@@ -511,7 +511,7 @@ public:
         AssertionProviderType::Assert(impl_ != nullptr); // Most probably you forgot to call Init()
         current_state_ = &kInTransition;
         initial_.clear();
-        EnterStatesFromDownTo(nullptr, initial);
+        EnterStatesFromDownTo(nullptr, initial, {});
     }
 
     /**
@@ -562,9 +562,9 @@ public:
                     on_state_change_(*this, event, *old_state, *transition.target_);
                 }
 
-                ExitStatesFromUpTo(old_state, common_parent);
+                ExitStatesFromUpTo(old_state, common_parent, event);
                 transition.ExecuteActions(impl_, event);
-                EnterStatesFromDownTo(common_parent, transition.target_);
+                EnterStatesFromDownTo(common_parent, transition.target_, event);
             }
             else
             {
@@ -775,7 +775,7 @@ private:
         return state->initial_;
     }
 
-    void ExitState(StatePtr state)
+    void ExitState(StatePtr state, Event event)
     {
         if (on_state_exit_ != nullptr)
         {
@@ -784,17 +784,17 @@ private:
 
         for (const auto& on_ex : state->on_exit_)
         {
-            (impl_->*on_ex)();
+            (impl_->*on_ex)(event);
         }
     }
 
-    void ExitStatesFromUpTo(StatePtr from, StatePtr top)
+    void ExitStatesFromUpTo(StatePtr from, StatePtr top, Event event)
     {
         const auto* state = from;
 
         if (state == top)
         {
-            ExitState(state);
+            ExitState(state, event);
         }
         else
         {
@@ -809,14 +809,14 @@ private:
                     }
                 }
 
-                ExitState(state);
+                ExitState(state, event);
 
                 state = state->parent_;
             }
         }
     }
 
-    void EnterState(StateRef state) const
+    void EnterState(StateRef state, Event event) const
     {
         if (on_state_entry_ != nullptr)
         {
@@ -825,37 +825,37 @@ private:
 
         for (const auto& on_en : state.on_entry_)
         {
-            (impl_->*on_en)();
+            (impl_->*on_en)(event);
         }
     }
 
-    void EnterStatesFromDownToRecursive(StatePtr top, StatePtr target)
+    void EnterStatesFromDownToRecursive(StatePtr top, StatePtr target, Event event)
     {
         // Don't enter topmost state
         if ((target != nullptr) && (top != target))
         {
-            EnterStatesFromDownToRecursive(top, target->parent_);
-            EnterState(*target);
+            EnterStatesFromDownToRecursive(top, target->parent_, event);
+            EnterState(*target, event);
         }
     }
 
-    void EnterStatesFromDownTo(StatePtr top, StatePtr target)
+    void EnterStatesFromDownTo(StatePtr top, StatePtr target, Event event)
     {
         // Enter all states up to parent
         if (top != target)
         {
-            EnterStatesFromDownToRecursive(top, target->parent_);
+            EnterStatesFromDownToRecursive(top, target->parent_, event);
         }
 
         // Alywas enter target state (we may have exited it, possibly a self transition)
-        EnterState(*target);
+        EnterState(*target, event);
 
         // Is target a hierarchical state? If so, enter initial state
         const auto* state = GetInitialState(target);
         while (state != nullptr)
         {
             target = state;
-            EnterState(*state);
+            EnterState(*state, event);
             state = GetInitialState(target);
         }
 

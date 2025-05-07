@@ -129,36 +129,36 @@ private:
         assert(on_recall_event_called_ == false);
     }
 
-    void FsmOffEntry()
+    void FsmOffEntry(Fsm::Event /*event*/)
     {
         off_entry_called_ = true;
         std::cout << "Off entry\n";
     }
-    void FsmOffEntry2()
+    void FsmOffEntry2(Fsm::Event /*event*/)
     {
         off_entry2_called_ = true;
         std::cout << "Off entry2\n";
     }
 
-    void FsmOffExit()
+    void FsmOffExit(Fsm::Event /*event*/)
     {
         off_exit_called_ = true;
         fsm_.RecallEvents();
         std::cout << "Off exit\n";
     }
-    void FsmOffExit2()
+    void FsmOffExit2(Fsm::Event /*event*/)
     {
         off_exit2_called_ = true;
         std::cout << "Off exit2\n";
     }
 
-    void FsmOnEntry()
+    void FsmOnEntry(Fsm::Event /*event*/)
     {
         on_entry_called_ = true;
         std::cout << "On entry\n";
     }
 
-    void FsmOnExit()
+    void FsmOnExit(Fsm::Event /*event*/)
     {
         on_exit_called_ = true;
         std::cout << "On exit\n";
