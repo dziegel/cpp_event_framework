@@ -416,17 +416,13 @@ Example:
 
         Fsm::Transition (*)(Fsm::ImplPtr impl, Fsm::Event event)
 
-- Entry/Exit actions. Actions are member functions of an interface/class.
-
-        void (Fsm::ImplPtr)()
-
-- Transition actions. Actions are member functions of an interface/class.
+- Transition actions, Entry/Exit actions. Actions are member functions of an interface/class.
 
         void (Fsm::ImplPtr)(Fsm::Event event)
 
 ### Execution order
 
-The order of execution of guards/actions/entry/exit are as follows:
+The order of execution of transitions are as follows:
 
 - Evaluation of all necessary guards to select a transition
 - Exit actions from source state up to least common ancestor parent state
